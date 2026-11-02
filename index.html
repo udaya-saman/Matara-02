@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pizza Hut Daily Report</title>
+<meta name="theme-color" content="#E31837">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PH Report">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+  :root {
+    --accent: #E31837; /* Official Pizza Hut Red */
+    --accent-hover: #C8102E;
+    --bg: #F4F5F7;
+    --surface: #FFFFFF;
+    --card: #FFFFFF;
+    --border: #E5E7EB;
+    --border-soft: #F3F4F6;
+    --text: #111827;
+    --text2: #374151;
+    --muted: #6B7280;
+    --input-bg: #FFFFFF;
+    --modal-bg: #FFFFFF;
+    --overlay-bg: rgba(17, 24, 39, 0.4);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.1);
+    --ring: rgba(227, 24, 55, 0.15);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+    padding-bottom: 60px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Header */
+  .header {
+    background: var(--accent);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(227, 24, 55, 0.25);
+  }
+  .logo {
+    width: 46px;
+    height: 46px;
+    background: #FFFFFF;
+    color: var(--accent);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.2px;
+  }
+  .sub-title {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  /* Layout & Cards */
+  .main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 16px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0,0,0,0.02);
+  }
+  .sec-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Grids */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media(max-width:400px){ .grid-3 { grid-template-columns: 1fr 1fr; } }
+
+  /* Section Labels */
+  .cat-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin: 28px 0 14px;
+    padding: 6px 12px;
+    background: #FEF2F2;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  .cat-label:first-of-type { margin-top: 0; }
+
+  /* Inputs */
+  .input-group { display: flex; flex-direction: column; gap: 6px; }
+  .input-group label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  input[type=text], input[type=password] {
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 500;
+    width: 100%;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input[type=text]:focus, input[type=password]:focus {
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 4px var(--ring);
+  }
+  input::placeholder { color: #9CA3AF; }
+  input.upper { text-transform: uppercase; }
+  
+  /* ASR Field */
+  .asr-field {
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+  .asr-field:active { border-color: var(--accent); background: #FEF2F2; }
+  .asr-val { font-size: 15px; font-weight: 700; color: var(--text); }
+  .asr-arrow { color: var(--muted); font-size: 12px; }
+
+  /* Calculated Boxes */
+  hr { border: 0; border-top: 1.5px solid var(--border-soft); margin: 24px 0; }
+  .calc-box {
+    background: #FFFFFF;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 12px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .calc-box:active { 
+    border-color: var(--accent); 
+    transform: scale(0.98); 
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+  .calc-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); pointer-events: none; letter-spacing: 0.3px; }
+  .calc-val { font-size: 17px; font-weight: 700; pointer-events: none; }
+  .calc-center { grid-column: 2; }
+
+  /* Buttons */
+  .btn-small {
+    background: #F3F4F6;
+    color: var(--text2);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .btn-small:active { background: #E5E7EB; transform: scale(0.95); }
+  .btn-restore { background: #FFF7ED !important; color: #C2410C !important; }
+  .btn-restore:active { background: #FFEDD5 !important; }
+
+  .btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #20BD5A);
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 22px 16px;
+    font-weight: 700;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-family: inherit;
+    width: 100%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.25);
+  }
+  .btn-whatsapp:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+  }
+
+  .btn-upload {
+    background: #F9FAFB;
+    border: 2px dashed #D1D5DB;
+    color: #4B5563;
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  .btn-upload:active {
+    background: #FEF2F2;
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(0.98);
+  }
+  .upload-status {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  /* Modals & Overlays */
+  .confirm-overlay, .asr-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .confirm-overlay.open, .asr-overlay.open {
+    display: flex;
+    opacity: 1;
+  }
+  .confirm-sheet {
+    background: var(--modal-bg);
+    border-radius: 24px;
+    padding: 32px 24px 24px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.95);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .confirm-overlay.open .confirm-sheet { transform: scale(1); }
+  
+  .confirm-icon { font-size: 42px; text-align: center; margin-bottom: 12px; }
+  .confirm-title { font-size: 18px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 8px; }
+  .confirm-msg { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 24px; text-align: center; white-space: pre-line; }
+  
+  .confirm-btns { display: flex; gap: 12px; }
+  .confirm-ok {
+    flex: 1;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.1s ease;
+  }
+  .confirm-ok:active { transform: scale(0.95); }
+  .confirm-cancel {
+    flex: 1;
+    background: #F3F4F6;
+    color: var(--text2);
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.1s ease;
+  }
+  .confirm-cancel:active { transform: scale(0.95); background: #E5E7EB; }
+
+  /* Bottom Sheet ASR */
+  .asr-overlay { align-items: flex-end; padding: 0; z-index: 1000; }
+  .asr-sheet {
+    background: var(--modal-bg);
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 40px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
+  }
+  .asr-overlay.open .asr-sheet { transform: translateY(0); }
+  .asr-sheet-title {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .asr-options { display: flex; flex-direction: column; gap: 10px; }
+  .asr-opt {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s ease;
+  }
+  .asr-opt:active { transform: scale(0.98); }
+  .asr-opt.selected {
+    border-color: var(--accent);
+    background: #FEF2F2;
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+  .asr-opt.selected .asr-opt-badge { color: var(--accent); }
+  .asr-opt-badge { font-size: 20px; font-weight: 700; color: var(--text); min-width: 40px; }
+  .asr-opt-desc { font-size: 14px; font-weight: 500; color: var(--text2); }
+  .asr-cancel {
+    margin-top: 20px;
+    width: 100%;
+    padding: 16px;
+    background: #F3F4F6;
+    border: none;
+    border-radius: 14px;
+    color: var(--text2);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* Today / MTD / YTD grouping */
+  .grp-band { grid-column: 1 / -1; font-size: 12px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; padding: 9px 14px; border-radius: 10px; margin-top: 8px; }
+  .grp-band:first-child { margin-top: 0; }
+  .grp-band.today { background: #EFF6FF; color: #1D4ED8; border-left: 5px solid #2563EB; }
+  .grp-band.mtd   { background: #FFFBEB; color: #B45309; border-left: 5px solid #F59E0B; }
+  .grp-band.ytd   { background: #F5F3FF; color: #6D28D9; border-left: 5px solid #8B5CF6; }
+  .input-group.g-today input[type=text] { border-left: 4px solid #3B82F6; }
+  .input-group.g-mtd input[type=text]   { border-left: 4px solid #F59E0B; }
+  .input-group.g-ytd input[type=text]   { border-left: 4px solid #8B5CF6; }
+  .sum-note { grid-column: 1 / -1; font-size: 12px; font-weight: 700; }
+  .sum-note:empty { display: none; }
+  .wa-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .wa-row .btn-whatsapp { font-size: 18px; padding: 22px 8px; gap: 8px; }
+  .btn-whatsapp.m2 { background: linear-gradient(135deg, #128C7E, #0E7A6E); box-shadow: 0 8px 24px rgba(18, 140, 126, 0.25); }
+
+  /* Pop up messages */
+  .toast {
+    position: fixed !important;
+    top: 50% !important;
+    bottom: auto !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    border-radius: 18px !important;
+    padding: 28px 56px !important;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25) !important;
+    animation: toastPopCenter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    width: max-content !important;
+    max-width: 90% !important;
+    border: none !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    z-index: 99999 !important;
+    display: none;
+  }
+  @keyframes toastPopCenter {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* PWA Banner Modernized */
+  .pwa-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: center;
+    gap: 14px;
+  }
+  .pwa-banner.show { display: flex; }
+  .pwa-banner-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .pwa-banner-text { flex: 1; font-size: 12px; color: var(--text2); line-height: 1.4; }
+  .pwa-install-btn {
+    background: #008d3c;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .pwa-dismiss { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; padding: 4px; }
+
+  footer {
+    text-align: center;
+    padding: 12px 30px 24px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* Calendar Overlay Styles */
+  .calendar-overlay {
+    position: fixed; inset: 0; background: var(--overlay-bg);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    z-index: 1200; display: none; align-items: center; justify-content: center; padding: 20px;
+    opacity: 0; transition: opacity 0.2s ease;
+  }
+  .calendar-overlay.open { display: flex; opacity: 1; }
+  .calendar-sheet {
+    background: var(--modal-bg); border-radius: 24px; padding: 24px;
+    width: 100%; max-width: 360px; box-shadow: var(--shadow-lg);
+    transform: scale(0.95); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .calendar-overlay.open .calendar-sheet { transform: scale(1); }
+  .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .calendar-header button {
+    background: #F3F4F6; border: none; border-radius: 12px; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text);
+    transition: all 0.2s ease;
+  }
+  .calendar-header button:active { transform: scale(0.9); background: #E5E7EB; }
+  #calendarMonthYear { font-weight: 700; font-size: 16px; color: var(--text); letter-spacing: -0.2px; }
+  .calendar-days-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .calendar-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; color: var(--text); background: var(--surface);
+    border-radius: 12px; cursor: pointer; transition: all 0.2s ease; border: 1.5px solid transparent;
+  }
+  .calendar-day:active { transform: scale(0.92); }
+  .calendar-day.empty { visibility: hidden; }
+  .calendar-day:not(.empty):not(.selected):hover { background: var(--border-soft); }
+  .calendar-day.selected { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(227, 24, 55, 0.25); }
+  .calendar-day.today { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .calendar-day.today.selected { border-color: transparent; color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ══ CHROME OPEN GUIDE MODAL ══ -->
+<div id="chromeGuideOverlay" style="display:none;position:fixed;inset:0;background:rgba(17,24,39,0.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:24px;padding:32px 24px 24px;width:100%;max-width:360px;box-shadow:0 16px 40px rgba(0,0,0,0.15);text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">🌐</div>
+    <div style="font-size:18px;font-weight:700;color:#111827;margin-bottom:8px;">Chrome හි Open කරන්න</div>
+    <div style="font-size:14px;color:#4B5563;line-height:1.6;margin-bottom:24px;">
+      මෙම app Chrome Browser හි open කළ යුතුය.<br>
+      <span style="color:#E31837;font-weight:700;">File Manager → මෙම file → "Open with" → Chrome</span><br><br>
+      Chrome හි open කළ පසු:<br>
+      Menu (⋮) → <strong style="color:#111827;">Add to Home Screen</strong><br>
+      ඉන් පසු app icon ලෙස open කළ හැකිය.
+    </div>
+    <button onclick="document.getElementById('chromeGuideOverlay').style.display='none'" style="width:100%;padding:16px;background:#E31837;border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">OK, තේරුණා</button>
+  </div>
+</div>
+
+<div class="header">
+  <div class="logo">🍕</div>
+  <div style="flex:1">
+    <div class="title">Pizza Hut Daily Report</div>
+    <div class="sub-title">Matara 02</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ASR PICKER OVERLAY -->
+<div class="asr-overlay" id="asrOverlay" onclick="closeASR(event)">
+  <div class="asr-sheet">
+    <div class="asr-sheet-title" id="asrSheetTitle">Select Rating</div>
+    <div class="asr-options">
+      <div class="asr-opt" onclick="selectASR('AS')" id="asrOpt-AS">
+        <span class="asr-opt-badge">AS</span>
+        <span class="asr-opt-desc">At Standard</span>
+      </div>
+      <div class="asr-opt" onclick="selectASR('M')" id="asrOpt-M">
+        <span class="asr-opt-badge">M</span>
+        <span class="asr-opt-desc">Marginal</span>
+      </div>
+      <div class="asr-opt" onclick="selectASR('UP')" id="asrOpt-UP">
+        <span class="asr-opt-badge">UP</span>
+        <span class="asr-opt-desc">Underperforming</span>
+      </div>
+    </div>
+    <button class="asr-cancel" onclick="closeASR()">Cancel</button>
+  </div>
+</div>
+
+<!-- CUSTOM CONFIRM MODAL -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-sheet">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle"></div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-btns" id="confirmBtns">
+      <button class="confirm-cancel" id="confirmCancelBtn">Cancel</button>
+      <button class="confirm-ok" id="confirmOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR MODAL -->
+<div class="calendar-overlay" id="calendarOverlay" onclick="closeCalendar(event)">
+  <div class="calendar-sheet">
+    <div class="calendar-header">
+      <button onclick="prevMonth()">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div id="calendarMonthYear"></div>
+      <button onclick="nextMonth()">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="calendar-days-header">
+      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+    <div style="margin-top:20px; display:flex;">
+      <button class="confirm-cancel" onclick="closeCalendar()" style="width:100%;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- PWA INSTALL BANNER -->
+  <div class="pwa-banner" id="pwaBanner">
+    <div style="flex:1">
+      <div class="pwa-banner-title">📱 Install කරන්න</div>
+    </div>
+    <button class="pwa-install-btn" onclick="triggerPWAInstall()">Install</button>
+    <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
+  </div>
+
+  <!-- FIELDS CARD -->
+  <div class="card">
+    <div class="sec-title">
+      📋 Report Data
+      <div style="display:flex;gap:8px;">
+        <button class="btn-small btn-restore" onclick="restoreData()" id="restoreBtn" style="display:none;">↩️ Restore</button>
+        <button class="btn-small" onclick="resetData()">🔄 Reset</button>
+      </div>
+    </div>
+
+    <div class="cat-label">📊 Gamma MIS &amp; DESTINITY</div>
+    <!-- Date field: full-width, standalone -->
+    <div class="input-group" style="margin-bottom:12px;">
+      <label>Date</label>
+      <input type="text" id="date" readonly 
+        onclick="openCalendar()" 
+        placeholder="-" 
+        style="font-size:15px; cursor:pointer;">
+    </div>
+    <div class="grid-2" id="cat-gamma"></div>
+
+    <div class="cat-label">🐉 DragonTail</div>
+    <div class="grid-2" id="cat-dragon"></div>
+
+    <div class="cat-label">⭐ GES</div>
+    <div class="grid-2" id="cat-ges"></div>
+
+    <div class="cat-label">🌟 5 STAR</div>
+    <div class="grid-2" id="cat-5star"></div>
+
+    <div class="cat-label">🤖 HutBot</div>
+    <div class="grid-2" id="cat-hutbot"></div>
+
+    <hr>
+    <div class="sec-title" style="margin-bottom:16px;">🔢 Auto-Calculated <span style="font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.5px;">(Tap to Edit)</span></div>
+    <div class="grid-3" id="calcContainer"></div>
+  </div>
+
+  <!-- HIDDEN TEXTAREA (JS compat) -->
+  <textarea id="msgOutput" style="display:none;"></textarea>
+  <textarea id="msgOutput2" style="display:none;"></textarea>
+
+  <!-- SEND & UPLOAD CARD -->
+  <div class="card" style="display:flex;flex-direction:column;gap:24px;">
+    
+    <!-- WhatsApp Button Styled Elegantly -->
+    <div class="wa-row">
+      <button class="btn-whatsapp" onclick="sendWA(1)">💬 Message 1</button>
+      <button class="btn-whatsapp m2" onclick="sendWA(2)">💬 Message 2</button>
+    </div>
+    
+    <hr style="margin:0;">
+
+    <!-- CSV Upload Section -->
+    <div class="input-group">
+      <input type="file" id="misCsvFile" accept=".csv" style="display:none" onchange="handleMISUpload(event)">
+      <button class="btn-upload" onclick="document.getElementById('misCsvFile').click()">
+        <span style="font-size:22px;">📁</span> Select MIS File
+      </button>
+      <div id="misUploadStatus" class="upload-status">No report loaded</div>
+    </div>
+    
+  </div>
+
+</div><!-- /main -->
+
+<footer>
+  <p>If you notice any issues or mistakes, please contact me on WhatsApp at <br><a href="https://wa.me/94719698799" style="color:var(--accent);font-weight:700;text-decoration:none;font-size:14px;display:inline-block;margin-top:4px;">071 9698799</a></p>
+</footer>
+
+<script>
+// FORCE SERVICE WORKER UPDATE IMMEDIATELY
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for(let registration of registrations) {
+      registration.update();
+    }
+  });
+}
+
+const CATS = [
+  { id:'cat-gamma',  fields:[
+    {id:'monthlyTarget',   label:'Monthly Target',        type:'nodec'},
+    {id:'mtdTarget',       label:'MTD Target',            type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'mtdSale',         label:'MTD Sale',              type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'mtdTx',           label:'MTD Transactions',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'dayTarget',       label:'Day Target',            type:'nodec', grp:'today', today:true},
+    {id:'todaySale',       label:'Today Sale',            type:'nodec', grp:'today', today:true},
+  ]},
+  { id:'cat-dragon', fields:[
+    {band:'today', label:'📅 TODAY'},
+    {id:'under30',         label:'Under 30',              type:'pct',   grp:'today', today:true},
+    {id:'hotFresh',        label:'Hot & Fresh',           type:'pct',   grp:'today', today:true},
+    {id:'outOfDoor',       label:'Out of Door U12',       type:'pct',   grp:'today', today:true},
+    {id:'productionU3',    label:'Production U3',         type:'pct',   grp:'today', today:true},
+    {id:'deliveryTx',      label:'Delivery Transactions', type:'nodec', grp:'today', today:true},
+    {id:'dispatchDev',     label:'Dispatch Deviation',    type:'pct',   grp:'today', today:true},
+    {id:'todayRiders',     label:"Today's No of Riders",  type:'nodec', grp:'today', today:true},
+    {id:'todayDriveTime',  label:"Today's Drive Time (min)", type:'time', grp:'today', today:true},
+    {band:'mtd', label:'📆 MTD'},
+    {id:'mtdDel200',       label:'MTD Delivered at Place 200m', type:'pct',  grp:'mtd', keepOnReset:true},
+    {id:'mtdDel500',       label:'MTD Delivered at Place 500m', type:'pct',  grp:'mtd', keepOnReset:true},
+    {id:'mtdU3',           label:'MTD U3',                type:'pct',   grp:'mtd', keepOnReset:true},
+    {id:'mtdU12',          label:'MTD U12',               type:'pct',   grp:'mtd', keepOnReset:true},
+    {id:'mtdU20',          label:'MTD U20',               type:'pct',   grp:'mtd', keepOnReset:true},
+    {id:'mtdU30',          label:'MTD U30',               type:'pct',   grp:'mtd', keepOnReset:true},
+  ]},
+  { id:'cat-ges',    fields:[
+    {band:'today', label:'📅 TODAY'},
+    {id:'todayStar1',      label:'1 Star Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar2',      label:'2 Star Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar3',      label:'3 Star Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar4',      label:'4 Star Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar5',      label:'5 Star Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayGes',        label:"Today's GES Count",     type:'nodec', readonly:true, grp:'today'},
+    {band:'mtd', label:'📆 MTD'},
+    {id:'star1',           label:'1 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star2',           label:'2 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star3',           label:'3 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star4',           label:'4 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star5',           label:'5 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'smartGes',        label:'Smart GES',             type:'nodec', readonly:true, grp:'mtd'},
+    {id:'totalResponses',  label:'Total Responses',       type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'mtdWinScore',     label:'MTD Win Score',         type:'num',   keepOnReset:true, grp:'mtd'},
+  ]},
+  { id:'cat-5star', fields:[
+    {id:'overallRating',   label:'5★ Overall Rating',     type:'num'},
+    {id:'deliveredU30',    label:'Delivered U30',         type:'num'},
+    {id:'annualTMTurnover',label:'Annual TM Turnover',          type:'num'},
+    {id:'winScore',        label:'Win-Score',                   type:'num'},
+    {id:'hutbotOnTime',    label:'Hutbot On Time Star Rating',  type:'num'},
+    {id:'brandRating',     label:'Brand Star Rating',           type:'num'},
+    {id:'fsccRating',      label:'FSCC Star Rating',            type:'num'},
+  ]},
+  { id:'cat-hutbot', fields:[
+    {band:'today', label:'📅 TODAY'},
+    {id:'hutTodayOnTime',  label:"Today's On Time",       type:'pct', grp:'today', today:true},
+    {id:'hutTodayLate',    label:"Today's Late",          type:'pct', grp:'today', today:true},
+    {id:'hutTodayMissed',  label:"Today's Missed",        type:'pct', grp:'today', today:true},
+    {note:'hutTodayNote'},
+    {band:'mtd', label:'📆 MTD'},
+    {id:'hutMtdOnTime',    label:'MTD On Time',           type:'pct', grp:'mtd', keepOnReset:true},
+    {id:'hutMtdLate',      label:'MTD Late',              type:'pct', grp:'mtd', keepOnReset:true},
+    {id:'hutMtdMissed',    label:'MTD Missed',            type:'pct', grp:'mtd', keepOnReset:true},
+    {note:'hutMtdNote'},
+    {band:'ytd', label:'🗓️ YTD'},
+    {id:'hutYtdOnTime',    label:'YTD On Time',           type:'pct', grp:'ytd', yearly:true},
+  ]},
+];
+const FIELDS = CATS.flatMap(c => c.fields).filter(f => f.id);
+
+// Default values (restored on Reset / when empty)
+const DEFAULTS = { hutTodayOnTime:'100', hutTodayLate:'0', hutTodayMissed:'0', dispatchDev:'0' };
+// Old saved ids -> new ids (one-time migration of data saved by the previous version)
+const LEGACY_MAP = { mtdU20:['mtdHF'], hutTodayOnTime:['hutbotToday'], hutMtdOnTime:['hutbotMTD'] };
+// Calculation names used by earlier app versions are translated without losing manual overrides.
+const LEGACY_CALC_MAP = { 'MTD B2B':['B2B'], 'MTD Top Box':['Top Box'] };
+const DAILY_CALC_KEYS = ['Day Variance', 'Today B2B', 'Today Top Box'];
+const MONTHLY_CALC_KEYS = ['MTD Variance', 'ADS', 'ADT', 'MTD B2B', 'MTD Top Box', 'Overall Satisfaction'];
+// Set to false to stop Today's fields from clearing automatically on a new operational day
+const AUTO_CLEAR_TODAY = true;
+
+const LS_KEY        = 'ph_daily_report_v2';
+const LS_TARGET_KEY = 'ph_monthly_target';
+const LS_BACKUP_KEY = 'ph_daily_report_backup';
+const LS_MONTH_KEY  = 'ph_saved_month';
+const LS_YEAR_KEY   = 'ph_saved_year';
+const LS_DAY_KEY    = 'ph_saved_day';
+const now           = new Date();
+
+// The operational day runs from 6:00 AM until 5:59 AM the following day.
+function getOperationalDate(referenceDate = new Date()) {
+  const d = new Date(referenceDate.getTime());
+  if (d.getHours() < 6) d.setDate(d.getDate() - 1);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+function formatOperationalDate(date) {
+  return `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
+}
+const operationalToday = getOperationalDate(now);
+// Month rollover must follow the operational date too (not the calendar date before 6 AM).
+const currentMonth  = `${operationalToday.getFullYear()}-${operationalToday.getMonth()+1}`;
+const currentYear   = String(operationalToday.getFullYear());
+
+function saveToStorage() {
+  const data = {};
+  FIELDS.forEach(f => {
+    const el = document.getElementById(f.id);
+    if (el) data[f.id] = el.value;
+  });
+  const dateEl = document.getElementById('date');
+  if (dateEl) data['date'] = dateEl.value;
+  data._customCalcs = customCalcs;
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    localStorage.setItem(LS_MONTH_KEY, currentMonth);
+    localStorage.setItem(LS_YEAR_KEY, currentYear);
+    localStorage.setItem(LS_DAY_KEY, todayStr);
+  } catch(e){}
+  const mt = document.getElementById('monthlyTarget');
+  if (mt && mt.value && mt.value !== '') {
+    try { localStorage.setItem(LS_TARGET_KEY, mt.value); } catch(e){}
+  }
+}
+
+function saveBackupToStorage(data) {
+  try { localStorage.setItem(LS_BACKUP_KEY, JSON.stringify(data)); } catch(e){}
+}
+
+function clearTodayFields() {
+  const bak = {};
+  let had = false;
+  FIELDS.forEach(f => {
+    if (!f.today || f.readonly) return;
+    const el = document.getElementById(f.id);
+    if (!el) return;
+    bak[f.id] = el.value;
+    const def = DEFAULTS[f.id] !== undefined ? DEFAULTS[f.id] + '%' : '';
+    if (el.value !== '' && el.value !== def) had = true;
+    el.value = '';
+  });
+  if (had) {
+    backupData = bak;
+    saveBackupToStorage(bak);
+    const rb = document.getElementById('restoreBtn');
+    if (rb) rb.style.display = 'inline-block';
+    toast('🌅 අලුත් දිනයක්: Today data clear කරන ලදී.<br><span style="font-size:13px;font-weight:600;">Undo කිරීමට ↩️ Restore ඔබන්න.</span>', 'info', 3500);
+  }
+}
+
+function loadFromStorage() {
+  try {
+    const savedMonth = localStorage.getItem(LS_MONTH_KEY);
+    const calendarMonth = `${now.getFullYear()}-${now.getMonth()+1}`;
+    const legacyMonthBoundary = now.getHours() < 6 && now.getDate() === 1 && savedMonth === calendarMonth;
+    const isNewMonth = savedMonth !== null && savedMonth !== currentMonth && !legacyMonthBoundary;
+    const savedYear = localStorage.getItem(LS_YEAR_KEY);
+    const isNewYear = savedYear !== null && savedYear !== currentYear;
+    const lastDay = localStorage.getItem(LS_DAY_KEY);
+    const isNewDay = lastDay !== null && lastDay !== todayStr;
+    const raw = localStorage.getItem(LS_KEY);
+
+    if (raw) {
+      const data = JSON.parse(raw);
+      FIELDS.forEach(f => {
+        if (f.readonly) return;
+        if (isNewMonth && f.keepOnReset) return;
+        if (isNewYear && f.yearly) return;
+        const el = document.getElementById(f.id);
+        let val = data[f.id];
+        // New field IDs can read values saved by the earlier release.
+        if (val === undefined && LEGACY_MAP[f.id]) {
+          for (const legacyId of LEGACY_MAP[f.id]) {
+            if (data[legacyId] !== undefined) { val = data[legacyId]; break; }
+          }
+        }
+        if (el && val !== undefined) {
+          if (f.type === 'pct' && val !== null && String(val).trim() !== '') {
+            const savedPct = String(val).trim();
+            el.value = savedPct.endsWith('%') ? savedPct : savedPct + '%';
+          } else {
+            el.value = val;
+          }
+          if (f.type === 'asr') {
+            const disp = document.getElementById(f.id + '-display');
+            if (disp) disp.innerText = val || 'AS';
+          }
+        }
+      });
+
+      // Migrate manually edited calculation names from the previous version.
+      if (data._customCalcs && typeof data._customCalcs === 'object') {
+        customCalcs = { ...data._customCalcs };
+        Object.entries(LEGACY_CALC_MAP).forEach(([newKey, oldKeys]) => {
+          if (customCalcs[newKey] === undefined) {
+            const oldKey = oldKeys.find(key => customCalcs[key] !== undefined);
+            if (oldKey) customCalcs[newKey] = customCalcs[oldKey];
+          }
+          oldKeys.forEach(key => { delete customCalcs[key]; });
+        });
+      }
+
+      // The saved report date is intentionally not restored here. Startup always
+      // uses today's operational date, even if a different date was selected before closing.
+    }
+
+    const savedTarget = localStorage.getItem(LS_TARGET_KEY);
+    if (savedTarget) {
+      const mt = document.getElementById('monthlyTarget');
+      if (mt) mt.value = savedTarget;
+    }
+    const bak = localStorage.getItem(LS_BACKUP_KEY);
+    if (bak) {
+      try {
+        backupData = JSON.parse(bak);
+        const restoreButton = document.getElementById('restoreBtn');
+        if (restoreButton) restoreButton.style.display = 'inline-block';
+      } catch(e) {}
+    }
+
+    // Discard manual overrides that belong to a completed reporting period.
+    if (isNewDay) DAILY_CALC_KEYS.forEach(key => { delete customCalcs[key]; });
+    if (isNewMonth) MONTHLY_CALC_KEYS.forEach(key => { delete customCalcs[key]; });
+    if (isNewYear) {
+      // YTD is a new reporting period. There are currently no YTD calculation overrides.
+      try { localStorage.setItem(LS_YEAR_KEY, currentYear); } catch(e) {}
+    }
+
+    // New operational day: today's inputs start fresh. Keep a backup so Restore can undo it.
+    if (AUTO_CLEAR_TODAY && isNewDay) clearTodayFields();
+
+    // Persist cleared daily/monthly fields and updated period markers immediately.
+    // This prevents yesterday's or last month's values from returning after a restart.
+    saveToStorage();
+  } catch(e) {
+    console.error('Unable to load saved report data:', e);
+  }
+}
+function autoSave() { saveToStorage(); }
+
+let backupData   = {};
+let customCalcs  = {};
+let toastTimer   = null;
+
+function buildInput(f) {
+  if (f.band) return '<div class="grp-band '+f.band+'">'+f.label+'</div>';
+  if (f.note) return '<div class="sum-note" id="'+f.note+'"></div>';
+  const gcls = f.grp ? ' g-'+f.grp : '';
+  if (f.type === 'asr') {
+    return '<div class="input-group'+gcls+'">\n    <label>'+f.label+'</label>\n    <div class="asr-field" id="'+f.id+'-wrap" onclick="openASR(\''+f.id+'\')">\n      <span id="'+f.id+'-display" class="asr-val">AS</span>\n      <input type="hidden" id="'+f.id+'" value="AS">\n      <span class="asr-arrow">&#9662;</span>\n    </div>\n  </div>';
+  }
+  const isNum     = f.type==='num'||f.type==='nodec'||f.type==='time';
+  const inputMode = isNum ? 'inputmode="decimal" pattern="[0-9,.]*"' :
+                    f.type==='pct' ? 'inputmode="decimal"' : '';
+  let cls = '';
+  if (f.type==='num' || f.type==='time') cls = 'num';
+  if (f.type==='nodec') cls = 'num nodec';
+  const extra = f.type==='pct' ? ' onblur="onPctBlur(this)" onfocus="onPctFocus(this)"' : '';
+  const isLast = f.id === 'hutYtdOnTime';
+  const enterHint = isLast ? ' enterkeyhint="done"' : ' enterkeyhint="next"';
+  const kd = isLast
+    ? ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();scrollToBottom();}"'
+    : ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();focusNext(this);}"';
+  const focusSel = ' onfocus="try{this.select();}catch(e){}"';
+  const gesIds = ['star1','star2','star3','star4','star5','todayStar1','todayStar2','todayStar3','todayStar4','todayStar5'];
+  const ratingIds = ['overallRating','annualTMTurnover','winScore','hutbotOnTime','brandRating','fsccRating','deliveredU30'];
+  const blurExtra = gesIds.includes(f.id)    ? ' onblur="onGesBlur(this)"'
+                  : ratingIds.includes(f.id) ? ' onblur="onRatingBlur(this)"'
+                  : f.type === 'time'        ? ' onblur="onTimeBlur(this)"'
+                  : f.id === 'smartGes'      ? ' onblur="onSmartGesBlur(this)"'
+                  : '';
+  if (f.readonly) {
+    return '<div class="input-group'+gcls+'">\n    <label>'+f.label+' <span style="font-size:9px;color:#10B981;font-weight:700;margin-left:4px;">AUTO</span></label>\n    <input type="text" id="'+f.id+'" class="num nodec" readonly style="background:#F0FDF4;cursor:default;color:#059669;font-weight:700;" placeholder="-">\n  </div>';
+  }
+  return '<div class="input-group'+gcls+'">\n    <label>'+f.label+'</label>\n    <input type="text" id="'+f.id+'"'+(cls?' class="'+cls+'"':'')+' '+inputMode+enterHint+kd+focusSel+' placeholder="-" oninput="onFieldInput(this)"'+extra+blurExtra+'>\n  </div>';
+}
+CATS.forEach(cat => {
+  const el = document.getElementById(cat.id);
+  if (el) el.innerHTML = cat.fields.map(buildInput).join('');
+});
+
+const todayStr = formatOperationalDate(operationalToday);
+document.getElementById('date').value = todayStr;
+
+function toast(msg, type='info', duration=1800) {
+  clearTimeout(toastTimer);
+  const el = document.getElementById('toast');
+  const styles = {
+    error:   {bg:'#FEF2F2',color:'#DC2626'},
+    success: {bg:'#F0FDF4',color:'#059669'},
+    warning: {bg:'#FFFBEB',color:'#D97706'},
+    info:    {bg:'#EFF6FF',color:'#2563EB'},
+  };
+  const s = styles[type] || styles.info;
+  el.style.backgroundColor = s.bg;
+  el.style.color = s.color;
+  el.innerHTML = msg;
+  el.style.display = 'block';
+  if (duration > 0) toastTimer = setTimeout(() => { el.style.display='none'; }, duration);
+}
+
+function resetData() {
+  showModal({
+    icon: '🔄',
+    title: 'Reset Data',
+    msg: 'ඇතුළත් කළ data සියල්ල ඉවත් වේ.\nReset කිරීමට අවශ්‍යද?',
+    okLabel: 'ඔව්, Reset කරන්න',
+    cancelLabel: 'නැත, අවලංගු කරන්න',
+    onOk: () => {
+      backupData = {};
+      FIELDS.forEach(f => {
+        if (f.readonly) return;
+        const el = document.getElementById(f.id);
+        if (el) {
+            backupData[f.id] = el.value;
+            el.value = '';
+            if (f.type === 'asr') {
+                el.value = 'AS';
+                const disp = document.getElementById(f.id + '-display');
+                if (disp) disp.innerText = 'AS';
+            }
+        }
+      });
+      
+      const dateEl = document.getElementById('date');
+      if (dateEl) { backupData['date'] = dateEl.value; dateEl.value = todayStr; }
+      saveBackupToStorage(backupData);
+      
+      try { localStorage.removeItem(LS_TARGET_KEY); } catch(e){}
+      try { localStorage.removeItem('ph_mis_data'); } catch(e){}
+      
+      const statusEl = document.getElementById('misUploadStatus');
+      if (statusEl) {
+        statusEl.innerText = 'No report loaded';
+        statusEl.style.color = 'var(--muted)';
+      }
+
+      document.getElementById('date').value = todayStr;
+      customCalcs  = {};
+      
+      Object.entries(DEFAULTS).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val+'%'; });
+      
+      calcAndRender();
+      saveToStorage();
+      document.getElementById('restoreBtn').style.display = 'inline-block';
+      toast('🔄 Data reset කරන ලදී.','info');
+    }
+  });
+}
+function restoreData() {
+  FIELDS.forEach(f => {
+    if (f.readonly) return;
+    const el = document.getElementById(f.id);
+    if (el && backupData[f.id] !== undefined) el.value = backupData[f.id];
+  });
+  const dateEl = document.getElementById('date');
+  if (dateEl && backupData['date'] !== undefined) dateEl.value = backupData['date'];
+  calcAndRender();
+  saveToStorage();
+  backupData = {};
+  try { localStorage.removeItem(LS_BACKUP_KEY); } catch(e){}
+  document.getElementById('restoreBtn').style.display = 'none';
+  toast('✅ Data restore කරන ලදී.','success');
+}
+
+function gn(id) { return parseFloat((document.getElementById(id)?.value||'').replace(/[,%]/g,''))||0; }
+function fmt(n) {
+  if (n===undefined||n===null||n===''||isNaN(n)) return ':';
+  return Math.round(n).toLocaleString('en-US');
+}
+function fmtSign(n) { return (n>0?'+':'')+fmt(n); }
+function fmtVarianceMsg(n) { return n < 0 ? '('+fmt(Math.abs(n))+')' : (n > 0 ? '+' : '')+fmt(n); }
+function formatNumInput(el) {
+  const noDecimals = el.classList.contains('nodec');
+  const raw = el.value.replace(/[^0-9.]/g,'');
+  if (raw === '') { el.value = ''; return; }
+  if (noDecimals) {
+    const intPart = raw.replace(/\./g,'');
+    el.value = parseInt(intPart||'0',10).toLocaleString('en-US');
+  } else {
+    const parts = raw.split('.');
+    parts[0] = parseInt(parts[0]||'0',10).toLocaleString('en-US');
+    if (parts.length > 1) {
+      parts[1] = parts[1].slice(0,2);
+      el.value = parts[0] + '.' + parts[1];
+    } else {
+      el.value = parts[0];
+    }
+  }
+}
+function rawNum(id) {
+  return (document.getElementById(id)?.value||'').replace(/,/g,'');
+}
+function onFieldInput(el) {
+  if (el && el.classList.contains('upper')) {
+    const pos = el.selectionStart;
+    el.value = el.value.toUpperCase();
+    try { el.setSelectionRange(pos, pos); } catch(e){}
+  }
+  if (el && el.classList.contains('num')) {
+    const cursor = el.selectionStart;
+    const prevLen = el.value.length;
+    formatNumInput(el);
+    const diff = el.value.length - prevLen;
+    try { el.setSelectionRange(cursor + diff, cursor + diff); } catch(e){}
+  }
+
+  calcAndRender();
+  autoSave();
+}
+function onGesBlur(el) { calcAndRender(); }
+function onRatingBlur(el) {
+  const raw = (el.value||'').replace(/,/g,'').trim();
+  if (raw === '') return;
+  const num = parseFloat(raw);
+  if (isNaN(num) || num < 0 || num > 5) {
+    el.blur();
+    setTimeout(() => {
+      const overlay   = document.getElementById('confirmOverlay');
+      const btnsEl    = document.getElementById('confirmBtns');
+      document.getElementById('confirmIcon').textContent  = '⭐';
+      document.getElementById('confirmTitle').textContent = 'Rating පරාසයෙන් පිටය';
+      document.getElementById('confirmMsg').textContent   = 'ඇතුළත් කළ අගය ' + raw + ' : \nවලංගු පරාසය 0 සිට 5 දක්වා පමණයි.\nනිවැරදි අගය ඇතුළත් කරන්න.';
+      btnsEl.innerHTML = '<button class="confirm-cancel" id="confirmCancelBtn" style="display:none"></button><button class="confirm-ok" id="confirmOkBtn">හරි</button>';
+      overlay.classList.add('open');
+      document.getElementById('confirmOkBtn').onclick = () => {
+        overlay.classList.remove('open');
+        el.value = '';
+        calcAndRender();
+        requestAnimationFrame(() => { el.focus(); try { el.setSelectionRange(9999,9999); } catch(e){} });
+      };
+    }, 80);
+  }
+}
+function onSmartGesBlur(el) {
+  const raw = (el.value||'').replace(/,/g,'').trim();
+  if (raw === '') { calcAndRender(); return; }
+  const num = parseInt(raw, 10);
+  const totalResp = gn('star1')+gn('star2')+gn('star3')+gn('star4')+gn('star5');
+  const showErr = (icon, title, msg) => {
+    el.blur();
+    setTimeout(() => {
+      const overlay = document.getElementById('confirmOverlay');
+      const btnsEl  = document.getElementById('confirmBtns');
+      document.getElementById('confirmIcon').textContent  = icon;
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMsg').textContent   = msg;
+      btnsEl.innerHTML = '<button class="confirm-cancel" id="confirmCancelBtn" style="display:none"></button><button class="confirm-ok" id="confirmOkBtn">හරි</button>';
+      overlay.classList.add('open');
+      document.getElementById('confirmOkBtn').onclick = () => {
+        overlay.classList.remove('open');
+        el.value = '';
+        calcAndRender();
+        requestAnimationFrame(() => { el.focus(); try { el.setSelectionRange(9999,9999); } catch(e){} });
+      };
+    }, 80);
+  };
+  if (isNaN(num) || num < 0) {
+    showErr('⚠️', 'Smart GES අගය වැරදි ඇතුළත් කිරීමකි!', '\nඇතුළත් කළ අගය ' + raw + ' :\nSmart GES සඳහා ඍන අගයක් ඇතුළත් කළ නොහැකිය.');
+    return;
+  }
+  if (totalResp > 0 && num > totalResp) {
+    showErr('⭐', 'Smart GES ඉක්මවා ඇත', 'ඇතුළත් කළ අගය ' + num + ' :\nSmart GES, Total Responses (' + totalResp + ') ගණනට වඩා වැඩි විය නොහැකිය.\nනිවැරදි අගය ඇතුළත් කරන්න.');
+    return;
+  }
+  calcAndRender();
+  autoSave();
+}
+function editCalc(key, cur) {
+  const overlay  = document.getElementById('confirmOverlay');
+  const iconEl   = document.getElementById('confirmIcon');
+  const titleEl  = document.getElementById('confirmTitle');
+  const msgEl    = document.getElementById('confirmMsg');
+  const btnsEl   = document.getElementById('confirmBtns');
+
+  iconEl.textContent  = '✏️';
+  titleEl.textContent = key + ' - නව අගය';
+  msgEl.innerHTML     = '';
+
+  const inp = document.createElement('input');
+  inp.type        = 'text';
+  inp.inputMode   = 'decimal';
+  inp.value       = String(cur).replace(/[,%]/g,'');
+  inp.style.cssText = 'width:100%;padding:14px 16px;font-size:16px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;outline:none;margin-top:8px;box-shadow:var(--shadow-sm);';
+  inp.onfocus = () => { inp.style.borderColor='var(--accent)'; inp.style.boxShadow='0 0 0 4px var(--ring)'; };
+  inp.onblur  = () => { inp.style.borderColor='var(--border)'; inp.style.boxShadow='var(--shadow-sm)'; };
+  msgEl.appendChild(inp);
+
+  btnsEl.innerHTML = '<button class="confirm-cancel" id="confirmCancelBtn">අවලංගු කරන්න</button><button class="confirm-ok" id="confirmOkBtn">Set කරන්න</button>';
+  overlay.classList.add('open');
+  requestAnimationFrame(() => { try { inp.focus(); inp.select(); } catch(e){} });
+
+  function cleanup() { overlay.classList.remove('open'); }
+  document.getElementById('confirmOkBtn').onclick = () => {
+    const v = inp.value.trim();
+    if (v !== '') { customCalcs[key] = isNaN(v) ? v : Number(v); calcAndRender(); }
+    cleanup();
+  };
+  document.getElementById('confirmCancelBtn').onclick = () => { cleanup(); };
+  inp.onkeydown = e => { if (e.key === 'Enter') document.getElementById('confirmOkBtn').click(); };
+}
+function scrollToBottom() {
+  setTimeout(() => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}), 100);
+}
+
+function focusNext(el) {
+  if (el.id === 'mtdSale') {
+    const nextEl = document.getElementById('mtdTx');
+    if (nextEl) { nextEl.focus(); try { nextEl.select(); } catch(e){} return; }
+  }
+  if (el.id === 'mtdTx') {
+    const nextEl = document.getElementById('todaySale');
+    if (nextEl) { nextEl.focus(); try { nextEl.select(); } catch(e){} return; }
+  }
+
+  const inputs = Array.from(document.querySelectorAll('input[type=text]:not([readonly])'));
+  const idx = inputs.indexOf(el);
+  if (idx >= 0 && idx < inputs.length - 1) {
+    inputs[idx + 1].focus();
+    try { inputs[idx+1].select(); } catch(e){}
+  }
+}
+
+function getTomorrowTarget(dateVal) {
+  try {
+    const selected = parseAppDate(dateVal);
+    if (!selected) return '---';
+    const d = new Date(selected.year, selected.month - 1, selected.day);
+    const tmrw = new Date(selected.year, selected.month - 1, selected.day + 1);
+
+    // Preserve the existing rule: do not show next month's target in this field.
+    if (d.getMonth() !== tmrw.getMonth()) return '---';
+
+    const raw = localStorage.getItem('ph_mis_data');
+    if (!raw) return '---';
+    const mis = JSON.parse(raw);
+    if (!mis || !mis.data) return '---';
+
+    const record = Object.entries(mis.data)
+      .map(([key, row]) => normaliseMISRecord(key, row))
+      .find(item => item && item.day === tmrw.getDate() && item.month === tmrw.getMonth() + 1 &&
+        (item.year === null || item.year === tmrw.getFullYear()));
+    return record && record.dayTarget !== null && record.dayTarget !== undefined && Number.isFinite(Number(record.dayTarget))
+      ? fmt(Number(record.dayTarget)) : '---';
+  } catch(e) {
+    return '---';
+  }
+}
+
+function calcAndRender() {
+  const dateVal = document.getElementById('date')?.value || todayStr;
+  const dateParts = dateVal.split(/[.\-\/]/);
+  let dayNum = parseInt(dateParts[dateParts.length - 1], 10);
+  if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) dayNum = operationalToday.getDate();
+
+  const mtdSale   = gn('mtdSale');
+  const mtdTx     = gn('mtdTx');
+  const mtdTarget = gn('mtdTarget');
+  const dayTarget = gn('dayTarget');
+  const todaySale = gn('todaySale');
+  const s1=gn('star1'), s2=gn('star2'), s3=gn('star3'), s4=gn('star4'), s5=gn('star5');
+  const autoTot = s1+s2+s3+s4+s5;
+  const tot = autoTot || 1;
+  // Smart GES is the automatic sum of the five star-response fields.
+  // Total Responses is intentionally left for the user to enter manually.
+  const smartGesEl = document.getElementById('smartGes');
+  if (smartGesEl) smartGesEl.value = autoTot > 0 ? autoTot.toLocaleString('en-US') : '';
+
+  const mtdV  = customCalcs['MTD Variance'] !== undefined ? customCalcs['MTD Variance'] : mtdSale - mtdTarget;
+  const dayV  = customCalcs['Day Variance']  !== undefined ? customCalcs['Day Variance']  : todaySale - dayTarget;
+  const ads   = customCalcs['ADS']           !== undefined ? customCalcs['ADS']           : (dayNum > 0 ? Math.round(mtdSale / dayNum) : 0);
+  const adt   = customCalcs['ADT']           !== undefined ? customCalcs['ADT']           : (dayNum > 0 && mtdTx > 0 ? Math.round(mtdTx / dayNum) : 0);
+  const b2b   = customCalcs['MTD B2B']       !== undefined ? customCalcs['MTD B2B']           : Math.round((s1+s2)/tot*100);
+  const topB  = customCalcs['MTD Top Box']   !== undefined ? customCalcs['MTD Top Box']       : Math.round(s5/tot*100);
+  const osat  = customCalcs['Overall Satisfaction'] !== undefined ? customCalcs['Overall Satisfaction'] : Math.round(((s4+s5) - (s1+s2))/tot*100);
+
+  // ---- Today's GES (same formulas as MTD, using Today's own star counts) ----
+  const ts = ['todayStar1','todayStar2','todayStar3','todayStar4','todayStar5'].map(gn);
+  const todayTot = ts.reduce((x,y)=>x+y, 0);
+  const tTot = todayTot || 1;
+  const todayB2B = customCalcs['Today B2B']     !== undefined ? customCalcs['Today B2B']     : Math.round((ts[0]+ts[1])/tTot*100);
+  const todayTop = customCalcs['Today Top Box'] !== undefined ? customCalcs['Today Top Box'] : Math.round(ts[4]/tTot*100);
+  const todayGesEl = document.getElementById('todayGes');
+  if (todayGesEl) todayGesEl.value = todayTot > 0 ? todayTot.toLocaleString('en-US') : '';
+
+  const calcs = [
+    {key:'MTD Variance', val:mtdV,  disp:fmtSign(mtdV),  color:mtdV>=0?'#059669':'#DC2626'},
+    {key:'Day Variance', val:dayV,  disp:fmtSign(dayV),  color:dayV>=0?'#059669':'#DC2626'},
+    {key:'ADS',          val:ads,   disp:fmt(ads),        color:'#2563EB'},
+    {key:'ADT',          val:adt,   disp:fmt(adt),        color:'#2563EB'},
+    {key:'MTD B2B',      val:b2b,   disp:b2b+'%',         color:b2b<=10?'#059669':'#DC2626'},
+    {key:'MTD Top Box',  val:topB,  disp:topB+'%',        color:topB>=50?'#059669':'#DC2626'},
+    {key:'Today B2B',    val:todayB2B, disp:todayB2B+'%', color:todayB2B<=10?'#059669':'#DC2626'},
+    {key:'Today Top Box',val:todayTop, disp:todayTop+'%', color:todayTop>=50?'#059669':'#DC2626'},
+    {key:'Overall Satisfaction', val:osat, disp:osat+'%', color:osat>=70?'#059669':'#DC2626'},
+  ];
+
+
+  document.getElementById('calcContainer').innerHTML = calcs.map(c=>
+    `<div class="calc-box${c.span2?' calc-center':''}" onclick="editCalc('${c.key}','${c.val}')">
+       <div class="calc-lbl">${c.key}</div>
+       <div class="calc-val" style="color:${c.color}">${c.disp}</div>
+     </div>`
+  ).join('');
+
+  const v = id => document.getElementById(id)?.value || '---';
+  const msg =
+`*🍕 Pizza Hut Matara 02*
+*Daily Report - ${v('date')}*
+━━━━━━━━━━━━━━━━
+
+*Monthly Target : ${fmt(gn('monthlyTarget'))}*
+
+MTD Target : ${fmt(mtdTarget)}
+MTD Sale : ${fmt(mtdSale)}
+MTD Variance : ${fmtVarianceMsg(mtdV)}
+
+Day Target : ${fmt(dayTarget)}
+Today Sale : ${fmt(todaySale)}
+Variance : ${fmtVarianceMsg(dayV)}
+
+ADS : ${fmt(ads)}
+ADT : ${fmt(adt)}
+
+HUTBOT MTD : ${v('hutMtdOnTime')}
+HUTBOT Today : ${v('hutTodayOnTime')}
+
+MTD H&F : ${v('mtdU20')}
+MTD U30 : ${v('mtdU30')}
+
+Under 30 : ${v('under30')}
+Hot & Fresh U20 : ${v('hotFresh')}
+Out of Door time U12 : ${v('outOfDoor')}
+Production time U3 : ${v('productionU3')}
+Delivery Transactions : ${v('deliveryTx')}
+Dispatch Deviation : ${v('dispatchDev')}
+
+MTD GES : ${v('totalResponses')}
+Smart GES : ${autoTot > 0 ? autoTot.toLocaleString('en-US') : '---'}
+Top Box : ${topB}%
+B2B : ${b2b}%
+Overall Satisfaction : ${osat}%
+
+5 Star Overall Rating : ${v('overallRating')}
+Delivered U30 : ${v('deliveredU30')}
+Annual TMTO star rating : ${v('annualTMTurnover')}
+Win-Score star Rating : ${v('winScore')}
+Brand Star Rating : ${v('brandRating')}
+FSCC Star Rating : ${v('fsccRating')}
+Hutbot On time Star Rating : ${v('hutbotOnTime')}
+
+━━━━━━━━━━━━━━━━━
+🎯 *Tomorrow Target :* ${getTomorrowTarget(dateVal)}
+━━━━━━━━━━━━━━━━━
+`;
+
+  document.getElementById('msgOutput').value = msg;
+
+  // ---- Message 2 ----
+  const pc = (has, key, val) => (has || customCalcs[key] !== undefined) ? val + '%' : '---';
+  const minVal = id => {
+    const sRaw = rawNum(id).trim(); const n = parseFloat(sRaw);
+    return (sRaw === '' || isNaN(n)) ? '---' : n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' min';
+  };
+  const hasM = autoTot > 0, hasT = todayTot > 0;
+  const msg2 =
+`*📊 Daily Update - Matara 02*
+*Date :* ${v('date')}
+━━━━━━━━━━━━━━━━
+
+*🏆 Win Score*
+Today's GES Count : ${hasT ? todayTot.toLocaleString('en-US') : '---'}
+Today's Top Box : ${pc(hasT,'Today Top Box',todayTop)}
+Today's B2B : ${pc(hasT,'Today B2B',todayB2B)}
+
+MTD GES Count : ${v('totalResponses')}
+MTD Top Box : ${pc(hasM,'MTD Top Box',topB)}
+MTD Win Score : ${v('mtdWinScore')}
+MTD B2B : ${pc(hasM,'MTD B2B',b2b)}
+MTD OSI : ${pc(hasM,'Overall Satisfaction',osat)}
+
+*🤖 Hut Bot Performance*
+Today's On Time : ${v('hutTodayOnTime')}
+Today's Late : ${v('hutTodayLate')}
+Today's Missed : ${v('hutTodayMissed')}
+
+MTD On Time : ${v('hutMtdOnTime')}
+MTD Late : ${v('hutMtdLate')}
+MTD Missed : ${v('hutMtdMissed')}
+YTD On Time : ${v('hutYtdOnTime')}
+
+*🐉 Dragontail Performance*
+Today's No of Riders : ${v('todayRiders')}
+Today's No of Delivery : ${v('deliveryTx')}
+Today's Drive Time : ${minVal('todayDriveTime')}
+Today's U3 : ${v('productionU3')}
+Today's U12 : ${v('outOfDoor')}
+Today's U30 : ${v('under30')}
+
+MTD Delivered at Place 200m : ${v('mtdDel200')}
+MTD Delivered at Place 500m : ${v('mtdDel500')}
+MTD U3 : ${v('mtdU3')}
+MTD U12 : ${v('mtdU12')}
+MTD U20 : ${v('mtdU20')}
+MTD U30 : ${v('mtdU30')}
+━━━━━━━━━━━━━━━━
+`;
+  document.getElementById('msgOutput2').value = msg2;
+
+  updateSumNote('hutTodayNote', ['hutTodayOnTime','hutTodayLate','hutTodayMissed'], true);
+  updateSumNote('hutMtdNote',   ['hutMtdOnTime','hutMtdLate','hutMtdMissed'], true);
+}
+
+
+function updateSumNote(noteId, ids, requireAll) {
+  const el = document.getElementById(noteId);
+  if (!el) return;
+  const filled = ids.filter(i => (document.getElementById(i)?.value || '').trim() !== '').length;
+  if (filled === 0 || (requireAll && filled < ids.length)) { el.innerHTML = ''; return; }
+  const sum = Math.round(ids.reduce((x, i) => x + gn(i), 0) * 100) / 100;
+  el.innerHTML = Math.abs(sum - 100) > 1
+    ? '<span style="color:#D97706">⚠️ On time + Late + Missed = ' + sum + '% (should be 100%)</span>'
+    : '<span style="color:#059669">✓ Total = ' + sum + '%</span>';
+}
+
+function onTimeBlur(el) {
+  const raw = (el.value || '').replace(/,/g, '').trim();
+  if (raw === '') return;
+  const n = parseFloat(raw);
+  if (!isNaN(n)) el.value = n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  calcAndRender();
+  autoSave();
+}
+
+function sendWA(n) {
+  calcAndRender();
+  const text = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput').value;
+  if (!text.trim()) { toast('⚠️ Send කිරීමට message නොමැත.','warning'); return; }
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+// ==========================================
+// MIS REPORT CSV PARSING AND AUTO-FILL
+// ==========================================
+
+function parseCSVLine(text) {
+  const re = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+  return text.split(re).map(s => s.replace(/^"|"$/g, '').trim());
+}
+
+function parseMISDateHeader(value) {
+  const text = String(value || '').trim().replace(/^"|"$/g, '');
+  if (!text) return null;
+  const monthNames = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  let day, month, year = null, match;
+
+  // Common MIS headings: 1-Oct, 01-Oct-2026, or 1-Oct-26.
+  match = text.match(/^(\d{1,2})\s*[-\/. ]\s*([A-Za-z]{3,9})(?:\s*[-\/. ,]\s*(\d{2,4}))?$/);
+  if (match) {
+    day = Number(match[1]);
+    const monthText = match[2].slice(0,3).toLowerCase();
+    month = monthNames.indexOf(monthText) + 1;
+    if (match[3]) year = normaliseMISYear(match[3]);
+  } else {
+    // Also accept ISO dates (YYYY-MM-DD), month-first headings, and numeric D/M[/Y].
+    match = text.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);
+    if (match) {
+      year = Number(match[1]); month = Number(match[2]); day = Number(match[3]);
+    } else {
+      match = text.match(/^([A-Za-z]{3,9})\s*[-\/. ]\s*(\d{1,2})(?:\s*[-\/. ,]\s*(\d{2,4}))?$/);
+      if (match) {
+        month = monthNames.indexOf(match[1].slice(0,3).toLowerCase()) + 1;
+        day = Number(match[2]);
+        if (match[3]) year = normaliseMISYear(match[3]);
+      } else {
+        match = text.match(/^(\d{1,2})[\/\.](\d{1,2})(?:[\/\.](\d{2,4}))?$/);
+        if (!match) return null;
+        day = Number(match[1]); month = Number(match[2]);
+        if (match[3]) year = normaliseMISYear(match[3]);
+      }
+    }
+  }
+
+  if (!Number.isInteger(day) || day < 1 || day > 31 || !Number.isInteger(month) || month < 1 || month > 12) return null;
+  const validationYear = year || 2000; // leap year permits a valid 29-Feb heading without a year
+  const check = new Date(validationYear, month - 1, day);
+  if (check.getFullYear() !== validationYear || check.getMonth() !== month - 1 || check.getDate() !== day) return null;
+  if (year !== null && (!Number.isInteger(year) || year < 1900 || year > 2200)) return null;
+  return { day, month, year };
+}
+
+function normaliseMISYear(value) {
+  const n = Number(value);
+  if (!Number.isInteger(n)) return null;
+  return String(value).length === 2 ? 2000 + n : n;
+}
+
+function parseAppDate(value) {
+  const match = String(value || '').trim().match(/^(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})$/);
+  if (!match) return null;
+  const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+  return { year, month, day };
+}
+
+function clearMISAutoFilledTargets(clearMonthly = true) {
+  ['mtdTarget', 'dayTarget'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  if (clearMonthly) {
+    const el = document.getElementById('monthlyTarget');
+    if (el) el.value = '';
+  }
+  calcAndRender();
+  autoSave();
+}
+
+function parseMISNumber(value) {
+  const cleaned = String(value == null ? '' : value).replace(/[" ,]/g, '').trim();
+  if (!cleaned || cleaned === '-' || cleaned === '—') return null;
+  const valueNum = Number(cleaned);
+  return Number.isFinite(valueNum) ? valueNum : null;
+}
+
+function handleMISUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const lines = String(e.target.result || '').replace(/^\uFEFF/, '').split(/\r?\n/);
+      let datesRow = null;
+      let dayTargetRow = null;
+      let mtdTargetRow = null;
+      let inTotalSystem = false;
+
+      for (let i = 0; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (!cols[0]) continue;
+        const firstCol = cols[0].toUpperCase().trim();
+
+        if (firstCol === 'TOTAL SYSTEM') {
+          inTotalSystem = true;
+          datesRow = cols;
+        } else if (inTotalSystem && (firstCol === 'DELIVERY' || firstCol === 'TAKE AWAY' || firstCol === 'DINE IN' || firstCol === 'AGGEGATOR')) {
+          break;
+        } else if (inTotalSystem && datesRow && firstCol === 'NET SALES - TARGET' && !dayTargetRow) {
+          dayTargetRow = cols;
+        } else if (inTotalSystem && datesRow && firstCol === 'MTD NET SALES - TARGET' && !mtdTargetRow) {
+          mtdTargetRow = cols;
+        }
+
+        if (datesRow && dayTargetRow && mtdTargetRow) break;
+      }
+
+      if (datesRow && dayTargetRow && mtdTargetRow) {
+        const parsedData = {};
+        for (let i = 1; i < datesRow.length; i++) {
+          const parsedDate = parseMISDateHeader(datesRow[i]);
+          if (!parsedDate) continue;
+          const key = parsedDate.year !== null
+            ? `${parsedDate.year}-${String(parsedDate.month).padStart(2,'0')}-${String(parsedDate.day).padStart(2,'0')}`
+            : `${parsedDate.day}-${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parsedDate.month-1]}`;
+          parsedData[key] = {
+            day: parseMISNumber(dayTargetRow[i]),
+            mtd: parseMISNumber(mtdTargetRow[i]),
+            dateDay: parsedDate.day,
+            dateMonth: parsedDate.month,
+            dateYear: parsedDate.year
+          };
+        }
+
+        if (Object.keys(parsedData).length > 0) {
+          localStorage.setItem('ph_mis_data', JSON.stringify({ filename: file.name, data: parsedData }));
+          toast('✅ MIS Report successfully loaded!', 'success');
+          autoFillFromMIS();
+        } else {
+          try { localStorage.removeItem('ph_mis_data'); } catch(err) {}
+          const statusEl = document.getElementById('misUploadStatus');
+          if (statusEl) { statusEl.innerText = 'No valid dates found'; statusEl.style.color = '#DC2626'; }
+          clearMISAutoFilledTargets(true);
+          toast('⚠️ No valid date headings found in the MIS file.', 'error');
+        }
+      } else {
+        // Do not keep displaying values from a previous file after an unreadable upload.
+        try { localStorage.removeItem('ph_mis_data'); } catch(err) {}
+        const statusEl = document.getElementById('misUploadStatus');
+        if (statusEl) { statusEl.innerText = 'No report loaded'; statusEl.style.color = 'var(--muted)'; }
+        clearMISAutoFilledTargets(true);
+        toast('⚠️ Could not parse the CSV. Make sure it is a Gamma MIS Report.', 'error');
+      }
+    } catch(err) {
+      try { localStorage.removeItem('ph_mis_data'); } catch(storageErr) {}
+      clearMISAutoFilledTargets(true);
+      toast('⚠️ Could not read this MIS file. Please check the CSV and try again.', 'error');
+    }
+  };
+  reader.onerror = function() {
+    try { localStorage.removeItem('ph_mis_data'); } catch(err) {}
+    const statusEl = document.getElementById('misUploadStatus');
+    if (statusEl) { statusEl.innerText = 'No report loaded'; statusEl.style.color = 'var(--muted)'; }
+    clearMISAutoFilledTargets(true);
+    toast('⚠️ Could not read this MIS file. Please try again.', 'error');
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function normaliseMISRecord(key, record) {
+  if (!record || typeof record !== 'object') return null;
+  if (Number.isInteger(record.dateDay) && Number.isInteger(record.dateMonth)) {
+    return { day: record.dateDay, month: record.dateMonth, year: Number.isInteger(record.dateYear) ? record.dateYear : null, dayTarget: record.day, mtdTarget: record.mtd };
+  }
+  // Backward-compatible reader for previously saved MIS files (for example, 1-Oct).
+  const parsed = parseMISDateHeader(key);
+  if (!parsed) return null;
+  return { day: parsed.day, month: parsed.month, year: parsed.year, dayTarget: record.day, mtdTarget: record.mtd };
+}
+
+function autoFillFromMIS() {
+  try {
+    const raw = localStorage.getItem('ph_mis_data');
+    if (!raw) return;
+    const mis = JSON.parse(raw);
+
+    const statusEl = document.getElementById('misUploadStatus');
+    if (statusEl && mis.filename) {
+      statusEl.innerText = 'Loaded: ' + mis.filename;
+      statusEl.style.color = '#059669';
+    }
+
+    const selected = parseAppDate(document.getElementById('date').value);
+    if (!selected || !mis.data || typeof mis.data !== 'object') {
+      clearMISAutoFilledTargets(true);
+      return;
+    }
+
+    const records = Object.entries(mis.data).map(([key, row]) => normaliseMISRecord(key, row)).filter(Boolean);
+    const matchesSelectedYear = record => record.year === null || record.year === selected.year;
+    const monthRecords = records.filter(record => record.month === selected.month && matchesSelectedYear(record));
+    const dateRecord = monthRecords.find(record => record.day === selected.day);
+
+    // Clear first, so mismatched or missing dates can never leave stale targets visible.
+    const mtdEl = document.getElementById('mtdTarget');
+    const dayEl = document.getElementById('dayTarget');
+    const monthlyEl = document.getElementById('monthlyTarget');
+    if (mtdEl) mtdEl.value = '';
+    if (dayEl) dayEl.value = '';
+    if (monthlyEl) monthlyEl.value = '';
+
+    if (dateRecord) {
+      if (mtdEl && dateRecord.mtdTarget !== null && dateRecord.mtdTarget !== undefined && Number.isFinite(Number(dateRecord.mtdTarget))) {
+        mtdEl.value = Number(dateRecord.mtdTarget).toLocaleString('en-US');
+      }
+      if (dayEl && dateRecord.dayTarget !== null && dateRecord.dayTarget !== undefined && Number.isFinite(Number(dateRecord.dayTarget))) {
+        dayEl.value = Number(dateRecord.dayTarget).toLocaleString('en-US');
+      }
+    }
+
+    // Keep the existing month-end rule for Monthly Target, but only use the selected month/year.
+    let monthlyTargetVal = null;
+    for (let d = 31; d >= 28; d--) {
+      const record = monthRecords.find(item => item.day === d && item.mtdTarget !== null && item.mtdTarget !== undefined && Number.isFinite(Number(item.mtdTarget)) && Number(item.mtdTarget) > 0);
+      if (record) { monthlyTargetVal = Number(record.mtdTarget); break; }
+    }
+    if (monthlyEl && monthlyTargetVal !== null) {
+      monthlyEl.value = monthlyTargetVal.toLocaleString('en-US');
+    }
+
+    calcAndRender();
+    autoSave();
+  } catch(e) {
+    // Fail closed if the stored MIS data is invalid.
+    clearMISAutoFilledTargets(true);
+  }
+}
+
+// ==========================================
+// CALENDAR PICKER LOGIC
+// ==========================================
+let calDate = new Date();
+
+function openCalendar() {
+  const val = document.getElementById('date').value;
+  if (val) {
+    const parts = val.split(/[.\-\/]/);
+    if (parts.length === 3) {
+      calDate = new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+  } else {
+    calDate = getOperationalDate();
+  }
+  renderCalendar();
+  document.getElementById('calendarOverlay').classList.add('open');
+}
+
+function closeCalendar(e) {
+  if (e && e.target !== document.getElementById('calendarOverlay') && !e.target.closest('.confirm-cancel')) return;
+  document.getElementById('calendarOverlay').classList.remove('open');
+}
+
+function prevMonth() { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); }
+function nextMonth() { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); }
+
+function renderCalendar() {
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calendarMonthYear').innerText = months[month] + ' ' + year;
+  
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
+  
+  const val = document.getElementById('date').value;
+  let selY = -1, selM = -1, selD = -1;
+  if(val) {
+    const p = val.split(/[.\-\/]/);
+    if(p.length===3) { selY = parseInt(p[0],10); selM = parseInt(p[1],10)-1; selD = parseInt(p[2],10); }
+  }
+  
+  const today = getOperationalDate();
+  
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'calendar-day empty';
+    grid.appendChild(empty);
+  }
+  
+  for (let i = 1; i <= daysInMonth; i++) {
+    const dEl = document.createElement('div');
+    dEl.className = 'calendar-day';
+    dEl.innerText = i;
+    
+    if (year === selY && month === selM && i === selD) dEl.classList.add('selected');
+    if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) dEl.classList.add('today');
+    
+    dEl.onclick = () => { selectDate(year, month, i); };
+    grid.appendChild(dEl);
+  }
+}
+
+function selectDate(y, m, d) {
+  const formatted = y + '.' + String(m + 1).padStart(2, '0') + '.' + String(d).padStart(2, '0');
+  document.getElementById('date').value = formatted;
+  document.getElementById('calendarOverlay').classList.remove('open');
+  autoFillFromMIS();
+  calcAndRender();
+  autoSave();
+}
+
+
+let _asrTarget = null;
+function openASR(fieldId) {
+  _asrTarget = fieldId;
+  const cur = document.getElementById(fieldId).value || 'AS';
+  ['AS','M','UP'].forEach(v => {
+    const el = document.getElementById('asrOpt-'+v);
+    if (el) el.classList.toggle('selected', v === cur);
+  });
+  document.getElementById('asrSheetTitle').innerText =
+    document.querySelector(`#${fieldId}-wrap`)?.closest('.input-group')?.querySelector('label')?.innerText || 'Select Rating';
+  document.getElementById('asrOverlay').classList.add('open');
+}
+function selectASR(val) {
+  if (!_asrTarget) return;
+  document.getElementById(_asrTarget).value = val;
+  document.getElementById(_asrTarget + '-display').innerText = val;
+  closeASR(); calcAndRender(); autoSave();
+}
+function closeASR(e) {
+  if (e && e.target !== document.getElementById('asrOverlay')) return;
+  document.getElementById('asrOverlay').classList.remove('open');
+  _asrTarget = null;
+}
+
+function showModal(opts) {
+  const overlay   = document.getElementById('confirmOverlay');
+  const iconEl    = document.getElementById('confirmIcon');
+  const titleEl   = document.getElementById('confirmTitle');
+  const msgEl     = document.getElementById('confirmMsg');
+  const btnsEl    = document.getElementById('confirmBtns');
+  btnsEl.innerHTML = '<button class="confirm-cancel" id="confirmCancelBtn">Cancel</button><button class="confirm-ok" id="confirmOkBtn">OK</button>';
+  const okBtn     = document.getElementById('confirmOkBtn');
+  const cancelBtn = document.getElementById('confirmCancelBtn');
+  iconEl.textContent    = opts.icon   || '⚠️';
+  titleEl.textContent   = opts.title  || '';
+  msgEl.textContent     = opts.msg    || '';
+  okBtn.textContent     = opts.okLabel     || 'OK';
+  cancelBtn.textContent = opts.cancelLabel || 'Cancel';
+  cancelBtn.style.display = opts.cancelLabel === null ? 'none' : '';
+  overlay.classList.add('open');
+  function cleanup() {
+    overlay.classList.remove('open');
+    okBtn.onclick = null; cancelBtn.onclick = null;
+  }
+  okBtn.onclick     = () => { cleanup(); if (opts.onOk)     opts.onOk(); };
+  cancelBtn.onclick = () => { cleanup(); if (opts.onCancel) opts.onCancel(); };
+}
+
+function blurAndShowModal(triggerEl, opts) {
+  triggerEl.blur();
+  setTimeout(() => {
+    const origOnOk     = opts.onOk;
+    const origOnCancel = opts.onCancel;
+    opts.onOk = () => {
+      if (origOnOk) origOnOk();
+      requestAnimationFrame(() => {
+        const isLast = triggerEl.id === 'hutYtdOnTime';
+        if (isLast) { triggerEl.blur(); return; }
+        _skipPctBlur = true;
+        focusNext(triggerEl);
+      });
+    };
+    opts.onCancel = () => {
+      if (origOnCancel) origOnCancel();
+      requestAnimationFrame(() => {
+        triggerEl.focus();
+        try { triggerEl.setSelectionRange(9999,9999); } catch(e){}
+      });
+    };
+    showModal(opts);
+  }, 80);
+}
+
+let _skipPctBlur = false;
+function onPctBlur(el) {
+  if (_skipPctBlur) { _skipPctBlur = false; return; }
+  const raw = el.value.trim();
+  if (raw === '' || raw === '%') {
+    el.value = '';
+    autoSave();
+    return;
+  }
+  const clean = raw.replace(/%/g,'').trim();
+  const num = parseFloat(clean);
+  if (!isNaN(num) && num > 100) {
+    blurAndShowModal(el, {
+      icon: '⚠️',
+      title: '100% ඉක්මවයි',
+      msg: 'ඔබ ඇතුළත් කළ අගය ' + num + '% \nඑය නිවැරදිද?',
+      okLabel: 'ඔව්, නිවැරදිය',
+      cancelLabel: 'නැත, නැවත ඇතුළත් කරන්න',
+      onOk: () => { el.value = clean + '%'; calcAndRender(); autoSave(); },
+      onCancel: () => { el.value = ''; autoSave(); }
+    });
+    return;
+  }
+  if (clean !== '') el.value = clean + '%';
+  calcAndRender();
+  autoSave();
+}
+function onPctFocus(el) {
+  el.value = el.value.replace(/%/g,'').trim();
+  requestAnimationFrame(() => { try { el.select(); } catch(e){} });
+}
+
+loadFromStorage();
+document.getElementById('date').value = todayStr;
+(function setDefaults(){
+  Object.entries(DEFAULTS).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el && el.value === '') el.value = val + '%';
+  });
+})();
+autoFillFromMIS();
+calcAndRender(); // single render after all init steps
+saveToStorage(); // persist defaults, migrated values and any rollover cleanup
+
+(function detectBadViewer() {
+  try {
+    const ua = navigator.userAgent || '';
+    const isChrome = ua.includes('Chrome') && !ua.includes('EdgA') && !ua.includes('OPR');
+    const isAndroid = ua.includes('Android');
+    if (isAndroid && !isChrome) {
+      setTimeout(() => {
+        document.getElementById('chromeGuideOverlay').style.display = 'flex';
+      }, 500);
+    }
+  } catch(e) {}
+})();
+
+(function setupPWA() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js', {scope: './', updateViaCache: 'none'})
+      .then(() => console.log('Service Worker Registered Cleanly'))
+      .catch(err => console.error('SW Registration Failed', err));
+  }
+})();
+
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  const dismissed = localStorage.getItem('ph_pwa_dismissed');
+  if (!dismissed) document.getElementById('pwaBanner').classList.add('show');
+});
+function triggerPWAInstall() {
+  if (_pwaPrompt) {
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(r => {
+      if (r.outcome === 'accepted') {
+        document.getElementById('pwaBanner').classList.remove('show');
+        toast('✅ App install කරන ලදී!','success');
+      }
+      _pwaPrompt = null;
+    });
+  }
+}
+function dismissPWA() {
+  document.getElementById('pwaBanner').classList.remove('show');
+  try { localStorage.setItem('ph_pwa_dismissed','1'); } catch(e){}
+}
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwaBanner').classList.remove('show');
+  toast('✅ App successfully install කරන ලදී!','success');
+});
+
+
+history.replaceState({modal:'base'}, '');
+history.pushState({modal:'guard'}, '');
+
+let _ignoreNextPop = false;
+let _exitReady     = false;
+let _exitTimer     = null;
+
+function _pushGuard() { history.pushState({modal:'guard'}, ''); }
+
+function _uiClose(closeFn) {
+  closeFn();
+  _ignoreNextPop = true;
+  history.back();
+}
+
+window.addEventListener('popstate', function(e) {
+  if (_ignoreNextPop) { _ignoreNextPop = false; return; }
+
+  if (_exitReady) {
+    _exitReady = false;
+    clearTimeout(_exitTimer);
+    _exitTimer = null;
+    return;
+  }
+
+  _exitReady = true;
+  toast('<div style="font-size:32px;margin-bottom:8px;">⚠️</div>ඉවත් වීමට නැවත වරක් Back Button එක ඔබන්න.', 'error', 1200);
+  clearTimeout(_exitTimer);
+  _exitTimer = setTimeout(() => {
+    _exitReady = false;
+    _exitTimer = null;
+    _pushGuard(); // re-arm guard after timeout so future back still warns
+  }, 10000);
+});
+
+// Auto-focus logic correctly prioritizing MTD Sale on startup
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const startEl = document.getElementById('mtdSale');
+    if (startEl) {
+      startEl.focus();
+      try { startEl.select(); } catch(e){}
+    }
+  }, 300);
+});
+
+</script>
+</body>
+</html>
