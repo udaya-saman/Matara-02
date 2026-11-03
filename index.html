@@ -1318,7 +1318,7 @@ ADT : ${fmt(adt)}
 HUTBOT MTD : ${v('hutMtdOnTime')}
 HUTBOT Today : ${v('hutTodayOnTime')}
 
-MTD H&F : ${v('mtdU20')}
+MTD H&F U20 : ${v('mtdU20')}
 MTD U30 : ${v('mtdU30')}
 
 Under 30 : ${v('under30')}
@@ -1357,11 +1357,12 @@ Hutbot On time Star Rating : ${v('hutbotOnTime')}
   };
   const hasM = autoTot > 0, hasT = todayTot > 0;
   const msg2 =
-`*📊 Daily Update - Matara 02*
+`*🍕 Daily Update - Matara 02*
 *Date :* ${v('date')}
 ━━━━━━━━━━━━━━━━
 
 *🏆 Win Score*
+━━━━━━━━━━━━━━━━
 Today's GES Count : ${hasT ? todayTot.toLocaleString('en-US') : '---'}
 Today's Top Box : ${pc(hasT,'Today Top Box',todayTop)}
 Today's B2B : ${pc(hasT,'Today B2B',todayB2B)}
@@ -1373,6 +1374,7 @@ MTD B2B : ${pc(hasM,'MTD B2B',b2b)}
 MTD OSI : ${pc(hasM,'Overall Satisfaction',osat)}
 
 *🤖 Hut Bot Performance*
+━━━━━━━━━━━━━━━━
 Today's On Time : ${v('hutTodayOnTime')}
 Today's Late : ${v('hutTodayLate')}
 Today's Missed : ${v('hutTodayMissed')}
@@ -1383,6 +1385,7 @@ MTD Missed : ${v('hutMtdMissed')}
 YTD On Time : ${v('hutYtdOnTime')}
 
 *🐉 Dragontail Performance*
+━━━━━━━━━━━━━━━━
 Today's No of Riders : ${v('todayRiders')}
 Today's No of Delivery : ${v('deliveryTx')}
 Today's Drive Time : ${minVal('todayDriveTime')}
@@ -1396,7 +1399,6 @@ MTD U3 : ${v('mtdU3')}
 MTD U12 : ${v('mtdU12')}
 MTD U20 : ${v('mtdU20')}
 MTD U30 : ${v('mtdU30')}
-━━━━━━━━━━━━━━━━
 `;
   document.getElementById('msgOutput2').value = msg2;
 
