@@ -512,149 +512,35 @@
   .calendar-day.today { border-color: var(--accent); color: var(--accent); font-weight: 700; }
   .calendar-day.today.selected { border-color: transparent; color: #fff; }
 
-/* Professional mobile-first reporting interface */
-:root { --bg:#F6F7FA; --accent:#C91331; --accent-hover:#A90E27; --text:#18212F; --text2:#475467; --muted:#667085; --border:#DFE3E9; }
-body { font-size:14px; background:var(--bg); line-height:1.5; padding-bottom:28px; }
-.header { padding:13px max(16px, calc((100vw - 980px) / 2)); box-shadow:0 2px 12px rgba(16,24,40,.08); position:sticky; }
-.header .logo { border-radius:12px; width:42px;height:42px; font-size:20px; box-shadow:none; }
-.header .title { font-size:17px; letter-spacing:-.3px; }
-.header-settings { flex-shrink:0; border:1px solid rgba(255,255,255,.45); background:rgba(255,255,255,.13); color:white; font-family:inherit; border-radius:12px; padding:10px 13px; font-weight:650; cursor:pointer; min-height:44px; }
-.main { max-width:1024px; padding:20px 18px 40px; }
-.overview { background:linear-gradient(120deg,#fff,#FCF5F6); border:1px solid #F0E5E7; border-radius:18px; padding:23px 25px; margin-bottom:14px; box-shadow:0 4px 18px rgba(16,24,40,.03); }
-.overview h1 { font-size:clamp(24px,5vw,34px);letter-spacing:-.9px; margin:2px 0 3px; font-weight:800; color:var(--text); }
-.overview p {font-weight:650;color:var(--text2);margin:0 0 6px;}
-.overview small {display:block;color:var(--muted);font-size:12px;}
-.eyebrow {color:var(--accent);font-size:11px;letter-spacing:1.1px;font-weight:800;}
-.toolbar {display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px;}
-.toolbar button {background:white;border:1px solid var(--border);padding:11px 17px;border-radius:12px;color:var(--text2);font-family:inherit;font-weight:700;font-size:13px;min-height:44px;cursor:pointer;}
-.card {border:1px solid #E9EBF0;box-shadow:0 4px 16px rgba(16,24,40,.035);border-radius:18px;padding:22px 24px;margin-bottom:15px;}
-.sec-title {font-size:17px;letter-spacing:-.3px;margin-bottom:18px;gap:10px;}
-.cat-label {font-size:11px;letter-spacing:.8px;margin-top:25px;margin-bottom:12px;border-radius:7px;padding:7px 10px;}
-.grid-2 {gap:14px;}
-.grid-3 {gap:11px;}
-.input-group label {font-size:11px;letter-spacing:.35px;line-height:1.4;}
-input[type=text],input[type=password] {min-height:48px;border-radius:10px;padding:12px 13px;font-size:16px;box-shadow:none;}
-input[readonly] {background:#F6F8FA;}
-.calc-box {border-radius:11px;min-height:78px;justify-content:center;box-shadow:none;}
-.calc-lbl {font-size:10px;line-height:1.45;}
-.calc-val {font-size:20px;}
-.btn-small {min-height:38px;}
-.btn-whatsapp,.wa-row .btn-whatsapp {font-size:15px;padding:15px 10px;border-radius:12px;box-shadow:none;min-height:54px;}
-.btn-whatsapp.m2 {box-shadow:none;}
-.btn-upload {min-height:58px;border-radius:12px;font-size:14px;}
-.toast {font-size:14px !important;padding:18px 22px !important;max-width:min(92%,420px) !important;white-space:normal;overflow-wrap:anywhere;z-index:9999 !important;}
-.settings-overlay {display:none;position:fixed;inset:0;z-index:1500;align-items:center;justify-content:center;background:rgba(16,24,40,.55);padding:16px;backdrop-filter:blur(3px);}
+
+/* Only new visual control: persistent outlet selector and its small dialog */
+.header-outlet {background:rgba(255,255,255,.16);color:white;min-height:44px;
+  border:1px solid rgba(255,255,255,.48);border-radius:11px;padding:9px 13px;
+  font-family:inherit;font-size:13px;font-weight:750;cursor:pointer;flex-shrink:0;}
+.header-outlet:hover {background:rgba(255,255,255,.24);}
+.settings-overlay {display:none;position:fixed;inset:0;z-index:1200;background:rgba(16,24,40,.55);
+  align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px);}
 .settings-overlay.open {display:flex;}
-.settings-dialog {background:white;width:100%;max-width:510px;max-height:90vh;overflow:auto;border-radius:20px;padding:25px;box-shadow:0 25px 80px rgba(16,24,40,.2);color:var(--text);}
-.settings-head {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;}
-.settings-head h2 {font-size:21px;letter-spacing:-.5px;}
-.settings-head button {background:#F2F4F7;border:0;border-radius:9px;padding:9px 12px;cursor:pointer;min-height:42px;min-width:42px;}
-.settings-dialog label {font-size:12px;font-weight:750;}
-.settings-dialog select {display:block;width:100%;min-height:49px;padding:11px 13px;margin:8px 0 10px;font-family:inherit;font-weight:600;font-size:16px;color:var(--text);background:white;border:1px solid var(--border);border-radius:10px;}
-.settings-dialog h3 {font-size:16px;margin-bottom:8px;}
-.settings-dialog p {font-size:13px;color:var(--muted);line-height:1.55;margin:9px 0 14px;}
-.settings-dialog button {font-family:inherit;font-weight:650;}
-.settings-primary {background:var(--accent)!important;color:white!important;border-color:var(--accent)!important;}
-.settings-dialog > .settings-primary,.settings-actions button {padding:12px 16px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;min-height:46px;}
-.settings-actions {display:flex;gap:10px;flex-wrap:wrap;}
-.settings-actions button {flex:1;min-width:130px;}
-.message-preview {max-height:52vh;overflow:auto;white-space:pre-wrap;word-break:break-word;background:#F8FAFC;border:1px solid var(--border);border-radius:11px;padding:15px;font:13px/1.5 ui-monospace,Consolas,monospace;margin:12px 0 18px;}
-:focus-visible {outline:3px solid rgba(201,19,49,.4)!important;outline-offset:2px;}
-@media(max-width:600px) {
- .main {padding:14px 11px 30px;}
- .header {padding:12px 13px;gap:10px;}
- .header .title {font-size:15px;}
- .header-settings {font-size:12px;padding:9px;}
- .card {padding:17px 13px;border-radius:15px;}
- .overview {padding:18px 16px;}
- .grid-2 {grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 9px;}
- .grid-3 {grid-template-columns:repeat(2,minmax(0,1fr));}
- .input-group label {font-size:10px;}
- input[type=text] {padding:11px 9px;font-size:16px;}
- .settings-dialog {padding:19px;}
-}
-@media(max-width:350px) {
- .grid-2 {grid-template-columns:minmax(0,1fr);}
- .wa-row {grid-template-columns:minmax(0,1fr);}
- .header-settings {font-size:0;}
- .header-settings::first-letter {font-size:20px;}
-}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+.settings-dialog {width:min(100%,450px);background:#fff;border-radius:20px;padding:24px;
+  color:var(--text);box-shadow:0 18px 65px rgba(0,0,0,.22);max-height:90vh;overflow:auto;}
+.settings-head {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;}
+.settings-head h2 {font-size:20px;font-weight:800;}
+.settings-head button {background:#f4f5f8;border:0;border-radius:10px;min-width:42px;min-height:42px;cursor:pointer;font-size:16px;}
+.settings-dialog label {font-weight:750;font-size:13px;display:block;margin-bottom:8px;}
+.settings-dialog select {width:100%;border:1px solid #D5DBE5;border-radius:11px;
+  background:#fff;color:#16202d;padding:12px;font:650 16px inherit;min-height:52px;}
+.settings-dialog p {font-size:12px;color:#667085;margin:11px 0 16px;line-height:1.5;}
+.settings-primary {width:100%;border:0;border-radius:11px;background:var(--accent);
+  color:white;font:750 14px inherit;padding:13px;min-height:48px;cursor:pointer;}
+.settings-actions {display:flex;gap:9px;margin-top:11px;flex-wrap:wrap;}
+.settings-actions button {background:#fff;border:1px solid #d5dbe5;cursor:pointer;
+  border-radius:9px;min-height:44px;padding:9px 12px;flex:1;font-family:inherit;font-weight:650;}
+.advanced-tools {border-top:1px solid #E5E7EB;margin-top:20px;padding-top:14px;font-size:13px;}
+.advanced-tools summary {color:#58667A;cursor:pointer;font-weight:650;min-height:35px;}
+.advanced-tools #undoBackupImportBtn {background:#fff;border:1px solid #d5dbe5;border-radius:9px;padding:10px;}
+@media(max-width:390px){.header{gap:8px;padding:12px 14px;}
+ .header .title{font-size:16px;}.header-outlet{font-size:12px;padding:9px 10px;}}
 
-
-/* DAY END visual language: quiet white header, compact data cards, soft boundaries. */
-:root {
- --accent:#C92026; --accent-hover:#AC171F;--bg:#F4F6FA;--card:#FFFFFF;
- --text:#161B27;--text2:#475467;--muted:#657084;--border:#E2E7EF;
- --shadow:0 12px 44px rgba(30,38,52,.055);
-}
-html{-webkit-text-size-adjust:100%;}
-body {font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(ellipse at 15% 0%,#fff 0%,var(--bg) 55%);font-size:16px;}
-.header {background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);color:var(--text);box-shadow:none;position:sticky;top:0;z-index:100;min-height:77px;}
-.header .title {color:var(--text);font-size:16px;font-weight:850;letter-spacing:.055em;}
-.header .sub-title {color:var(--muted);font-size:12px;letter-spacing:0;font-weight:550;}
-.header .logo.brand-mark{object-fit:cover;background:transparent;padding:0;box-shadow:0 4px 14px rgba(201,32,38,.15);width:44px;height:44px;}
-.outlet-button {max-width:48%;display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--text);min-height:46px;border:1px solid #DCE1E9;border-radius:13px;padding:9px 12px;font-family:inherit;font-weight:750;font-size:13px;line-height:1.2;box-shadow:none;cursor:pointer;}
-.outlet-button:hover{background:#FFF8F8;border-color:#D1A6AA;}
-.outlet-button #headerOutletText {max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:750;}
-.outlet-pin{font-size:20px;color:var(--accent);}
-.main{max-width:860px;padding:27px 20px 40px;}
-.modern-toolbar{display:flex;align-items:stretch;gap:10px;margin:0 0 8px;}
-.modern-toolbar button {font-family:inherit;}
-.date-quick {display:flex;align-items:center;gap:12px;flex:1;text-align:left;padding:12px 16px;min-height:64px;border:1px solid var(--border);border-radius:16px;background:#fff;box-shadow:var(--shadow);cursor:pointer;}
-.date-quick .tool-icon {display:grid;place-items:center;width:40px;height:40px;font-size:23px;color:var(--accent);background:#FFF2F2;border-radius:11px;}
-.date-quick small{display:block;margin-bottom:3px;font-size:10px;color:var(--muted);letter-spacing:.09em;font-weight:800;}
-.date-quick strong{display:block;font-size:15px;color:var(--text);font-weight:800;}
-.date-quick .tool-chevron {margin-left:auto;font-size:18px;color:#667085;}
-.settings-quick{width:64px;min-width:64px;min-height:64px;border-radius:16px;background:white;border:1px solid var(--border);font-size:22px;color:var(--text);cursor:pointer;box-shadow:var(--shadow);}
-.report-date-indicator {min-height:18px;font-size:12px;margin:5px 6px 19px;font-weight:650;}
-.mis-panel{background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
-.mis-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:17px;}
-.mis-eyebrow{font-size:10px;letter-spacing:.12em;font-weight:850;color:var(--accent);}
-.mis-head h2{font-size:21px;color:var(--text);font-weight:850;letter-spacing:-.6px;margin:5px 0 5px;}
-.mis-head p{font-size:13px;color:var(--muted);max-width:470px;line-height:1.5;}
-.mis-head-icon{display:grid;place-items:center;background:#FFF1F1;color:var(--accent);border-radius:13px;width:45px;height:45px;font-size:30px;flex:none;}
-.mis-dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:168px;width:100%;border:1.5px dashed #BBC6D6;background:#FAFBFD;border-radius:16px;padding:20px;color:var(--text);font-family:inherit;cursor:pointer;}
-.mis-dropzone:hover,.mis-dropzone:focus-visible{background:#FFF6F6;border-color:var(--accent);}
-.mis-dropzone .drop-icon{display:grid;place-items:center;background:#F1F3F8;color:var(--accent);height:43px;width:43px;border-radius:12px;font-size:27px;}
-.mis-dropzone strong{font-size:15px;font-weight:800;}
-.mis-dropzone>span:last-child{font-size:12px;color:var(--muted);}
-.mis-panel .upload-status{text-align:left;font-size:12px;margin:12px 0 18px;color:var(--muted);}
-.mis-month-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 9px;font-size:13px;font-weight:800;}
-.mis-month-sub{font-size:11px;font-weight:550;color:var(--muted);}
-.mis-month-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
-.mis-month-item{display:flex;justify-content:space-between;align-items:center;text-align:left;gap:9px;background:#F9FAFC;border:1px solid var(--border);min-height:45px;border-radius:11px;padding:11px 12px;color:var(--text);font-family:inherit;font-weight:700;font-size:13px;line-height:1.3;cursor:pointer;}
-.mis-month-item span:last-child{color:var(--accent);white-space:nowrap;}
-.mis-month-item:hover{background:#FFF7F7;border-color:#E6B6BA;}
-.mis-empty{font-size:12px;color:var(--muted);grid-column:1/-1;padding:7px 0;}
-.card{background:#fff;border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:25px;}
-.sec-title{color:var(--text);letter-spacing:-.25px;font-size:17px;}
-.cat-label{background:#F6F8FB!important;color:#49566C!important;border-left:3px solid #C92026;border-radius:8px;font-size:11px;letter-spacing:.075em;}
-.input-group input[type=text]{background:white;border:1px solid #D4DCE7;border-radius:11px;min-height:47px;}
-.input-group input[type=text]:focus{border-color:var(--accent);}
-.btn-small{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:10px;min-height:41px;}
-.btn-whatsapp{box-shadow:none!important;border-radius:12px;}
-.toast{top:auto!important;bottom:27px!important;left:50%!important;transform:translateX(-50%)!important;max-width:min(92vw,490px)!important;padding:14px 18px!important;font-family:inherit!important;font-weight:650!important;font-size:13px!important;line-height:1.5!important;border:1px solid var(--border)!important;box-shadow:0 12px 32px rgba(16,24,40,.15)!important;}
-@media(max-width:600px){
- .main{padding:15px 12px 32px;}
- .header{padding:13px 14px;gap:10px;min-height:72px;}
- .header .title{font-size:14px;}
- .outlet-button {padding:9px 10px;gap:5px;}
- .outlet-button #headerOutletText{max-width:85px;}
- .date-quick{padding:11px 12px;}
- .mis-panel{padding:19px 15px;border-radius:17px;}
- .mis-head h2{font-size:19px;}
- .mis-month-list{grid-template-columns:1fr;}
- .mis-head-icon{height:40px;width:40px;}
- .card{padding:17px 14px;}
-}
-
-
-.section-jump{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--border);}
-.section-jump button{background:#F7F9FC;border:1px solid #E0E5ED;color:#455164;border-radius:999px;min-height:40px;padding:9px 14px;font:750 12px system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;}
-.section-jump button:hover,.section-jump button:focus-visible{border-color:#C92026;background:#FFF5F5;color:#B71923;}
-#cat-gamma,#cat-dragon,#cat-ges,#cat-5star,#cat-hutbot{scroll-margin-top:100px;}
-@media(max-width:600px){.section-jump{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}.section-jump button{padding:9px 7px;}}
 </style>
 </head>
 <body>
@@ -676,14 +562,13 @@ body {font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;backgroun
 </div>
 
 <div class="header">
-  <img class="logo brand-mark" src="./icons/icon-192.png" alt="" width="44" height="44">
+  <div class="logo">🍕</div>
   <div style="flex:1">
-    <div class="title">PH DAILY REPORT</div>
-    <div class="sub-title">Outlet performance</div>
+    <div class="title">Pizza Hut Daily Report</div>
+    <div class="sub-title" id="headerOutletText">Matara 02</div>
   </div>
-  <button class="outlet-button" id="selectedOutletLabel" type="button" onclick="openSettings()" aria-label="Change outlet">
-    <span class="outlet-pin">⌖</span><span id="headerOutletText">Matara 02</span><span aria-hidden="true">⌄</span>
-  </button>
+  <button class="header-outlet" type="button" id="selectedOutletLabel"
+    onclick="openSettings()" aria-label="Select outlet">Outlet ▾</button>
 </div>
 
 <!-- TOAST -->
@@ -711,15 +596,37 @@ body {font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;backgroun
   </div>
 </div>
 
-<div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
-<section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-<div class="settings-head"><h2 id="settingsTitle">Outlet & settings</h2><button onclick="closeSettings()" aria-label="Close">✕</button></div>
-<label for="outletSelect">Selected outlet</label><select id="outletSelect"><option>Akuressa</option><option>Embilipitiya</option><option>Monaragala</option><option>Matara</option><option>Matara 02</option><option>Tangalle</option></select>
-<p>Resetting a report never changes this selection.</p><button class="settings-primary" onclick="changeOutlet()">Save outlet</button>
-<hr><h3>Backup & recovery</h3><p>Export before changing devices or clearing app storage.</p>
-<div class="settings-actions"><button onclick="exportReportBackup()">↓ Export backup</button><button onclick="document.getElementById('backupFileInput').click()">↑ Import backup</button></div>
-<input id="backupFileInput" type="file" accept=".json,application/json" hidden onchange="handleBackupImport(event)"><button id="undoBackupImportBtn" type="button" onclick="undoBackupImport()" style="display:none;margin-top:12px;min-height:44px">Undo last backup import</button>
-</section></div>
+<div class="settings-overlay" id="settingsOverlay"
+  onclick="if(event.target===this)closeSettings()">
+  <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="settings-head">
+      <h2 id="settingsTitle">Select Outlet</h2>
+      <button type="button" onclick="closeSettings()" aria-label="Close">✕</button>
+    </div>
+    <label for="outletSelect">Outlet</label>
+    <select id="outletSelect">
+      <option>Akuressa</option>
+      <option>Embilipitiya</option>
+      <option>Monaragala</option>
+      <option>Matara</option>
+      <option>Matara 02</option>
+      <option>Tangalle</option>
+    </select>
+    <p>Your selected outlet is saved on this device. Reports are stored separately for each outlet.</p>
+    <button type="button" class="settings-primary" onclick="changeOutlet()">Save Outlet</button>
+    <details class="advanced-tools">
+      <summary>Backup and restore (optional)</summary>
+      <p>Export a backup before clearing browser storage or moving to another phone.</p>
+      <div class="settings-actions">
+        <button type="button" onclick="exportReportBackup()">Export backup</button>
+        <button type="button" onclick="document.getElementById('backupFileInput').click()">Import backup</button>
+      </div>
+      <input id="backupFileInput" type="file" accept=".json,application/json" hidden onchange="handleBackupImport(event)">
+      <button type="button" id="undoBackupImportBtn" onclick="undoBackupImport()"
+        style="display:none;margin-top:12px;min-height:44px">Undo last backup import</button>
+    </details>
+  </section>
+</div>
 <!-- CUSTOM CONFIRM MODAL -->
 <div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
   <div class="confirm-sheet">
@@ -756,21 +663,6 @@ body {font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;backgroun
 </div>
 
 <div class="main">
-<div class="toolbar modern-toolbar">
- <button class="date-quick" onclick="openCalendar()" type="button"><span class="tool-icon">▦</span><span><small>REPORT DATE</small><strong id="summaryDate">Choose date</strong></span><span class="tool-chevron">⌄</span></button>
- <button class="settings-quick" type="button" onclick="openSettings()" aria-label="Open report settings">⚙</button>
-</div>
-<p class="report-date-indicator" id="reportDateNotice" role="status" aria-live="polite"></p>
-<section class="mis-panel">
-  <div class="mis-head"><div><span class="mis-eyebrow">DATA IMPORT</span><h2>Gamma MIS Report</h2><p>Upload your monthly CSV. The outlet and reporting month are detected automatically.</p></div><span class="mis-head-icon">⇧</span></div>
-  <input type="file" id="misCsvFile" accept=".csv,text/csv" hidden onchange="handleMISUpload(event)">
-  <button class="mis-dropzone" type="button" onclick="document.getElementById('misCsvFile').click()">
-    <span class="drop-icon">↥</span><strong>Select Gamma MIS File</strong><span>CSV file · automatic outlet detection</span>
-  </button>
-  <div id="misUploadStatus" class="upload-status">No MIS report for this outlet and month.</div>
-  <div class="mis-month-heading"><span>Saved MIS months</span><span class="mis-month-sub">Separate records per outlet</span></div>
-  <div id="misMonthList" class="mis-month-list"></div>
-</section>
 
   <!-- PWA INSTALL BANNER -->
   <div class="pwa-banner" id="pwaBanner">
@@ -791,14 +683,7 @@ body {font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;backgroun
       </div>
     </div>
 
-    <nav class="section-jump" aria-label="Jump to report section">
-  <button type="button" onclick="goToReportSection('cat-gamma')">Gamma</button>
-  <button type="button" onclick="goToReportSection('cat-dragon')">Dragontail</button>
-  <button type="button" onclick="goToReportSection('cat-ges')">GES</button>
-  <button type="button" onclick="goToReportSection('cat-5star')">5 Star</button>
-  <button type="button" onclick="goToReportSection('cat-hutbot')">HutBot</button>
-</nav>
-<div class="cat-label">📊 Gamma MIS &amp; DESTINITY</div>
+    <div class="cat-label">📊 Gamma MIS &amp; DESTINITY</div>
     <!-- Date field: full-width, standalone -->
     <div class="input-group" style="margin-bottom:12px;">
       <label>Date</label>
@@ -839,7 +724,16 @@ body {font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;backgroun
       <button class="btn-whatsapp m2" onclick="sendWA(2)">💬 Message 2</button>
     </div>
     
+    <hr style="margin:0;">
 
+    <!-- CSV Upload Section -->
+    <div class="input-group">
+      <input type="file" id="misCsvFile" accept=".csv" style="display:none" onchange="handleMISUpload(event)">
+      <button class="btn-upload" onclick="document.getElementById('misCsvFile').click()">
+        <span style="font-size:22px;">📁</span> Select MIS File
+      </button>
+      <div id="misUploadStatus" class="upload-status">No report loaded</div>
+    </div>
     
   </div>
 
