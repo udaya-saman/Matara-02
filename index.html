@@ -1085,6 +1085,13 @@ function fmt(n) {
   if (n===undefined||n===null||n===''||isNaN(n)) return ':';
   return Math.round(n).toLocaleString('en-US');
 }
+function shownNumber(id) {
+  const raw = rawNum(id).trim();
+  return raw === '' ? '---' : fmt(gn(id));
+}
+function shownCalculation(key, value, required) {
+  return customCalcs[key] !== undefined || required ? fmt(value) : '---';
+}
 function fmtSign(n) { return (n>0?'+':'')+fmt(n); }
 function fmtVarianceMsg(n) { return n < 0 ? '('+fmt(Math.abs(n))+')' : (n > 0 ? '+' : '')+fmt(n); }
 function formatNumInput(el) {
@@ -1302,15 +1309,15 @@ function calcAndRender() {
   if (todayGesEl) todayGesEl.value = todayTot > 0 ? todayTot.toLocaleString('en-US') : '';
 
   const calcs = [
-    {key:'MTD Variance', val:mtdV,  disp:fmtSign(mtdV),  color:mtdV>=0?'#059669':'#DC2626'},
-    {key:'Day Variance', val:dayV,  disp:fmtSign(dayV),  color:dayV>=0?'#059669':'#DC2626'},
-    {key:'ADS',          val:ads,   disp:fmt(ads),        color:'#2563EB'},
-    {key:'ADT',          val:adt,   disp:fmt(adt),        color:'#2563EB'},
-    {key:'MTD B2B',      val:b2b,   disp:b2b+'%',         color:b2b<=10?'#059669':'#DC2626'},
-    {key:'MTD Top Box',  val:topB,  disp:topB+'%',        color:topB>=50?'#059669':'#DC2626'},
-    {key:'Today B2B',    val:todayB2B, disp:todayB2B+'%', color:todayB2B<=10?'#059669':'#DC2626'},
-    {key:'Today Top Box',val:todayTop, disp:todayTop+'%', color:todayTop>=50?'#059669':'#DC2626'},
-    {key:'Overall Satisfaction', val:osat, disp:osat+'%', color:osat>=70?'#059669':'#DC2626'},
+    {key:'MTD Variance', val:mtdV,  disp:rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtSign(mtdV) : '---',  color:mtdV>=0?'#059669':'#DC2626'},
+    {key:'Day Variance', val:dayV,  disp:rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtSign(dayV) : '---',  color:dayV>=0?'#059669':'#DC2626'},
+    {key:'ADS',          val:ads,   disp:shownCalculation('ADS',ads,!!rawNum('mtdSale').trim()),        color:'#2563EB'},
+    {key:'ADT',          val:adt,   disp:shownCalculation('ADT',adt,!!rawNum('mtdTx').trim()),        color:'#2563EB'},
+    {key:'MTD B2B',      val:b2b,   disp:autoTot > 0 || customCalcs['MTD B2B'] !== undefined ? b2b+'%' : '---',         color:b2b<=10?'#059669':'#DC2626'},
+    {key:'MTD Top Box',  val:topB,  disp:autoTot > 0 || customCalcs['MTD Top Box'] !== undefined ? topB+'%' : '---',        color:topB>=50?'#059669':'#DC2626'},
+    {key:'Today B2B',    val:todayB2B, disp:todayTot > 0 || customCalcs['Today B2B'] !== undefined ? todayB2B+'%' : '---', color:todayB2B<=10?'#059669':'#DC2626'},
+    {key:'Today Top Box',val:todayTop, disp:todayTot > 0 || customCalcs['Today Top Box'] !== undefined ? todayTop+'%' : '---', color:todayTop>=50?'#059669':'#DC2626'},
+    {key:'Overall Satisfaction', val:osat, disp:autoTot > 0 || customCalcs['Overall Satisfaction'] !== undefined ? osat+'%' : '---', color:osat>=70?'#059669':'#DC2626'},
   ];
 
 
@@ -1339,18 +1346,18 @@ function calcAndRender() {
 *Daily Report - ${v('date')}*
 ━━━━━━━━━━━━━━━━
 
-*Monthly Target : ${fmt(gn('monthlyTarget'))}*
+*Monthly Target : ${shownNumber('monthlyTarget')}*
 
-MTD Target : ${fmt(mtdTarget)}
-MTD Sale : ${fmt(mtdSale)}
-MTD Variance : ${fmtVarianceMsg(mtdV)}
+MTD Target : ${shownNumber('mtdTarget')}
+MTD Sale : ${shownNumber('mtdSale')}
+MTD Variance : ${rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtVarianceMsg(mtdV) : '---'}
 
-Day Target : ${fmt(dayTarget)}
-Today Sale : ${fmt(todaySale)}
-Variance : ${fmtVarianceMsg(dayV)}
+Day Target : ${shownNumber('dayTarget')}
+Today Sale : ${shownNumber('todaySale')}
+Variance : ${rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtVarianceMsg(dayV) : '---'}
 
-ADS : ${fmt(ads)}
-ADT : ${fmt(adt)}
+ADS : ${shownCalculation('ADS',ads,!!rawNum('mtdSale').trim())}
+ADT : ${shownCalculation('ADT',adt,!!rawNum('mtdTx').trim())}
 
 HUTBOT MTD : ${v('hutMtdOnTime')}
 HUTBOT Today : ${v('hutTodayOnTime')}
@@ -1367,9 +1374,9 @@ Dispatch Deviation : ${v('dispatchDev')}
 
 MTD GES : ${v('totalResponses')}
 Smart GES : ${autoTot > 0 ? autoTot.toLocaleString('en-US') : '---'}
-Top Box : ${topB}%
-B2B : ${b2b}%
-Overall Satisfaction : ${osat}%
+Top Box : ${autoTot > 0 ? topB + '%' : '---'}
+B2B : ${autoTot > 0 ? b2b + '%' : '---'}
+Overall Satisfaction : ${autoTot > 0 ? osat + '%' : '---'}
 
 5 Star Overall Rating : ${v('overallRating')}
 Delivered U30 : ${v('deliveredU30')}
