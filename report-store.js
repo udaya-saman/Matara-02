@@ -176,9 +176,8 @@
     if (monthKey != null) {
       if (!validMonthKey(monthKey)) return null;
       var periodMIS = a.misByMonth[monthKey];
-      // Older files sometimes have no month/year in their name or date headings.
-      // Keep their original selected-outlet behavior rather than hiding saved MIS.
-      if (!periodMIS && a.mis && !inferMISMonth(a.mis)) return clone(a.mis);
+      // Never use undated legacy MIS as a fallback for a specific month.
+      // An unknown reporting period cannot be safely matched to an outlet/date.
       return periodMIS ? clone(periodMIS) : null;
     }
     if (a.mis) return clone(a.mis);
