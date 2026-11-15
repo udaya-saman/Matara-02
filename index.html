@@ -1778,7 +1778,11 @@ function normaliseMISRecord(key, record) {
 
 function autoFillFromMIS() {
   try {
-    if (reportSkipMIS) return;
+    if (reportSkipMIS) {
+      const status = document.getElementById('misUploadStatus');
+      if (status) status.textContent = 'Report reset: MIS auto-fill paused';
+      return;
+    }
     const selectedValue = document.getElementById('date').value;
     const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet, selectedValue.slice(0,7).replace('.', '-')));
     if (!raw || raw === 'null') {
