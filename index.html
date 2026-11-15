@@ -680,6 +680,7 @@
   <p>If you notice any issues or mistakes, please contact me on WhatsApp at <br><a href="https://wa.me/94719698799" style="color:var(--accent);font-weight:700;text-decoration:none;font-size:14px;display:inline-block;margin-top:4px;">071 9698799</a></p>
 </footer>
 
+<script src="./report-store.js"></script>
 <script>
 // FORCE SERVICE WORKER UPDATE IMMEDIATELY
 if ('serviceWorker' in navigator) {
@@ -782,11 +783,10 @@ const now           = new Date();
 
 // The operational day runs from 6:00 AM until 5:59 AM the following day.
 function getOperationalDate(referenceDate = new Date()) {
-  const d = new Date(referenceDate.getTime());
-  if (d.getHours() < 6) d.setDate(d.getDate() - 1);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  const parts = ReportStore.operationalDate(referenceDate).split('.').map(Number);
+  return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0, 0);
 }
+
 function formatOperationalDate(date) {
   return `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
 }
@@ -795,140 +795,104 @@ const operationalToday = getOperationalDate(now);
 const currentMonth  = `${operationalToday.getFullYear()}-${operationalToday.getMonth()+1}`;
 const currentYear   = String(operationalToday.getFullYear());
 
-function saveToStorage() {
+function collectReportValues() {
   const data = {};
   FIELDS.forEach(f => {
+    if (f.readonly) return;
     const el = document.getElementById(f.id);
     if (el) data[f.id] = el.value;
   });
-  const dateEl = document.getElementById('date');
-  if (dateEl) data['date'] = dateEl.value;
-  data._customCalcs = customCalcs;
+  return data;
+}
+
+let storageWarningShown = false;
+function saveToStorage() {
   try {
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-    localStorage.setItem(LS_MONTH_KEY, currentMonth);
-    localStorage.setItem(LS_YEAR_KEY, currentYear);
-    localStorage.setItem(LS_DAY_KEY, todayStr);
-  } catch(e){}
-  const mt = document.getElementById('monthlyTarget');
-  if (mt && mt.value && mt.value !== '') {
-    try { localStorage.setItem(LS_TARGET_KEY, mt.value); } catch(e){}
+    ReportStore.save(selectedOutlet, activeDate, collectReportValues(), customCalcs);
+    storageWarningShown = false;
+    return true;
+  } catch (err) {
+    if (!storageWarningShown) {
+      toast('Your report could not be saved. Export a backup and check device storage.', 'error', 6000);
+      storageWarningShown = true;
+    }
+    console.error('Could not save report', err);
+    return false;
   }
 }
 
-function saveBackupToStorage(data) {
-  try { localStorage.setItem(LS_BACKUP_KEY, JSON.stringify(data)); } catch(e){}
-}
-
-function clearTodayFields() {
-  const bak = {};
-  let had = false;
+function applyReportData(record) {
+  const values = record && record.values && typeof record.values === 'object' ? record.values : {};
+  const legacy = {mtdU20:['mtdHF'], hutTodayOnTime:['hutbotToday'], hutMtdOnTime:['hutbotMTD']};
   FIELDS.forEach(f => {
-    if (!f.today || f.readonly) return;
     const el = document.getElementById(f.id);
     if (!el) return;
-    bak[f.id] = el.value;
-    const def = DEFAULTS[f.id] !== undefined ? DEFAULTS[f.id] + '%' : '';
-    if (el.value !== '' && el.value !== def) had = true;
-    el.value = '';
+    if (f.readonly) { el.value = ''; return; }
+    let value = values[f.id];
+    if (value === undefined && legacy[f.id]) {
+      const oldId = legacy[f.id].find(id => values[id] !== undefined);
+      if (oldId) value = values[oldId];
+    }
+    value = value == null ? '' : String(value);
+    if (f.type === 'pct' && value && !value.endsWith('%')) value += '%';
+    el.value = value;
+    if (f.type === 'asr') {
+      const display = document.getElementById(f.id + '-display');
+      if (display) display.textContent = value || 'AS';
+    }
   });
-  if (had) {
-    backupData = bak;
-    saveBackupToStorage(bak);
-    const rb = document.getElementById('restoreBtn');
-    if (rb) rb.style.display = 'inline-block';
-    toast('🌅 අලුත් දිනයක්: Today data clear කරන ලදී.<br><span style="font-size:13px;font-weight:600;">Undo කිරීමට ↩️ Restore ඔබන්න.</span>', 'info', 3500);
+  customCalcs = record && record.customCalcs && typeof record.customCalcs === 'object'
+    ? {...record.customCalcs} : {};
+  // Keep the previous manual-calculation migration.
+  Object.entries(LEGACY_CALC_MAP).forEach(([newKey, oldKeys]) => {
+    if (customCalcs[newKey] === undefined) {
+      const oldKey = oldKeys.find(key => customCalcs[key] !== undefined);
+      if (oldKey) customCalcs[newKey] = customCalcs[oldKey];
+    }
+    oldKeys.forEach(key => { delete customCalcs[key]; });
+  });
+  Object.entries(DEFAULTS).forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.value = value + '%';
+  });
+  document.getElementById('date').value = activeDate;
+  updateOutletDisplay();
+  refreshRestoreButton();
+}
+
+function loadSelectedReport(date, seed) {
+  activeDate = date;
+  try {
+    applyReportData(ReportStore.load(selectedOutlet, date, !!seed));
+  } catch (err) {
+    console.error('Could not load report', err);
+    toast('Saved report could not be opened. Your previous data has not been deleted.', 'error', 6000);
+    return false;
   }
+  return true;
 }
 
 function loadFromStorage() {
-  try {
-    const savedMonth = localStorage.getItem(LS_MONTH_KEY);
-    const calendarMonth = `${now.getFullYear()}-${now.getMonth()+1}`;
-    const legacyMonthBoundary = now.getHours() < 6 && now.getDate() === 1 && savedMonth === calendarMonth;
-    const isNewMonth = savedMonth !== null && savedMonth !== currentMonth && !legacyMonthBoundary;
-    const savedYear = localStorage.getItem(LS_YEAR_KEY);
-    const isNewYear = savedYear !== null && savedYear !== currentYear;
-    const lastDay = localStorage.getItem(LS_DAY_KEY);
-    const isNewDay = lastDay !== null && lastDay !== todayStr;
-    const raw = localStorage.getItem(LS_KEY);
-
-    if (raw) {
-      const data = JSON.parse(raw);
-      FIELDS.forEach(f => {
-        if (f.readonly) return;
-        if (isNewMonth && f.keepOnReset) return;
-        if (isNewYear && f.yearly) return;
-        const el = document.getElementById(f.id);
-        let val = data[f.id];
-        // New field IDs can read values saved by the earlier release.
-        if (val === undefined && LEGACY_MAP[f.id]) {
-          for (const legacyId of LEGACY_MAP[f.id]) {
-            if (data[legacyId] !== undefined) { val = data[legacyId]; break; }
-          }
-        }
-        if (el && val !== undefined) {
-          if (f.type === 'pct' && val !== null && String(val).trim() !== '') {
-            const savedPct = String(val).trim();
-            el.value = savedPct.endsWith('%') ? savedPct : savedPct + '%';
-          } else {
-            el.value = val;
-          }
-          if (f.type === 'asr') {
-            const disp = document.getElementById(f.id + '-display');
-            if (disp) disp.innerText = val || 'AS';
-          }
-        }
-      });
-
-      // Migrate manually edited calculation names from the previous version.
-      if (data._customCalcs && typeof data._customCalcs === 'object') {
-        customCalcs = { ...data._customCalcs };
-        Object.entries(LEGACY_CALC_MAP).forEach(([newKey, oldKeys]) => {
-          if (customCalcs[newKey] === undefined) {
-            const oldKey = oldKeys.find(key => customCalcs[key] !== undefined);
-            if (oldKey) customCalcs[newKey] = customCalcs[oldKey];
-          }
-          oldKeys.forEach(key => { delete customCalcs[key]; });
-        });
-      }
-
-      // The saved report date is intentionally not restored here. Startup always
-      // uses today's operational date, even if a different date was selected before closing.
-    }
-
-    const savedTarget = localStorage.getItem(LS_TARGET_KEY);
-    if (savedTarget) {
-      const mt = document.getElementById('monthlyTarget');
-      if (mt) mt.value = savedTarget;
-    }
-    const bak = localStorage.getItem(LS_BACKUP_KEY);
-    if (bak) {
-      try {
-        backupData = JSON.parse(bak);
-        const restoreButton = document.getElementById('restoreBtn');
-        if (restoreButton) restoreButton.style.display = 'inline-block';
-      } catch(e) {}
-    }
-
-    // Discard manual overrides that belong to a completed reporting period.
-    if (isNewDay) DAILY_CALC_KEYS.forEach(key => { delete customCalcs[key]; });
-    if (isNewMonth) MONTHLY_CALC_KEYS.forEach(key => { delete customCalcs[key]; });
-    if (isNewYear) {
-      // YTD is a new reporting period. There are currently no YTD calculation overrides.
-      try { localStorage.setItem(LS_YEAR_KEY, currentYear); } catch(e) {}
-    }
-
-    // New operational day: today's inputs start fresh. Keep a backup so Restore can undo it.
-    if (AUTO_CLEAR_TODAY && isNewDay) clearTodayFields();
-
-    // Persist cleared daily/monthly fields and updated period markers immediately.
-    // This prevents yesterday's or last month's values from returning after a restart.
-    saveToStorage();
-  } catch(e) {
-    console.error('Unable to load saved report data:', e);
-  }
+  loadSelectedReport(todayStr, true);
 }
+
+function refreshRestoreButton() {
+  const button = document.getElementById('restoreBtn');
+  if (button) button.style.display = ReportStore.canRestore(selectedOutlet, activeDate) ? 'inline-flex' : 'none';
+}
+
+function updateOutletDisplay() {
+  const label = document.getElementById('selectedOutletLabel');
+  if (label) label.textContent = selectedOutlet;
+  const overview = document.getElementById('overviewOutlet');
+  if (overview) overview.textContent = selectedOutlet;
+  const selector = document.getElementById('outletSelect');
+  if (selector) selector.value = selectedOutlet;
+  const summary = document.getElementById('summaryDate');
+  if (summary) summary.textContent = activeDate;
+  document.title = 'PH Daily Report | ' + selectedOutlet;
+}
+
 function autoSave() { saveToStorage(); }
 
 let backupData   = {};
@@ -943,7 +907,7 @@ function buildInput(f) {
     return '<div class="input-group'+gcls+'">\n    <label>'+f.label+'</label>\n    <div class="asr-field" id="'+f.id+'-wrap" onclick="openASR(\''+f.id+'\')">\n      <span id="'+f.id+'-display" class="asr-val">AS</span>\n      <input type="hidden" id="'+f.id+'" value="AS">\n      <span class="asr-arrow">&#9662;</span>\n    </div>\n  </div>';
   }
   const isNum     = f.type==='num'||f.type==='nodec'||f.type==='time';
-  const inputMode = isNum ? 'inputmode="decimal" pattern="[0-9,.]*"' :
+  const inputMode = isNum ? (f.type==='nodec' ? 'inputmode="numeric" pattern="[0-9,]*"' : 'inputmode="decimal" pattern="[0-9,.]*"') :
                     f.type==='pct' ? 'inputmode="decimal"' : '';
   let cls = '';
   if (f.type==='num' || f.type==='time') cls = 'num';
@@ -954,7 +918,7 @@ function buildInput(f) {
   const kd = isLast
     ? ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();scrollToBottom();}"'
     : ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();focusNext(this);}"';
-  const focusSel = ' onfocus="try{this.select();}catch(e){}"';
+  const focusSel = f.type==='pct' ? '' : ' onfocus="try{this.select();}catch(e){}"';
   const gesIds = ['star1','star2','star3','star4','star5','todayStar1','todayStar2','todayStar3','todayStar4','todayStar5'];
   const ratingIds = ['overallRating','annualTMTurnover','winScore','hutbotOnTime','brandRating','fsccRating','deliveredU30'];
   const blurExtra = gesIds.includes(f.id)    ? ' onblur="onGesBlur(this)"'
@@ -963,16 +927,18 @@ function buildInput(f) {
                   : f.id === 'smartGes'      ? ' onblur="onSmartGesBlur(this)"'
                   : '';
   if (f.readonly) {
-    return '<div class="input-group'+gcls+'">\n    <label>'+f.label+' <span style="font-size:9px;color:#10B981;font-weight:700;margin-left:4px;">AUTO</span></label>\n    <input type="text" id="'+f.id+'" class="num nodec" readonly style="background:#F0FDF4;cursor:default;color:#059669;font-weight:700;" placeholder="-">\n  </div>';
+    return '<div class="input-group'+gcls+'">\n    <label for="'+f.id+'">'+f.label+' <span style="font-size:9px;color:#10B981;font-weight:700;margin-left:4px;">AUTO</span></label>\n    <input type="text" id="'+f.id+'" class="num nodec" readonly style="background:#F0FDF4;cursor:default;color:#059669;font-weight:700;" placeholder="-">\n  </div>';
   }
-  return '<div class="input-group'+gcls+'">\n    <label>'+f.label+'</label>\n    <input type="text" id="'+f.id+'"'+(cls?' class="'+cls+'"':'')+' '+inputMode+enterHint+kd+focusSel+' placeholder="-" oninput="onFieldInput(this)"'+extra+blurExtra+'>\n  </div>';
+  return '<div class="input-group'+gcls+'">\n    <label for="'+f.id+'">'+f.label+'</label>\n    <input type="text" id="'+f.id+'"'+(cls?' class="'+cls+'"':'')+' '+inputMode+enterHint+kd+focusSel+' placeholder="-" oninput="onFieldInput(this)"'+extra+blurExtra+'>\n  </div>';
 }
 CATS.forEach(cat => {
   const el = document.getElementById(cat.id);
   if (el) el.innerHTML = cat.fields.map(buildInput).join('');
 });
 
-const todayStr = formatOperationalDate(operationalToday);
+let todayStr = ReportStore.operationalDate();
+let activeDate = todayStr;
+let selectedOutlet = ReportStore.getOutlet();
 document.getElementById('date').value = todayStr;
 
 function toast(msg, type='info', duration=1800) {
@@ -994,66 +960,40 @@ function toast(msg, type='info', duration=1800) {
 
 function resetData() {
   showModal({
-    icon: '🔄',
-    title: 'Reset Data',
-    msg: 'ඇතුළත් කළ data සියල්ල ඉවත් වේ.\nReset කිරීමට අවශ්‍යද?',
-    okLabel: 'ඔව්, Reset කරන්න',
-    cancelLabel: 'නැත, අවලංගු කරන්න',
+    icon: 'alert-triangle', title: 'Reset this report?',
+    msg: 'This clears the report for ' + selectedOutlet + ' on ' + activeDate +
+      '. Your outlet selection, other dates, and uploaded MIS file stay saved. You can restore this report afterward.',
+    okLabel: 'Reset report', cancelLabel: 'Cancel',
     onOk: () => {
-      backupData = {};
-      FIELDS.forEach(f => {
-        if (f.readonly) return;
-        const el = document.getElementById(f.id);
-        if (el) {
-            backupData[f.id] = el.value;
-            el.value = '';
-            if (f.type === 'asr') {
-                el.value = 'AS';
-                const disp = document.getElementById(f.id + '-display');
-                if (disp) disp.innerText = 'AS';
-            }
-        }
-      });
-      
-      const dateEl = document.getElementById('date');
-      if (dateEl) { backupData['date'] = dateEl.value; dateEl.value = todayStr; }
-      saveBackupToStorage(backupData);
-      
-      try { localStorage.removeItem(LS_TARGET_KEY); } catch(e){}
-      try { localStorage.removeItem('ph_mis_data'); } catch(e){}
-      
-      const statusEl = document.getElementById('misUploadStatus');
-      if (statusEl) {
-        statusEl.innerText = 'No report loaded';
-        statusEl.style.color = 'var(--muted)';
+      try {
+        saveToStorage();
+        ReportStore.reset(selectedOutlet, activeDate);
+        loadSelectedReport(activeDate, false);
+        autoFillFromMIS();
+        calcAndRender();
+        saveToStorage();
+        refreshRestoreButton();
+        toast('Report reset. Use Restore to undo.', 'success');
+      } catch (err) {
+        toast('Could not reset the report. No saved data was deleted.', 'error', 5000);
       }
-
-      document.getElementById('date').value = todayStr;
-      customCalcs  = {};
-      
-      Object.entries(DEFAULTS).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val+'%'; });
-      
-      calcAndRender();
-      saveToStorage();
-      document.getElementById('restoreBtn').style.display = 'inline-block';
-      toast('🔄 Data reset කරන ලදී.','info');
     }
   });
 }
 function restoreData() {
-  FIELDS.forEach(f => {
-    if (f.readonly) return;
-    const el = document.getElementById(f.id);
-    if (el && backupData[f.id] !== undefined) el.value = backupData[f.id];
-  });
-  const dateEl = document.getElementById('date');
-  if (dateEl && backupData['date'] !== undefined) dateEl.value = backupData['date'];
-  calcAndRender();
-  saveToStorage();
-  backupData = {};
-  try { localStorage.removeItem(LS_BACKUP_KEY); } catch(e){}
-  document.getElementById('restoreBtn').style.display = 'none';
-  toast('✅ Data restore කරන ලදී.','success');
+  try {
+    if (!ReportStore.restore(selectedOutlet, activeDate)) {
+      toast('No backup is available for this outlet and date.', 'warning');
+      return;
+    }
+    loadSelectedReport(activeDate, false);
+    calcAndRender();
+    saveToStorage();
+    refreshRestoreButton();
+    toast('Your report has been restored.', 'success');
+  } catch (err) {
+    toast('Could not restore the report.', 'error', 5000);
+  }
 }
 
 function gn(id) { return parseFloat((document.getElementById(id)?.value||'').replace(/[,%]/g,''))||0; }
@@ -1697,8 +1637,8 @@ function closeCalendar(e) {
   document.getElementById('calendarOverlay').classList.remove('open');
 }
 
-function prevMonth() { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); }
-function nextMonth() { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); }
+function prevMonth() { calDate.setDate(1); calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); }
+function nextMonth() { calDate.setDate(1); calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); }
 
 function renderCalendar() {
   const year = calDate.getFullYear();
@@ -1742,13 +1682,48 @@ function renderCalendar() {
 
 function selectDate(y, m, d) {
   const formatted = y + '.' + String(m + 1).padStart(2, '0') + '.' + String(d).padStart(2, '0');
-  document.getElementById('date').value = formatted;
+  if (!ReportStore.validDate(formatted)) return;
+  if (!saveToStorage()) return;
   document.getElementById('calendarOverlay').classList.remove('open');
+  if (!loadSelectedReport(formatted, formatted === todayStr)) return;
   autoFillFromMIS();
   calcAndRender();
-  autoSave();
+  saveToStorage();
 }
-
+function checkOperationalRollover() {
+  const actualDay = ReportStore.operationalDate();
+  if (actualDay === todayStr) return;
+  if (!saveToStorage()) return;
+  todayStr = actualDay;
+  if (!loadSelectedReport(todayStr, true)) return;
+  autoFillFromMIS();
+  calcAndRender();
+  saveToStorage();
+  toast('New reporting day. Today and selected MTD fields are ready for fresh entries.', 'info', 4500);
+}
+function changeOutlet() {
+  const next = document.getElementById('outletSelect').value;
+  if (next === selectedOutlet) { closeSettings(); return; }
+  if (!ReportStore.OUTLETS.includes(next)) return;
+  showModal({
+    icon: 'store', title: 'Change outlet?',
+    msg: 'Switch from ' + selectedOutlet + ' to ' + next + '? Each outlet has its own saved reports. Nothing will be deleted.',
+    okLabel: 'Change outlet', cancelLabel: 'Cancel',
+    onOk: () => {
+      if (!saveToStorage()) return;
+      try {
+        ReportStore.setOutlet(next);
+        selectedOutlet = next;
+        closeSettings();
+        loadSelectedReport(todayStr, true);
+        autoFillFromMIS();
+        calcAndRender();
+        saveToStorage();
+        toast('Outlet changed to ' + next, 'success');
+      } catch (err) { toast('Could not change the outlet.', 'error'); }
+    }
+  });
+}
 
 let _asrTarget = null;
 function openASR(fieldId) {
@@ -1953,15 +1928,12 @@ window.addEventListener('popstate', function(e) {
 });
 
 // Auto-focus logic correctly prioritizing MTD Sale on startup
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const startEl = document.getElementById('mtdSale');
-    if (startEl) {
-      startEl.focus();
-      try { startEl.select(); } catch(e){}
-    }
-  }, 300);
+setInterval(checkOperationalRollover, 30000);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) checkOperationalRollover();
 });
+window.addEventListener('pageshow', checkOperationalRollover);
+window.addEventListener('focus', checkOperationalRollover);
 
 </script>
 </body>
