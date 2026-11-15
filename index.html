@@ -720,8 +720,6 @@ body {font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;backgroun
 <div class="settings-actions"><button onclick="exportReportBackup()">↓ Export backup</button><button onclick="document.getElementById('backupFileInput').click()">↑ Import backup</button></div>
 <input id="backupFileInput" type="file" accept=".json,application/json" hidden onchange="handleBackupImport(event)"><button id="undoBackupImportBtn" type="button" onclick="undoBackupImport()" style="display:none;margin-top:12px;min-height:44px">Undo last backup import</button>
 </section></div>
-<div class="settings-overlay" id="previewOverlay" onclick="if(event.target===this)closePreview()">
-<section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><div class="settings-head"><h2 id="previewTitle">Preview WhatsApp message</h2><button onclick="closePreview()" aria-label="Close">✕</button></div><pre class="message-preview" id="previewText"></pre><div class="settings-actions"><button onclick="copyPreview()">Copy</button><button class="settings-primary" onclick="openPreviewWhatsApp()">Open WhatsApp</button></div></section></div>
 <!-- CUSTOM CONFIRM MODAL -->
 <div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
   <div class="confirm-sheet">
@@ -1591,34 +1589,18 @@ function formatPercentValue(id) {
   const n = Number(raw.replace(/[,%]/g,''));
   return Number.isFinite(n) && n >= 0 && n <= 100 ? n.toLocaleString('en-US',{maximumFractionDigits:2}) + '%' : '---';
 }
-let pendingWhatsApp = '';
 function sendWA(n) {
+  // Called directly by Message 1 or Message 2. Keep the existing message
+  // generation and all business calculations unchanged.
   calcAndRender();
-  pendingWhatsApp = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput').value;
-  if (!pendingWhatsApp.trim()) { toast('No report message is available.', 'warning'); return; }
-  const warnings = [];
-  if (!rawNum('mtdSale').trim()) warnings.push('MTD Sale is missing');
-  if (!rawNum('todaySale').trim()) warnings.push('Today Sale is missing');
-  if (!rawNum('totalResponses').trim()) warnings.push('MTD GES Total Responses is missing');
-  if (activeDate > todayStr) warnings.push('This message is for a FUTURE DRAFT report');
-  if (activeDate < todayStr) warnings.push('This message is for a HISTORICAL report');
-  document.getElementById('previewText').textContent =
-    (warnings.length ? 'CHECK BEFORE SENDING:\n• ' + warnings.join('\n• ') + '\n\n' : '') + pendingWhatsApp;
-  lastModalFocus = document.activeElement;
-  document.getElementById('previewOverlay').classList.add('open');
-  requestAnimationFrame(() => document.getElementById('previewOverlay').querySelector('button')?.focus({preventScroll:true}));
-}
-function closePreview() { document.getElementById('previewOverlay').classList.remove('open'); if (lastModalFocus?.isConnected) lastModalFocus.focus({preventScroll:true}); }
-function copyPreview() {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(pendingWhatsApp).then(() => toast('Message copied.', 'success'))
-      .catch(() => toast('Could not copy. Please select the text.', 'warning'));
-  } else toast('Copy is unavailable. Please select the text.', 'warning');
-}
-function openPreviewWhatsApp() {
-  if (!pendingWhatsApp) return;
-  window.open('https://wa.me/?text=' + encodeURIComponent(pendingWhatsApp), '_blank', 'noopener,noreferrer');
-  closePreview();
+  const output = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput');
+  const message = output ? output.value : '';
+  if (!message.trim()) {
+    toast('No report message is available.', 'warning');
+    return;
+  }
+  // Open WhatsApp directly from the user's click, without an intermediate dialog.
+  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
 }
 function openSettings() {
   updateOutletDisplay();
@@ -2207,7 +2189,6 @@ function closeTopOverlay() {
   const found = [
     ['confirmOverlay', () => document.getElementById('confirmCancelBtn')?.click()],
     ['settingsOverlay', () => {closeSettings();updateOutletDisplay();}],
-    ['previewOverlay', closePreview],
     ['calendarOverlay', () => document.getElementById('calendarOverlay').classList.remove('open')],
     ['asrOverlay', () => closeASR()],
     ['chromeGuideOverlay', () => {document.getElementById('chromeGuideOverlay').style.display='none';}]
