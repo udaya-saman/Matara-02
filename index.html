@@ -1652,89 +1652,89 @@ function parseMISNumber(value) {
 
 function handleMISUpload(event) {
   const file = event.target.files[0];
+  event.target.value = '';
   if (!file) return;
-
+  if (file.size > 3 * 1024 * 1024 || !/\.csv$/i.test(file.name)) {
+    toast('Please choose a Gamma MIS CSV file under 3 MB.', 'warning', 4000);
+    return;
+  }
+  const uploadOutlet = selectedOutlet;
+  const selected = parseAppDate(activeDate);
+  if (!selected) { toast('Select a valid report date first.', 'error'); return; }
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const lines = String(e.target.result || '').replace(/^\uFEFF/, '').split(/\r?\n/);
-      let datesRow = null;
-      let dayTargetRow = null;
-      let mtdTargetRow = null;
-      let inTotalSystem = false;
-
+      if (lines.length < 4) throw new Error('Incomplete CSV');
+      let datesRow = null, dayTargetRow = null, mtdTargetRow = null, inTotalSystem = false;
       for (let i = 0; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
-        if (!cols[0]) continue;
-        const firstCol = cols[0].toUpperCase().trim();
-
+        const firstCol = (cols[0] || '').toUpperCase().trim();
         if (firstCol === 'TOTAL SYSTEM') {
-          inTotalSystem = true;
-          datesRow = cols;
-        } else if (inTotalSystem && (firstCol === 'DELIVERY' || firstCol === 'TAKE AWAY' || firstCol === 'DINE IN' || (firstCol === 'AGGREGATOR' || firstCol === 'AGGEGATOR'))) {
+          inTotalSystem = true; datesRow = cols;
+        } else if (inTotalSystem && ['DELIVERY','TAKE AWAY','DINE IN','AGGREGATOR','AGGEGATOR'].includes(firstCol)) {
           break;
         } else if (inTotalSystem && datesRow && firstCol === 'NET SALES - TARGET' && !dayTargetRow) {
           dayTargetRow = cols;
         } else if (inTotalSystem && datesRow && firstCol === 'MTD NET SALES - TARGET' && !mtdTargetRow) {
           mtdTargetRow = cols;
         }
-
         if (datesRow && dayTargetRow && mtdTargetRow) break;
       }
-
-      if (datesRow && dayTargetRow && mtdTargetRow) {
-        const parsedData = {};
-        for (let i = 1; i < datesRow.length; i++) {
-          const parsedDate = parseMISDateHeader(datesRow[i]);
-          if (!parsedDate) continue;
-          const key = parsedDate.year !== null
-            ? `${parsedDate.year}-${String(parsedDate.month).padStart(2,'0')}-${String(parsedDate.day).padStart(2,'0')}`
-            : `${parsedDate.day}-${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parsedDate.month-1]}`;
-          parsedData[key] = {
-            day: parseMISNumber(dayTargetRow[i]),
-            mtd: parseMISNumber(mtdTargetRow[i]),
-            dateDay: parsedDate.day,
-            dateMonth: parsedDate.month,
-            dateYear: parsedDate.year
-          };
-        }
-
-        if (Object.keys(parsedData).length > 0) {
-          ReportStore.setMIS(selectedOutlet, { filename: file.name, data: parsedData });
-          toast('✅ MIS Report successfully loaded!', 'success');
-          autoFillFromMIS();
-        } else {
-          /* Keep previous MIS file */
-          const statusEl = document.getElementById('misUploadStatus');
-          if (statusEl) { statusEl.innerText = 'No valid dates found'; statusEl.style.color = '#DC2626'; }
-          /* Keep old targets if new file is unreadable */
-          toast('⚠️ No valid date headings found in the MIS file.', 'error');
-        }
-      } else {
-        // Do not keep displaying values from a previous file after an unreadable upload.
-        /* Keep previous MIS file */
-        const statusEl = document.getElementById('misUploadStatus');
-        if (statusEl) { statusEl.innerText = 'No report loaded'; statusEl.style.color = 'var(--muted)'; }
-        /* Keep old targets if new file is unreadable */
-        toast('⚠️ Could not parse the CSV. Make sure it is a Gamma MIS Report.', 'error');
+      if (!datesRow || !dayTargetRow || !mtdTargetRow || datesRow.length < 2) throw new Error('Gamma MIS headings are missing');
+      if (dayTargetRow.length < datesRow.length || mtdTargetRow.length < datesRow.length) throw new Error('Incomplete target columns');
+      const parsedData = {}; let count = 0;
+      for (let i = 1; i < datesRow.length; i++) {
+        const header = String(datesRow[i] || '').trim();
+        if (!header) continue;
+        const date = parseMISDateHeader(header);
+        if (!date) throw new Error('Invalid date heading: ' + header);
+        const effectiveYear = date.year === null ? selected.year : date.year;
+        if (effectiveYear !== selected.year || date.month !== selected.month) throw new Error('CSV dates do not match the selected reporting month/year');
+        if (date.day > new Date(effectiveYear,date.month,0).getDate()) throw new Error('Invalid calendar date');
+        const key = effectiveYear + '-' + String(date.month).padStart(2,'0') + '-' + String(date.day).padStart(2,'0');
+        if (parsedData[key]) throw new Error('Duplicate date: ' + header);
+        const daily = parseMISNumber(dayTargetRow[i]), mtd = parseMISNumber(mtdTargetRow[i]);
+        if (daily === null && mtd === null) throw new Error('Missing target values: ' + header);
+        if ((daily !== null && daily < 0) || (mtd !== null && mtd < 0)) throw new Error('Negative sales target');
+        parsedData[key] = {day:daily,mtd:mtd,dateDay:date.day,dateMonth:date.month,dateYear:effectiveYear};
+        count++;
       }
-    } catch(err) {
-      /* Keep previous MIS file */
-      /* Keep old targets if new file is unreadable */
-      toast('⚠️ Could not read this MIS file. Please check the CSV and try again.', 'error');
-    }
+      if (!count) throw new Error('No valid dates');
+      // Verify outlet name if the export identifies it; otherwise require explicit confirmation.
+      const headerText = (file.name + ' ' + lines.slice(0,20).join(' ')).toLowerCase().replace(/matara[\s_-]*0?2/g,'matara 02');
+      const identified = ReportStore.OUTLETS.filter(name => {
+        const phrase = name.toLowerCase();
+        const at = headerText.indexOf(phrase);
+        if (at < 0) return false;
+        const before = at === 0 ? ' ' : headerText[at-1];
+        const after = headerText[at+phrase.length] || ' ';
+        return !/[a-z]/.test(before) && !/[a-z0-9]/.test(after);
+      }).filter(name => name !== 'Matara' || !headerText.includes('matara 02'));
+      if (identified.length && (identified.length !== 1 || identified[0] !== uploadOutlet)) throw new Error('CSV appears to belong to another outlet: ' + identified.join(', '));
+      const verified = identified.length === 1;
+      showModal({
+        icon:'📄',title:'Confirm MIS file',
+        msg:count + ' valid dates for ' + selected.year + '-' + String(selected.month).padStart(2,'0') + ', outlet ' + uploadOutlet + '. ' +
+          (verified ? 'Outlet identity matched.' : 'Outlet identity not found. Check the CSV source before confirming.') +
+          ' Replace the saved MIS file?',
+        okLabel:'Save MIS',cancelLabel:'Cancel',
+        onOk:() => {
+          if (selectedOutlet !== uploadOutlet) {toast('Outlet changed. Upload again.', 'warning');return;}
+          try {
+            ReportStore.setMIS(uploadOutlet,{filename:file.name,data:parsedData,reportYear:selected.year,reportMonth:selected.month,verifiedOutlet:verified});
+            reportSkipMIS = false;
+            autoFillFromMIS();
+            saveToStorage();
+            toast('MIS saved for '+uploadOutlet, 'success');
+          } catch (err) {toast('MIS could not be saved; previous MIS remains.', 'error');}
+        }
+      });
+    } catch(err) {toast('MIS rejected: '+err.message+'. Previous data was preserved.', 'error',5500);}
   };
-  reader.onerror = function() {
-    /* Keep previous MIS file */
-    const statusEl = document.getElementById('misUploadStatus');
-    if (statusEl) { statusEl.innerText = 'No report loaded'; statusEl.style.color = 'var(--muted)'; }
-    /* Keep old targets if new file is unreadable */
-    toast('⚠️ Could not read this MIS file. Please try again.', 'error');
-  };
+  reader.onerror = function(){toast('CSV could not be read; previous MIS remains.', 'error');};
   reader.readAsText(file);
-  event.target.value = '';
 }
-
 function normaliseMISRecord(key, record) {
   if (!record || typeof record !== 'object') return null;
   if (Number.isInteger(record.dateDay) && Number.isInteger(record.dateMonth)) {
