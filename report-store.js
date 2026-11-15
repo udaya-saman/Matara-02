@@ -3,6 +3,7 @@
   'use strict';
   var DB_KEY = 'ph_report_database_v3';
   var OUTLET_KEY = 'ph_report_selected_outlet_v1';
+  var IMPORT_UNDO_KEY = 'ph_report_pre_import_v3';
   var OUTLETS = ['Akuressa', 'Embilipitiya', 'Monaragala', 'Matara', 'Matara 02', 'Tangalle'];
   var DEFAULT_OUTLET = 'Matara 02';
   var DAY_FIELDS = [
@@ -39,7 +40,7 @@
   }
   function normaliseDB(db) {
     if (!db || db.version !== 3 || !db.outlets || typeof db.outlets !== 'object' || Array.isArray(db.outlets)) {
-      return {version: 3, outlets: {}};
+      throw new Error('Saved report database is not valid; no data has been overwritten.');
     }
     return db;
   }
@@ -88,6 +89,7 @@
     var next = clone(previous);
     if (!next.values || typeof next.values !== 'object') next.values = {};
     DAY_FIELDS.forEach(function (key) { delete next.values[key]; });
+    delete next.values._skipMISAutoFill;
     if (period(oldDate) !== period(newDate)) MONTH_FIELDS.forEach(function (key) { delete next.values[key]; });
     if (year(oldDate) !== year(newDate)) YEAR_FIELDS.forEach(function (key) { delete next.values[key]; });
     // None of the previous day's manual calculation overrides may leak into the new day.
@@ -121,6 +123,8 @@
     var db = getDB(), a = area(db, outlet);
     a.backup = {date: date, record: clone(a.reports[date] || blank())};
     a.reports[date] = blank();
+    // An explicit reset must remain empty after app reload, even with an MIS file loaded.
+    a.reports[date].values._skipMISAutoFill = true;
     saveDB(db);
   }
   function canRestore(outlet, date) {
@@ -151,29 +155,136 @@
     return JSON.stringify({format: 'PH-Daily-Report-Backup', version: 3, exportedAt: new Date().toISOString(),
       outlet: getOutlet(), database: getDB()}, null, 2);
   }
-  function importBackup(json) {
-    var payload = typeof json === 'string' ? JSON.parse(json) : json;
+  function isRecordMap(value) {
+    return value && typeof value === 'object' && !Array.isArray(value);
+  }
+  function validateImportPayload(json) {
+    var payload;
+    try {
+      payload = typeof json === 'string' ? JSON.parse(json) : json;
+    } catch (err) {
+      throw new Error('Backup is not valid JSON.');
+    }
     if (!payload || payload.format !== 'PH-Daily-Report-Backup' || payload.version !== 3 ||
-        !payload.database || payload.database.version !== 3 || !payload.database.outlets) {
+        !payload.database || payload.database.version !== 3 ||
+        !isRecordMap(payload.database.outlets)) {
       throw new Error('This is not a compatible report backup.');
     }
+    var data = payload.database.outlets;
+    if (Object.keys(data).some(function (outlet) {return OUTLETS.indexOf(outlet) < 0;})) {
+      throw new Error('Backup contains an unknown outlet.');
+    }
+    var total = 0, maxReports = 12000;
+    Object.keys(data).forEach(function (outlet) {
+      var source = data[outlet];
+      if (!isRecordMap(source) || !isRecordMap(source.reports)) {
+        throw new Error('Backup outlet reports have an invalid structure: ' + outlet);
+      }
+      Object.keys(source.reports).forEach(function (date) {
+        if (!validDate(date)) throw new Error('Invalid date in backup: ' + date);
+        total++;
+        if (total > maxReports) throw new Error('Backup includes too many reports.');
+        validateRecord(source.reports[date], date);
+      });
+      if (source.mis != null && (!isRecordMap(source.mis) || !isRecordMap(source.mis.data))) {
+        throw new Error('Backup contains an invalid MIS report for ' + outlet);
+      }
+      if (source.backup != null) {
+        if (!isRecordMap(source.backup) || !validDate(source.backup.date)) {
+          throw new Error('Backup contains an invalid reset record for ' + outlet);
+        }
+        validateRecord(source.backup.record, source.backup.date);
+      }
+    });
+    return payload;
+  }
+  function validateRecord(record, date) {
+    if (!isRecordMap(record) || !isRecordMap(record.values) ||
+        (record.customCalcs != null && !isRecordMap(record.customCalcs))) {
+      throw new Error('Invalid report structure for ' + date);
+    }
+    Object.keys(record.values).forEach(function (key) {
+      if (['__proto__','constructor','prototype'].indexOf(key) >= 0) throw new Error('Invalid field name in backup');
+      var val = record.values[key];
+      if (key === '_skipMISAutoFill') {
+        if (typeof val !== 'boolean') throw new Error('Invalid MIS reset flag');
+      } else if (!(typeof val === 'string' || typeof val === 'number' || val === null) ||
+                 (typeof val === 'string' && val.length > 200) ||
+                 (typeof val === 'number' && !Number.isFinite(val))) {
+        throw new Error('Invalid stored value for ' + key);
+      }
+    });
+    Object.keys(record.customCalcs || {}).forEach(function (key) {
+      if (['__proto__','constructor','prototype'].indexOf(key) >= 0) throw new Error('Invalid calculation key');
+      var val = record.customCalcs[key];
+      if (!(typeof val === 'number' && Number.isFinite(val)) &&
+          !(typeof val === 'string' && val.trim() !== '' && Number.isFinite(Number(val)))) {
+        throw new Error('Invalid saved calculated value for ' + key);
+      }
+    });
+    if (record.updatedAt != null && (!Number.isFinite(Number(record.updatedAt)) || Number(record.updatedAt) < 0)) {
+      throw new Error('Invalid report timestamp for ' + date);
+    }
+  }
+  function previewBackup(json) {
+    var payload = validateImportPayload(json), db = getDB();
+    var stats = {incoming: 0, newReports: 0, conflicts: 0, outlets: 0};
+    Object.keys(payload.database.outlets).forEach(function (outlet) {
+      stats.outlets++;
+      var source = payload.database.outlets[outlet].reports;
+      var existing = db.outlets[outlet] && db.outlets[outlet].reports || {};
+      Object.keys(source).forEach(function (date) {
+        stats.incoming++;
+        if (existing[date]) stats.conflicts++; else stats.newReports++;
+      });
+    });
+    return stats;
+  }
+  function importBackup(json, preferBackup) {
+    var payload = validateImportPayload(json);
     var db = getDB(), incoming = payload.database.outlets;
+    var stats = {added: 0, keptExisting: 0, replaced: 0, outlets: 0};
+    // Validate all incoming reports before modifying anything. Keep a local undo snapshot.
+    var originalJSON = JSON.stringify(db);
     Object.keys(incoming).forEach(function (outlet) {
-      if (OUTLETS.indexOf(outlet) < 0) return;
       var src = incoming[outlet], dest = area(db, outlet);
-      if (!src || typeof src !== 'object' || !src.reports || typeof src.reports !== 'object') return;
+      stats.outlets++;
       Object.keys(src.reports).forEach(function (date) {
         var record = src.reports[date];
-        if (!validDate(date) || !record || !record.values || typeof record.values !== 'object' ||
-            Array.isArray(record.values)) return;
-        if (!dest.reports[date] || (Number(record.updatedAt) || 0) > (Number(dest.reports[date].updatedAt) || 0)) {
-          dest.reports[date] = {values: clone(record.values), customCalcs: clone(record.customCalcs || {}),
-            updatedAt: Number(record.updatedAt) || Date.now()};
+        if (dest.reports[date] && !preferBackup) {
+          stats.keptExisting++;
+          return;
         }
+        if (dest.reports[date]) stats.replaced++; else stats.added++;
+        dest.reports[date] = {
+          values: clone(record.values),
+          customCalcs: clone(record.customCalcs || {}),
+          updatedAt: Number(record.updatedAt) || Date.now()
+        };
       });
       if (!dest.mis && src.mis && src.mis.data) dest.mis = clone(src.mis);
+      if (!dest.backup && src.backup) dest.backup = clone(src.backup);
     });
+    // Fail safely if storage is full, rather than importing without an undo snapshot.
+    global.localStorage.setItem(IMPORT_UNDO_KEY, originalJSON);
+    try { saveDB(db); }
+    catch (err) {
+      global.localStorage.removeItem(IMPORT_UNDO_KEY);
+      throw err;
+    }
+    return stats;
+  }
+  function canUndoImport() {
+    return !!global.localStorage.getItem(IMPORT_UNDO_KEY);
+  }
+  function undoImport() {
+    var previous = global.localStorage.getItem(IMPORT_UNDO_KEY);
+    if (!previous) return false;
+    // Undo is explicit because any edits made since importing will also be undone.
+    var db = normaliseDB(JSON.parse(previous));
     saveDB(db);
+    global.localStorage.removeItem(IMPORT_UNDO_KEY);
+    return true;
   }
   // Sri Lankan operating day: 06:00 to 05:59, independent of the device timezone.
   function operationalDate(reference) {
@@ -194,6 +305,7 @@
     OUTLETS: OUTLETS.slice(), getOutlet: getOutlet, setOutlet: setOutlet,
     load: load, save: save, reset: reset, canRestore: canRestore, restore: restore,
     getMIS: getMIS, setMIS: setMIS, exportBackup: exportBackup, importBackup: importBackup,
+    previewBackup: previewBackup, canUndoImport: canUndoImport, undoImport: undoImport,
     operationalDate: operationalDate, rollover: rollover, validDate: validDate
   };
 })(globalThis);
