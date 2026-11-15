@@ -39,6 +39,7 @@ const ctx={
  ReportStore:store,document:{getElementById:el,title:'',activeElement:el('settingsButton')},
  FIELDS:[{id:'todaySale'},{id:'mtdSale'}],DEFAULTS:{},LEGACY_CALC_MAP:{},
  lastValidValues:Object.create(null),customCalcs:{},reportSkipMIS:false,
+ isInputValidForSave:()=>true,
  selectedOutlet:'Matara 02',activeDate:'2026.11.15',todayStr:'2026.11.15',
  lastModalFocus:null,requestAnimationFrame:cb=>cb(),updateUndoImportButton:()=>{},
  updateReportingDateNotice:()=>{},console:{error(){}},
