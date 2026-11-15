@@ -20,6 +20,8 @@ jobs:
         run: node tests/report-ui.test.js
       - name: Test Gamma MIS sample formats and saved monthly reports
         run: node tests/gamma-mis.test.js
+      - name: Verify direct WhatsApp buttons
+        run: node tests/whatsapp-direct.test.js
       - name: Validate JavaScript syntax
         run: |
           node --check gamma-mis.js
