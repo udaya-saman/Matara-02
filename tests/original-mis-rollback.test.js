@@ -47,12 +47,12 @@ for(const f of expected){
  assert.ok(m,'Stored month '+key);
  assert.equal(m.reportYear,2026);
  assert.equal(m.reportMonth,expected.indexOf(f)+4);
- assert.equal(Object.keys(m.data).filter(k=>k.startsWith('2026-')).length,f.days);
- const lastKey=key+'-'+String(f.days).padStart(2,'0');
+ assert.equal(Object.values(m.data).filter(row=>row.dateMonth===expected.indexOf(f)+4 && row.dateYear===2026).length,f.days);
+ const lastKey=String(f.days)+'-'+f.month;
  assert.equal(m.data[lastKey].mtd,f.target);
 }
 // June's additional "1-Jun" must not overwrite the first day's data.
-assert.equal(stored['2026-06'].data['2026-06-01'].day,100);
+assert.equal(stored['2026-06'].data['1-Jun'].day,100);
 assert.equal(count,4);
 assert.equal(context.selectedOutlet,'Akuressa','Import did not silently change the outlet');
 assert.match(html,/id="selectedOutletLabel"/);
