@@ -11,7 +11,8 @@ function take(from,to) {
 }
 const pure=take('function parseMISDateHeader(', 'function clearMISAutoFilledTargets(')
   + take('function normaliseMISRecord(', 'function autoFillFromMIS(')
-  + take('function parseMISNumber(', 'function handleMISUpload(');
+  + take('function parseMISNumber(', 'function handleMISUpload(')
+  + take('function getMatchingMISForDate(', 'function getTomorrowTarget(');
 const funcs=vm.runInNewContext(pure+
   ';({parseMISDateHeader,parseAppDate,parseMISNumber,normaliseMISRecord})');
 assert.deepEqual(JSON.parse(JSON.stringify(funcs.parseMISDateHeader('15-Nov'))),{day:15,month:11,year:null});
@@ -32,7 +33,10 @@ let data={'2026-02-14':{dateDay:14,dateMonth:2,dateYear:2026,day:100,mtd:1200},
 let ReportStore={getMIS:()=>({filename:'gamma.csv',data})};
 const code=pure + take('function autoFillFromMIS(', '// ==========================================\n// CALENDAR PICKER');
 const context={document,selectedOutlet,reportSkipMIS,ReportStore,calcAndRender:()=>recalcs++,
-  autoSave:()=>saved++,clearMISAutoFilledTargets:()=>{throw Error('Unexpected clearing')},Date,JSON,Object,Number};
+  autoSave:()=>saved++,clearMISAutoFilledTargets:()=>{
+    for(const id of ['mtdTarget','dayTarget','monthlyTarget']) fields[id].value='';
+    recalcs++;saved++;
+  },Date,JSON,Object,Number};
 vm.createContext(context);
 vm.runInContext(code,context);
 vm.runInContext('autoFillFromMIS()',context);
