@@ -24,6 +24,8 @@ jobs:
         run: node tests/whatsapp-direct.test.js
       - name: Verify original Gamma MIS upload and restored interface
         run: node tests/original-mis-rollback.test.js
+      - name: Test outlet selector and date navigation
+        run: node tests/outlet-date-navigation.test.js
       - name: Validate JavaScript syntax
         run: |
           node --check gamma-mis.js

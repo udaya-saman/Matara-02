@@ -931,15 +931,39 @@ function applyReportData(record) {
 }
 
 function loadSelectedReport(date, seed) {
-  activeDate = date;
+  // Read the destination report before touching the current screen.
+  // A failed storage read must not clear fields or change the selected date.
+  let destination;
   try {
-    applyReportData(ReportStore.load(selectedOutlet, date, !!seed));
+    destination = ReportStore.load(selectedOutlet, date, !!seed);
   } catch (err) {
-    console.error('Could not load report', err);
-    toast('Saved report could not be opened. Your previous data has not been deleted.', 'error', 6000);
+    console.error('Could not read report', err);
+    toast('Could not open this date. Your current report has been kept.', 'error', 5500);
     return false;
   }
-  return true;
+
+  const previousDate = activeDate;
+  const previousValues = collectReportValues();
+  const previousCalcs = {...customCalcs};
+  const previousSkipMIS = reportSkipMIS;
+  try {
+    activeDate = date;
+    applyReportData(destination);
+    return true;
+  } catch (err) {
+    console.error('Could not display report', err);
+    activeDate = previousDate;
+    try {
+      applyReportData({values: {...previousValues, _skipMISAutoFill: previousSkipMIS},
+        customCalcs: previousCalcs});
+    } catch (restoreErr) {
+      console.error('Could not restore the report screen', restoreErr);
+      const dateInput = document.getElementById('date');
+      if (dateInput) dateInput.value = previousDate;
+    }
+    toast('Could not open this date. Your previous report is still available.', 'error', 5500);
+    return false;
+  }
 }
 
 function loadFromStorage() {
@@ -962,7 +986,6 @@ function updateOutletDisplay() {
   if (selector) selector.value = selectedOutlet;
   const summary = document.getElementById('summaryDate');
   if (summary) summary.textContent = activeDate;
-  renderMISMonthList();
   document.title = 'PH Daily Report | ' + selectedOutlet;
 }
 
@@ -1917,11 +1940,9 @@ function selectDate(y, m, d) {
   if (!ReportStore.validDate(formatted)) return;
   if (!saveToStorage()) return;
   document.getElementById('calendarOverlay').classList.remove('open');
-  if (formatted > todayStr) {
-    showModal({icon:'📅',title:'Future reporting date',msg:'This is a future date. Your entry is stored separately from today. Continue?',okLabel:'Open date',cancelLabel:'Cancel',onOk:()=>openReportDate(formatted)});
-    return;
-  }
-  openReportDate(formatted);
+  // A different date opens directly, including a future date.
+  // Existing values remain saved under their original outlet and date.
+  if (formatted !== activeDate) openReportDate(formatted);
 }
 function openReportDate(formatted) {
   if (!loadSelectedReport(formatted, formatted === todayStr)) return;
