@@ -511,6 +511,76 @@
   .calendar-day.selected { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(227, 24, 55, 0.25); }
   .calendar-day.today { border-color: var(--accent); color: var(--accent); font-weight: 700; }
   .calendar-day.today.selected { border-color: transparent; color: #fff; }
+
+/* Professional mobile-first reporting interface */
+:root { --bg:#F6F7FA; --accent:#C91331; --accent-hover:#A90E27; --text:#18212F; --text2:#475467; --muted:#667085; --border:#DFE3E9; }
+body { font-size:14px; background:var(--bg); line-height:1.5; padding-bottom:28px; }
+.header { padding:13px max(16px, calc((100vw - 980px) / 2)); box-shadow:0 2px 12px rgba(16,24,40,.08); position:sticky; }
+.header .logo { border-radius:12px; width:42px;height:42px; font-size:20px; box-shadow:none; }
+.header .title { font-size:17px; letter-spacing:-.3px; }
+.header-settings { flex-shrink:0; border:1px solid rgba(255,255,255,.45); background:rgba(255,255,255,.13); color:white; font-family:inherit; border-radius:12px; padding:10px 13px; font-weight:650; cursor:pointer; min-height:44px; }
+.main { max-width:1024px; padding:20px 18px 40px; }
+.overview { background:linear-gradient(120deg,#fff,#FCF5F6); border:1px solid #F0E5E7; border-radius:18px; padding:23px 25px; margin-bottom:14px; box-shadow:0 4px 18px rgba(16,24,40,.03); }
+.overview h1 { font-size:clamp(24px,5vw,34px);letter-spacing:-.9px; margin:2px 0 3px; font-weight:800; color:var(--text); }
+.overview p {font-weight:650;color:var(--text2);margin:0 0 6px;}
+.overview small {display:block;color:var(--muted);font-size:12px;}
+.eyebrow {color:var(--accent);font-size:11px;letter-spacing:1.1px;font-weight:800;}
+.toolbar {display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px;}
+.toolbar button {background:white;border:1px solid var(--border);padding:11px 17px;border-radius:12px;color:var(--text2);font-family:inherit;font-weight:700;font-size:13px;min-height:44px;cursor:pointer;}
+.card {border:1px solid #E9EBF0;box-shadow:0 4px 16px rgba(16,24,40,.035);border-radius:18px;padding:22px 24px;margin-bottom:15px;}
+.sec-title {font-size:17px;letter-spacing:-.3px;margin-bottom:18px;gap:10px;}
+.cat-label {font-size:11px;letter-spacing:.8px;margin-top:25px;margin-bottom:12px;border-radius:7px;padding:7px 10px;}
+.grid-2 {gap:14px;}
+.grid-3 {gap:11px;}
+.input-group label {font-size:11px;letter-spacing:.35px;line-height:1.4;}
+input[type=text],input[type=password] {min-height:48px;border-radius:10px;padding:12px 13px;font-size:16px;box-shadow:none;}
+input[readonly] {background:#F6F8FA;}
+.calc-box {border-radius:11px;min-height:78px;justify-content:center;box-shadow:none;}
+.calc-lbl {font-size:10px;line-height:1.45;}
+.calc-val {font-size:20px;}
+.btn-small {min-height:38px;}
+.btn-whatsapp,.wa-row .btn-whatsapp {font-size:15px;padding:15px 10px;border-radius:12px;box-shadow:none;min-height:54px;}
+.btn-whatsapp.m2 {box-shadow:none;}
+.btn-upload {min-height:58px;border-radius:12px;font-size:14px;}
+.toast {font-size:14px !important;padding:18px 22px !important;max-width:min(92%,420px) !important;white-space:normal;overflow-wrap:anywhere;z-index:9999 !important;}
+.settings-overlay {display:none;position:fixed;inset:0;z-index:1500;align-items:center;justify-content:center;background:rgba(16,24,40,.55);padding:16px;backdrop-filter:blur(3px);}
+.settings-overlay.open {display:flex;}
+.settings-dialog {background:white;width:100%;max-width:510px;max-height:90vh;overflow:auto;border-radius:20px;padding:25px;box-shadow:0 25px 80px rgba(16,24,40,.2);color:var(--text);}
+.settings-head {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;}
+.settings-head h2 {font-size:21px;letter-spacing:-.5px;}
+.settings-head button {background:#F2F4F7;border:0;border-radius:9px;padding:9px 12px;cursor:pointer;min-height:42px;min-width:42px;}
+.settings-dialog label {font-size:12px;font-weight:750;}
+.settings-dialog select {display:block;width:100%;min-height:49px;padding:11px 13px;margin:8px 0 10px;font-family:inherit;font-weight:600;font-size:16px;color:var(--text);background:white;border:1px solid var(--border);border-radius:10px;}
+.settings-dialog h3 {font-size:16px;margin-bottom:8px;}
+.settings-dialog p {font-size:13px;color:var(--muted);line-height:1.55;margin:9px 0 14px;}
+.settings-dialog button {font-family:inherit;font-weight:650;}
+.settings-primary {background:var(--accent)!important;color:white!important;border-color:var(--accent)!important;}
+.settings-dialog > .settings-primary,.settings-actions button {padding:12px 16px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;min-height:46px;}
+.settings-actions {display:flex;gap:10px;flex-wrap:wrap;}
+.settings-actions button {flex:1;min-width:130px;}
+.message-preview {max-height:52vh;overflow:auto;white-space:pre-wrap;word-break:break-word;background:#F8FAFC;border:1px solid var(--border);border-radius:11px;padding:15px;font:13px/1.5 ui-monospace,Consolas,monospace;margin:12px 0 18px;}
+:focus-visible {outline:3px solid rgba(201,19,49,.4)!important;outline-offset:2px;}
+@media(max-width:600px) {
+ .main {padding:14px 11px 30px;}
+ .header {padding:12px 13px;gap:10px;}
+ .header .title {font-size:15px;}
+ .header-settings {font-size:12px;padding:9px;}
+ .card {padding:17px 13px;border-radius:15px;}
+ .overview {padding:18px 16px;}
+ .grid-2 {grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 9px;}
+ .grid-3 {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .input-group label {font-size:10px;}
+ input[type=text] {padding:11px 9px;font-size:16px;}
+ .settings-dialog {padding:19px;}
+}
+@media(max-width:350px) {
+ .grid-2 {grid-template-columns:minmax(0,1fr);}
+ .wa-row {grid-template-columns:minmax(0,1fr);}
+ .header-settings {font-size:0;}
+ .header-settings::first-letter {font-size:20px;}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
 </style>
 </head>
 <body>
@@ -535,8 +605,9 @@
   <div class="logo">🍕</div>
   <div style="flex:1">
     <div class="title">Pizza Hut Daily Report</div>
-    <div class="sub-title">Matara 02</div>
+    <div class="sub-title" id="selectedOutletLabel">Matara 02</div>
   </div>
+  <button class="header-settings" onclick="openSettings()">⚙ Settings</button>
 </div>
 
 <!-- TOAST -->
@@ -564,8 +635,19 @@
   </div>
 </div>
 
+<div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+<section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+<div class="settings-head"><h2 id="settingsTitle">Outlet & settings</h2><button onclick="closeSettings()" aria-label="Close">✕</button></div>
+<label for="outletSelect">Selected outlet</label><select id="outletSelect"><option>Akuressa</option><option>Embilipitiya</option><option>Monaragala</option><option>Matara</option><option>Matara 02</option><option>Tangalle</option></select>
+<p>Resetting a report never changes this selection.</p><button class="settings-primary" onclick="changeOutlet()">Save outlet</button>
+<hr><h3>Backup & recovery</h3><p>Export before changing devices or clearing app storage.</p>
+<div class="settings-actions"><button onclick="exportReportBackup()">↓ Export backup</button><button onclick="document.getElementById('backupFileInput').click()">↑ Import backup</button></div>
+<input id="backupFileInput" type="file" accept=".json,application/json" hidden onchange="handleBackupImport(event)"><button id="undoBackupImportBtn" type="button" onclick="undoBackupImport()" style="display:none;margin-top:12px;min-height:44px">Undo last backup import</button>
+</section></div>
+<div class="settings-overlay" id="previewOverlay" onclick="if(event.target===this)closePreview()">
+<section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><div class="settings-head"><h2 id="previewTitle">Preview WhatsApp message</h2><button onclick="closePreview()" aria-label="Close">✕</button></div><pre class="message-preview" id="previewText"></pre><div class="settings-actions"><button onclick="copyPreview()">Copy</button><button class="settings-primary" onclick="openPreviewWhatsApp()">Open WhatsApp</button></div></section></div>
 <!-- CUSTOM CONFIRM MODAL -->
-<div class="confirm-overlay" id="confirmOverlay">
+<div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
   <div class="confirm-sheet">
     <div class="confirm-icon" id="confirmIcon">⚠️</div>
     <div class="confirm-title" id="confirmTitle"></div>
@@ -600,6 +682,8 @@
 </div>
 
 <div class="main">
+<section class="overview"><span class="eyebrow">DAILY OPERATIONS</span><h1 id="overviewOutlet">Matara 02</h1><p>Operational report · <span id="summaryDate"></span></p><p id="reportDateNotice" role="status" aria-live="polite" style="font-size:12px;font-weight:700"></p><small>Separate saved reports by outlet and date · Operational day begins at 6:00 AM</small></section>
+<div class="toolbar"><button onclick="openCalendar()">📅 Choose date</button><button onclick="openSettings()">⚙ Outlet & backups</button></div>
 
   <!-- PWA INSTALL BANNER -->
   <div class="pwa-banner" id="pwaBanner">
@@ -680,6 +764,7 @@
   <p>If you notice any issues or mistakes, please contact me on WhatsApp at <br><a href="https://wa.me/94719698799" style="color:var(--accent);font-weight:700;text-decoration:none;font-size:14px;display:inline-block;margin-top:4px;">071 9698799</a></p>
 </footer>
 
+<script src="./report-store.js"></script>
 <script>
 // FORCE SERVICE WORKER UPDATE IMMEDIATELY
 if ('serviceWorker' in navigator) {
@@ -733,7 +818,7 @@ const CATS = [
     {id:'star5',           label:'5 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
     {id:'smartGes',        label:'Smart GES',             type:'nodec', readonly:true, grp:'mtd'},
     {id:'totalResponses',  label:'Total Responses',       type:'nodec', keepOnReset:true, grp:'mtd'},
-    {id:'mtdWinScore',     label:'MTD Win Score',         type:'num',   keepOnReset:true, grp:'mtd'},
+    {id:'mtdWinScore',     label:'MTD Win Score',         type:'pct',   keepOnReset:true, grp:'mtd'},
   ]},
   { id:'cat-5star', fields:[
     {id:'overallRating',   label:'5★ Overall Rating',     type:'num'},
@@ -782,11 +867,10 @@ const now           = new Date();
 
 // The operational day runs from 6:00 AM until 5:59 AM the following day.
 function getOperationalDate(referenceDate = new Date()) {
-  const d = new Date(referenceDate.getTime());
-  if (d.getHours() < 6) d.setDate(d.getDate() - 1);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  const parts = ReportStore.operationalDate(referenceDate).split('.').map(Number);
+  return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0, 0);
 }
+
 function formatOperationalDate(date) {
   return `${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`;
 }
@@ -795,139 +879,127 @@ const operationalToday = getOperationalDate(now);
 const currentMonth  = `${operationalToday.getFullYear()}-${operationalToday.getMonth()+1}`;
 const currentYear   = String(operationalToday.getFullYear());
 
-function saveToStorage() {
+function collectReportValues() {
   const data = {};
   FIELDS.forEach(f => {
+    if (f.readonly) return;
     const el = document.getElementById(f.id);
-    if (el) data[f.id] = el.value;
+    if (el) data[f.id] = isInputValidForSave(el) ? el.value : '';
   });
-  const dateEl = document.getElementById('date');
-  if (dateEl) data['date'] = dateEl.value;
-  data._customCalcs = customCalcs;
+  return data;
+}
+
+let storageWarningShown = false;
+let reportSkipMIS = false;
+function saveToStorage() {
   try {
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-    localStorage.setItem(LS_MONTH_KEY, currentMonth);
-    localStorage.setItem(LS_YEAR_KEY, currentYear);
-    localStorage.setItem(LS_DAY_KEY, todayStr);
-  } catch(e){}
-  const mt = document.getElementById('monthlyTarget');
-  if (mt && mt.value && mt.value !== '') {
-    try { localStorage.setItem(LS_TARGET_KEY, mt.value); } catch(e){}
+    ReportStore.save(selectedOutlet, activeDate, {...collectReportValues(), ...(reportSkipMIS ? {_skipMISAutoFill:true} : {})}, customCalcs);
+    storageWarningShown = false;
+    return true;
+  } catch (err) {
+    if (!storageWarningShown) {
+      toast('Your report could not be saved. Export a backup and check device storage.', 'error', 6000);
+      storageWarningShown = true;
+    }
+    console.error('Could not save report', err);
+    return false;
   }
 }
 
-function saveBackupToStorage(data) {
-  try { localStorage.setItem(LS_BACKUP_KEY, JSON.stringify(data)); } catch(e){}
-}
-
-function clearTodayFields() {
-  const bak = {};
-  let had = false;
+function applyReportData(record) {
+  const values = record && record.values && typeof record.values === 'object' ? record.values : {};
+  reportSkipMIS = values._skipMISAutoFill === true;
+  const legacy = {mtdU20:['mtdHF'], hutTodayOnTime:['hutbotToday'], hutMtdOnTime:['hutbotMTD']};
   FIELDS.forEach(f => {
-    if (!f.today || f.readonly) return;
     const el = document.getElementById(f.id);
     if (!el) return;
-    bak[f.id] = el.value;
-    const def = DEFAULTS[f.id] !== undefined ? DEFAULTS[f.id] + '%' : '';
-    if (el.value !== '' && el.value !== def) had = true;
-    el.value = '';
+    if (f.readonly) { el.value = ''; return; }
+    let value = values[f.id];
+    if (value === undefined && legacy[f.id]) {
+      const oldId = legacy[f.id].find(id => values[id] !== undefined);
+      if (oldId) value = values[oldId];
+    }
+    value = value == null ? '' : String(value);
+    if (f.type === 'pct' && value && !value.endsWith('%')) value += '%';
+    el.value = value;
+    if (f.type === 'asr') {
+      const display = document.getElementById(f.id + '-display');
+      if (display) display.textContent = value || 'AS';
+    }
   });
-  if (had) {
-    backupData = bak;
-    saveBackupToStorage(bak);
-    const rb = document.getElementById('restoreBtn');
-    if (rb) rb.style.display = 'inline-block';
-    toast('🌅 අලුත් දිනයක්: Today data clear කරන ලදී.<br><span style="font-size:13px;font-weight:600;">Undo කිරීමට ↩️ Restore ඔබන්න.</span>', 'info', 3500);
+  customCalcs = record && record.customCalcs && typeof record.customCalcs === 'object'
+    ? {...record.customCalcs} : {};
+  // Keep the previous manual-calculation migration.
+  Object.entries(LEGACY_CALC_MAP).forEach(([newKey, oldKeys]) => {
+    if (customCalcs[newKey] === undefined) {
+      const oldKey = oldKeys.find(key => customCalcs[key] !== undefined);
+      if (oldKey) customCalcs[newKey] = customCalcs[oldKey];
+    }
+    oldKeys.forEach(key => { delete customCalcs[key]; });
+  });
+  Object.entries(DEFAULTS).forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.value = value + '%';
+  });
+  document.getElementById('date').value = activeDate;
+  updateOutletDisplay();
+  updateReportingDateNotice();
+  refreshRestoreButton();
+}
+
+function loadSelectedReport(date, seed) {
+  activeDate = date;
+  try {
+    applyReportData(ReportStore.load(selectedOutlet, date, !!seed));
+  } catch (err) {
+    console.error('Could not load report', err);
+    toast('Saved report could not be opened. Your previous data has not been deleted.', 'error', 6000);
+    return false;
   }
+  return true;
 }
 
 function loadFromStorage() {
-  try {
-    const savedMonth = localStorage.getItem(LS_MONTH_KEY);
-    const calendarMonth = `${now.getFullYear()}-${now.getMonth()+1}`;
-    const legacyMonthBoundary = now.getHours() < 6 && now.getDate() === 1 && savedMonth === calendarMonth;
-    const isNewMonth = savedMonth !== null && savedMonth !== currentMonth && !legacyMonthBoundary;
-    const savedYear = localStorage.getItem(LS_YEAR_KEY);
-    const isNewYear = savedYear !== null && savedYear !== currentYear;
-    const lastDay = localStorage.getItem(LS_DAY_KEY);
-    const isNewDay = lastDay !== null && lastDay !== todayStr;
-    const raw = localStorage.getItem(LS_KEY);
+  loadSelectedReport(todayStr, true);
+}
 
-    if (raw) {
-      const data = JSON.parse(raw);
-      FIELDS.forEach(f => {
-        if (f.readonly) return;
-        if (isNewMonth && f.keepOnReset) return;
-        if (isNewYear && f.yearly) return;
-        const el = document.getElementById(f.id);
-        let val = data[f.id];
-        // New field IDs can read values saved by the earlier release.
-        if (val === undefined && LEGACY_MAP[f.id]) {
-          for (const legacyId of LEGACY_MAP[f.id]) {
-            if (data[legacyId] !== undefined) { val = data[legacyId]; break; }
-          }
-        }
-        if (el && val !== undefined) {
-          if (f.type === 'pct' && val !== null && String(val).trim() !== '') {
-            const savedPct = String(val).trim();
-            el.value = savedPct.endsWith('%') ? savedPct : savedPct + '%';
-          } else {
-            el.value = val;
-          }
-          if (f.type === 'asr') {
-            const disp = document.getElementById(f.id + '-display');
-            if (disp) disp.innerText = val || 'AS';
-          }
-        }
-      });
+function refreshRestoreButton() {
+  const button = document.getElementById('restoreBtn');
+  if (button) button.style.display = ReportStore.canRestore(selectedOutlet, activeDate) ? 'inline-flex' : 'none';
+}
 
-      // Migrate manually edited calculation names from the previous version.
-      if (data._customCalcs && typeof data._customCalcs === 'object') {
-        customCalcs = { ...data._customCalcs };
-        Object.entries(LEGACY_CALC_MAP).forEach(([newKey, oldKeys]) => {
-          if (customCalcs[newKey] === undefined) {
-            const oldKey = oldKeys.find(key => customCalcs[key] !== undefined);
-            if (oldKey) customCalcs[newKey] = customCalcs[oldKey];
-          }
-          oldKeys.forEach(key => { delete customCalcs[key]; });
-        });
-      }
+function updateOutletDisplay() {
+  const label = document.getElementById('selectedOutletLabel');
+  if (label) label.textContent = selectedOutlet;
+  const overview = document.getElementById('overviewOutlet');
+  if (overview) overview.textContent = selectedOutlet;
+  const selector = document.getElementById('outletSelect');
+  if (selector) selector.value = selectedOutlet;
+  const summary = document.getElementById('summaryDate');
+  if (summary) summary.textContent = activeDate;
+  document.title = 'PH Daily Report | ' + selectedOutlet;
+}
 
-      // The saved report date is intentionally not restored here. Startup always
-      // uses today's operational date, even if a different date was selected before closing.
-    }
-
-    const savedTarget = localStorage.getItem(LS_TARGET_KEY);
-    if (savedTarget) {
-      const mt = document.getElementById('monthlyTarget');
-      if (mt) mt.value = savedTarget;
-    }
-    const bak = localStorage.getItem(LS_BACKUP_KEY);
-    if (bak) {
-      try {
-        backupData = JSON.parse(bak);
-        const restoreButton = document.getElementById('restoreBtn');
-        if (restoreButton) restoreButton.style.display = 'inline-block';
-      } catch(e) {}
-    }
-
-    // Discard manual overrides that belong to a completed reporting period.
-    if (isNewDay) DAILY_CALC_KEYS.forEach(key => { delete customCalcs[key]; });
-    if (isNewMonth) MONTHLY_CALC_KEYS.forEach(key => { delete customCalcs[key]; });
-    if (isNewYear) {
-      // YTD is a new reporting period. There are currently no YTD calculation overrides.
-      try { localStorage.setItem(LS_YEAR_KEY, currentYear); } catch(e) {}
-    }
-
-    // New operational day: today's inputs start fresh. Keep a backup so Restore can undo it.
-    if (AUTO_CLEAR_TODAY && isNewDay) clearTodayFields();
-
-    // Persist cleared daily/monthly fields and updated period markers immediately.
-    // This prevents yesterday's or last month's values from returning after a restart.
-    saveToStorage();
-  } catch(e) {
-    console.error('Unable to load saved report data:', e);
+function updateReportingDateNotice() {
+  const el = document.getElementById('reportDateNotice');
+  if (!el) return;
+  const status = activeDate > todayStr ? 'FUTURE DRAFT' : (activeDate < todayStr ? 'HISTORICAL REPORT' : 'CURRENT REPORT');
+  el.textContent = status + ' · ' + activeDate + (activeDate !== todayStr ? ' · Edits affect only this date.' : '');
+  el.style.color = activeDate > todayStr ? '#9A3412' : '#475467';
+}
+function isInputValidForSave(el) {
+  const field = FIELDS.find(f => f.id === el.id);
+  if (!field || !el.value.trim()) return true;
+  const raw = el.value.replace(/[, %]/g,'').trim();
+  if (field.type === 'asr') return ['AS','M','UP'].includes(el.value);
+  if (field.type === 'pct') return raw !== '' && Number.isFinite(Number(raw)) && Number(raw) >= 0 && Number(raw) <= 100;
+  if (field.type === 'nodec') return /^\d+$/.test(raw);
+  if (field.type === 'time') return Number.isFinite(Number(raw)) && Number(raw) >= 0;
+  if (field.type === 'num') {
+    if (!Number.isFinite(Number(raw)) || Number(raw) < 0) return false;
+    if (['overallRating','annualTMTurnover','winScore','hutbotOnTime','brandRating','fsccRating','deliveredU30'].includes(el.id) && Number(raw) > 5) return false;
   }
+  return true;
 }
 function autoSave() { saveToStorage(); }
 
@@ -943,7 +1015,7 @@ function buildInput(f) {
     return '<div class="input-group'+gcls+'">\n    <label>'+f.label+'</label>\n    <div class="asr-field" id="'+f.id+'-wrap" onclick="openASR(\''+f.id+'\')">\n      <span id="'+f.id+'-display" class="asr-val">AS</span>\n      <input type="hidden" id="'+f.id+'" value="AS">\n      <span class="asr-arrow">&#9662;</span>\n    </div>\n  </div>';
   }
   const isNum     = f.type==='num'||f.type==='nodec'||f.type==='time';
-  const inputMode = isNum ? 'inputmode="decimal" pattern="[0-9,.]*"' :
+  const inputMode = isNum ? (f.type==='nodec' ? 'inputmode="numeric" pattern="[0-9,]*"' : 'inputmode="decimal" pattern="[0-9,.]*"') :
                     f.type==='pct' ? 'inputmode="decimal"' : '';
   let cls = '';
   if (f.type==='num' || f.type==='time') cls = 'num';
@@ -954,7 +1026,7 @@ function buildInput(f) {
   const kd = isLast
     ? ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();scrollToBottom();}"'
     : ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();focusNext(this);}"';
-  const focusSel = ' onfocus="try{this.select();}catch(e){}"';
+  const focusSel = f.type==='pct' ? '' : ' onfocus="try{this.select();}catch(e){}"';
   const gesIds = ['star1','star2','star3','star4','star5','todayStar1','todayStar2','todayStar3','todayStar4','todayStar5'];
   const ratingIds = ['overallRating','annualTMTurnover','winScore','hutbotOnTime','brandRating','fsccRating','deliveredU30'];
   const blurExtra = gesIds.includes(f.id)    ? ' onblur="onGesBlur(this)"'
@@ -963,16 +1035,18 @@ function buildInput(f) {
                   : f.id === 'smartGes'      ? ' onblur="onSmartGesBlur(this)"'
                   : '';
   if (f.readonly) {
-    return '<div class="input-group'+gcls+'">\n    <label>'+f.label+' <span style="font-size:9px;color:#10B981;font-weight:700;margin-left:4px;">AUTO</span></label>\n    <input type="text" id="'+f.id+'" class="num nodec" readonly style="background:#F0FDF4;cursor:default;color:#059669;font-weight:700;" placeholder="-">\n  </div>';
+    return '<div class="input-group'+gcls+'">\n    <label for="'+f.id+'">'+f.label+' <span style="font-size:9px;color:#10B981;font-weight:700;margin-left:4px;">AUTO</span></label>\n    <input type="text" id="'+f.id+'" class="num nodec" readonly style="background:#F0FDF4;cursor:default;color:#059669;font-weight:700;" placeholder="-">\n  </div>';
   }
-  return '<div class="input-group'+gcls+'">\n    <label>'+f.label+'</label>\n    <input type="text" id="'+f.id+'"'+(cls?' class="'+cls+'"':'')+' '+inputMode+enterHint+kd+focusSel+' placeholder="-" oninput="onFieldInput(this)"'+extra+blurExtra+'>\n  </div>';
+  return '<div class="input-group'+gcls+'">\n    <label for="'+f.id+'">'+f.label+'</label>\n    <input type="text" id="'+f.id+'"'+(cls?' class="'+cls+'"':'')+' '+inputMode+enterHint+kd+focusSel+' placeholder="-" oninput="onFieldInput(this)"'+extra+blurExtra+'>\n  </div>';
 }
 CATS.forEach(cat => {
   const el = document.getElementById(cat.id);
   if (el) el.innerHTML = cat.fields.map(buildInput).join('');
 });
 
-const todayStr = formatOperationalDate(operationalToday);
+let todayStr = ReportStore.operationalDate();
+let activeDate = todayStr;
+let selectedOutlet = ReportStore.getOutlet();
 document.getElementById('date').value = todayStr;
 
 function toast(msg, type='info', duration=1800) {
@@ -994,72 +1068,53 @@ function toast(msg, type='info', duration=1800) {
 
 function resetData() {
   showModal({
-    icon: '🔄',
-    title: 'Reset Data',
-    msg: 'ඇතුළත් කළ data සියල්ල ඉවත් වේ.\nReset කිරීමට අවශ්‍යද?',
-    okLabel: 'ඔව්, Reset කරන්න',
-    cancelLabel: 'නැත, අවලංගු කරන්න',
+    icon: 'alert-triangle', title: 'Reset this report?',
+    msg: 'This clears the report for ' + selectedOutlet + ' on ' + activeDate +
+      '. Your outlet selection, other dates, and uploaded MIS file stay saved. You can restore this report afterward.',
+    okLabel: 'Reset report', cancelLabel: 'Cancel',
     onOk: () => {
-      backupData = {};
-      FIELDS.forEach(f => {
-        if (f.readonly) return;
-        const el = document.getElementById(f.id);
-        if (el) {
-            backupData[f.id] = el.value;
-            el.value = '';
-            if (f.type === 'asr') {
-                el.value = 'AS';
-                const disp = document.getElementById(f.id + '-display');
-                if (disp) disp.innerText = 'AS';
-            }
-        }
-      });
-      
-      const dateEl = document.getElementById('date');
-      if (dateEl) { backupData['date'] = dateEl.value; dateEl.value = todayStr; }
-      saveBackupToStorage(backupData);
-      
-      try { localStorage.removeItem(LS_TARGET_KEY); } catch(e){}
-      try { localStorage.removeItem('ph_mis_data'); } catch(e){}
-      
-      const statusEl = document.getElementById('misUploadStatus');
-      if (statusEl) {
-        statusEl.innerText = 'No report loaded';
-        statusEl.style.color = 'var(--muted)';
+      try {
+        saveToStorage();
+        ReportStore.reset(selectedOutlet, activeDate);
+        loadSelectedReport(activeDate, false);
+        // Reset is intentional: do not automatically repopulate MIS targets.
+        calcAndRender();
+        saveToStorage();
+        refreshRestoreButton();
+        toast('Report reset. Use Restore to undo.', 'success');
+      } catch (err) {
+        toast('Could not reset the report. No saved data was deleted.', 'error', 5000);
       }
-
-      document.getElementById('date').value = todayStr;
-      customCalcs  = {};
-      
-      Object.entries(DEFAULTS).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val+'%'; });
-      
-      calcAndRender();
-      saveToStorage();
-      document.getElementById('restoreBtn').style.display = 'inline-block';
-      toast('🔄 Data reset කරන ලදී.','info');
     }
   });
 }
 function restoreData() {
-  FIELDS.forEach(f => {
-    if (f.readonly) return;
-    const el = document.getElementById(f.id);
-    if (el && backupData[f.id] !== undefined) el.value = backupData[f.id];
-  });
-  const dateEl = document.getElementById('date');
-  if (dateEl && backupData['date'] !== undefined) dateEl.value = backupData['date'];
-  calcAndRender();
-  saveToStorage();
-  backupData = {};
-  try { localStorage.removeItem(LS_BACKUP_KEY); } catch(e){}
-  document.getElementById('restoreBtn').style.display = 'none';
-  toast('✅ Data restore කරන ලදී.','success');
+  try {
+    if (!ReportStore.restore(selectedOutlet, activeDate)) {
+      toast('No backup is available for this outlet and date.', 'warning');
+      return;
+    }
+    loadSelectedReport(activeDate, false);
+    calcAndRender();
+    saveToStorage();
+    refreshRestoreButton();
+    toast('Your report has been restored.', 'success');
+  } catch (err) {
+    toast('Could not restore the report.', 'error', 5000);
+  }
 }
 
 function gn(id) { return parseFloat((document.getElementById(id)?.value||'').replace(/[,%]/g,''))||0; }
 function fmt(n) {
   if (n===undefined||n===null||n===''||isNaN(n)) return ':';
   return Math.round(n).toLocaleString('en-US');
+}
+function shownNumber(id) {
+  const raw = rawNum(id).trim();
+  return raw === '' ? '---' : fmt(gn(id));
+}
+function shownCalculation(key, value, required) {
+  return customCalcs[key] !== undefined || required ? fmt(value) : '---';
 }
 function fmtSign(n) { return (n>0?'+':'')+fmt(n); }
 function fmtVarianceMsg(n) { return n < 0 ? '('+fmt(Math.abs(n))+')' : (n > 0 ? '+' : '')+fmt(n); }
@@ -1104,26 +1159,13 @@ function onFieldInput(el) {
 function onGesBlur(el) { calcAndRender(); }
 function onRatingBlur(el) {
   const raw = (el.value||'').replace(/,/g,'').trim();
-  if (raw === '') return;
-  const num = parseFloat(raw);
-  if (isNaN(num) || num < 0 || num > 5) {
-    el.blur();
-    setTimeout(() => {
-      const overlay   = document.getElementById('confirmOverlay');
-      const btnsEl    = document.getElementById('confirmBtns');
-      document.getElementById('confirmIcon').textContent  = '⭐';
-      document.getElementById('confirmTitle').textContent = 'Rating පරාසයෙන් පිටය';
-      document.getElementById('confirmMsg').textContent   = 'ඇතුළත් කළ අගය ' + raw + ' : \nවලංගු පරාසය 0 සිට 5 දක්වා පමණයි.\nනිවැරදි අගය ඇතුළත් කරන්න.';
-      btnsEl.innerHTML = '<button class="confirm-cancel" id="confirmCancelBtn" style="display:none"></button><button class="confirm-ok" id="confirmOkBtn">හරි</button>';
-      overlay.classList.add('open');
-      document.getElementById('confirmOkBtn').onclick = () => {
-        overlay.classList.remove('open');
-        el.value = '';
-        calcAndRender();
-        requestAnimationFrame(() => { el.focus(); try { el.setSelectionRange(9999,9999); } catch(e){} });
-      };
-    }, 80);
+  if (raw === '') { autoSave(); return; }
+  const num = Number(raw);
+  if (!Number.isFinite(num) || num < 0 || num > 5) {
+    el.value = '';
+    toast('Rating must be between 0 and 5.', 'warning', 4000);
   }
+  calcAndRender(); autoSave();
 }
 function onSmartGesBlur(el) {
   const raw = (el.value||'').replace(/,/g,'').trim();
@@ -1186,7 +1228,7 @@ function editCalc(key, cur) {
   function cleanup() { overlay.classList.remove('open'); }
   document.getElementById('confirmOkBtn').onclick = () => {
     const v = inp.value.trim();
-    if (v !== '') { customCalcs[key] = isNaN(v) ? v : Number(v); calcAndRender(); }
+    if (v !== '' && Number.isFinite(Number(v.replace(/,/g,'')))) { customCalcs[key] = Number(v.replace(/,/g,'')); calcAndRender(); autoSave(); } else if (v !== '') { toast('Enter a valid number.', 'warning'); return; }
     cleanup();
   };
   document.getElementById('confirmCancelBtn').onclick = () => { cleanup(); };
@@ -1224,15 +1266,15 @@ function getTomorrowTarget(dateVal) {
     // Preserve the existing rule: do not show next month's target in this field.
     if (d.getMonth() !== tmrw.getMonth()) return '---';
 
-    const raw = localStorage.getItem('ph_mis_data');
-    if (!raw) return '---';
+    const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet));
+    if (!raw || raw === 'null') return '---';
     const mis = JSON.parse(raw);
     if (!mis || !mis.data) return '---';
 
     const record = Object.entries(mis.data)
       .map(([key, row]) => normaliseMISRecord(key, row))
       .find(item => item && item.day === tmrw.getDate() && item.month === tmrw.getMonth() + 1 &&
-        (item.year === null || item.year === tmrw.getFullYear()));
+        item.year === tmrw.getFullYear());
     return record && record.dayTarget !== null && record.dayTarget !== undefined && Number.isFinite(Number(record.dayTarget))
       ? fmt(Number(record.dayTarget)) : '---';
   } catch(e) {
@@ -1277,43 +1319,55 @@ function calcAndRender() {
   if (todayGesEl) todayGesEl.value = todayTot > 0 ? todayTot.toLocaleString('en-US') : '';
 
   const calcs = [
-    {key:'MTD Variance', val:mtdV,  disp:fmtSign(mtdV),  color:mtdV>=0?'#059669':'#DC2626'},
-    {key:'Day Variance', val:dayV,  disp:fmtSign(dayV),  color:dayV>=0?'#059669':'#DC2626'},
-    {key:'ADS',          val:ads,   disp:fmt(ads),        color:'#2563EB'},
-    {key:'ADT',          val:adt,   disp:fmt(adt),        color:'#2563EB'},
-    {key:'MTD B2B',      val:b2b,   disp:b2b+'%',         color:b2b<=10?'#059669':'#DC2626'},
-    {key:'MTD Top Box',  val:topB,  disp:topB+'%',        color:topB>=50?'#059669':'#DC2626'},
-    {key:'Today B2B',    val:todayB2B, disp:todayB2B+'%', color:todayB2B<=10?'#059669':'#DC2626'},
-    {key:'Today Top Box',val:todayTop, disp:todayTop+'%', color:todayTop>=50?'#059669':'#DC2626'},
-    {key:'Overall Satisfaction', val:osat, disp:osat+'%', color:osat>=70?'#059669':'#DC2626'},
+    {key:'MTD Variance', val:mtdV,  disp:rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtSign(mtdV) : '---',  color:mtdV>=0?'#059669':'#DC2626'},
+    {key:'Day Variance', val:dayV,  disp:rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtSign(dayV) : '---',  color:dayV>=0?'#059669':'#DC2626'},
+    {key:'ADS',          val:ads,   disp:shownCalculation('ADS',ads,!!rawNum('mtdSale').trim()),        color:'#2563EB'},
+    {key:'ADT',          val:adt,   disp:shownCalculation('ADT',adt,!!rawNum('mtdTx').trim()),        color:'#2563EB'},
+    {key:'MTD B2B',      val:b2b,   disp:autoTot > 0 || customCalcs['MTD B2B'] !== undefined ? b2b+'%' : '---',         color:b2b<=10?'#059669':'#DC2626'},
+    {key:'MTD Top Box',  val:topB,  disp:autoTot > 0 || customCalcs['MTD Top Box'] !== undefined ? topB+'%' : '---',        color:topB>=50?'#059669':'#DC2626'},
+    {key:'Today B2B',    val:todayB2B, disp:todayTot > 0 || customCalcs['Today B2B'] !== undefined ? todayB2B+'%' : '---', color:todayB2B<=10?'#059669':'#DC2626'},
+    {key:'Today Top Box',val:todayTop, disp:todayTot > 0 || customCalcs['Today Top Box'] !== undefined ? todayTop+'%' : '---', color:todayTop>=50?'#059669':'#DC2626'},
+    {key:'Overall Satisfaction', val:osat, disp:autoTot > 0 || customCalcs['Overall Satisfaction'] !== undefined ? osat+'%' : '---', color:osat>=70?'#059669':'#DC2626'},
   ];
 
 
-  document.getElementById('calcContainer').innerHTML = calcs.map(c=>
-    `<div class="calc-box${c.span2?' calc-center':''}" onclick="editCalc('${c.key}','${c.val}')">
-       <div class="calc-lbl">${c.key}</div>
-       <div class="calc-val" style="color:${c.color}">${c.disp}</div>
-     </div>`
-  ).join('');
+  // Create interactive calculated cards without interpolating saved values into HTML.
+  const container = document.getElementById('calcContainer');
+  container.replaceChildren();
+  calcs.forEach(c => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'calc-box' + (c.span2 ? ' calc-center' : '');
+    const label = document.createElement('span');
+    label.className = 'calc-lbl';
+    label.textContent = c.key;
+    const amount = document.createElement('span');
+    amount.className = 'calc-val';
+    amount.style.color = c.color;
+    amount.textContent = String(c.disp);
+    card.append(label, amount);
+    card.addEventListener('click', () => editCalc(c.key, c.val));
+    container.appendChild(card);
+  });
 
   const v = id => document.getElementById(id)?.value || '---';
   const msg =
-`*🍕 Pizza Hut Matara 02*
+`*🍕 Pizza Hut ${selectedOutlet}*
 *Daily Report - ${v('date')}*
 ━━━━━━━━━━━━━━━━
 
-*Monthly Target : ${fmt(gn('monthlyTarget'))}*
+*Monthly Target : ${shownNumber('monthlyTarget')}*
 
-MTD Target : ${fmt(mtdTarget)}
-MTD Sale : ${fmt(mtdSale)}
-MTD Variance : ${fmtVarianceMsg(mtdV)}
+MTD Target : ${shownNumber('mtdTarget')}
+MTD Sale : ${shownNumber('mtdSale')}
+MTD Variance : ${rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtVarianceMsg(mtdV) : '---'}
 
-Day Target : ${fmt(dayTarget)}
-Today Sale : ${fmt(todaySale)}
-Variance : ${fmtVarianceMsg(dayV)}
+Day Target : ${shownNumber('dayTarget')}
+Today Sale : ${shownNumber('todaySale')}
+Variance : ${rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtVarianceMsg(dayV) : '---'}
 
-ADS : ${fmt(ads)}
-ADT : ${fmt(adt)}
+ADS : ${shownCalculation('ADS',ads,!!rawNum('mtdSale').trim())}
+ADT : ${shownCalculation('ADT',adt,!!rawNum('mtdTx').trim())}
 
 HUTBOT MTD : ${v('hutMtdOnTime')}
 HUTBOT Today : ${v('hutTodayOnTime')}
@@ -1330,9 +1384,9 @@ Dispatch Deviation : ${v('dispatchDev')}
 
 MTD GES : ${v('totalResponses')}
 Smart GES : ${autoTot > 0 ? autoTot.toLocaleString('en-US') : '---'}
-Top Box : ${topB}%
-B2B : ${b2b}%
-Overall Satisfaction : ${osat}%
+Top Box : ${autoTot > 0 ? topB + '%' : '---'}
+B2B : ${autoTot > 0 ? b2b + '%' : '---'}
+Overall Satisfaction : ${autoTot > 0 ? osat + '%' : '---'}
 
 5 Star Overall Rating : ${v('overallRating')}
 Delivered U30 : ${v('deliveredU30')}
@@ -1357,7 +1411,7 @@ Hutbot On time Star Rating : ${v('hutbotOnTime')}
   };
   const hasM = autoTot > 0, hasT = todayTot > 0;
   const msg2 =
-`*🍕 Daily Update - Matara 02*
+`*🍕 Daily Update - ${selectedOutlet}*
 *Date :* ${v('date')}
 ━━━━━━━━━━━━━━━━
 
@@ -1369,7 +1423,7 @@ Today's B2B : ${pc(hasT,'Today B2B',todayB2B)}
 
 MTD GES Count : ${v('totalResponses')}
 MTD Top Box : ${pc(hasM,'MTD Top Box',topB)}
-MTD Win Score : ${v('mtdWinScore')}
+MTD Win Score : ${formatPercentValue('mtdWinScore')}
 MTD B2B : ${pc(hasM,'MTD B2B',b2b)}
 MTD OSI : ${pc(hasM,'Overall Satisfaction',osat)}
 
@@ -1422,18 +1476,128 @@ function onTimeBlur(el) {
   const raw = (el.value || '').replace(/,/g, '').trim();
   if (raw === '') return;
   const n = parseFloat(raw);
-  if (!isNaN(n)) el.value = n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (!Number.isFinite(Number(raw)) || Number(raw) < 0) {
+    el.value = ''; toast('Enter a valid positive number of minutes.', 'warning'); autoSave(); return;
+  }
+  el.value = Number(raw).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
   calcAndRender();
   autoSave();
 }
 
+
+function formatPercentValue(id) {
+  const raw = document.getElementById(id)?.value.trim();
+  if (!raw) return '---';
+  const n = Number(raw.replace(/[,%]/g,''));
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? n.toLocaleString('en-US',{maximumFractionDigits:2}) + '%' : '---';
+}
+let pendingWhatsApp = '';
 function sendWA(n) {
   calcAndRender();
-  const text = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput').value;
-  if (!text.trim()) { toast('⚠️ Send කිරීමට message නොමැත.','warning'); return; }
-  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  pendingWhatsApp = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput').value;
+  if (!pendingWhatsApp.trim()) { toast('No report message is available.', 'warning'); return; }
+  const warnings = [];
+  if (!rawNum('mtdSale').trim()) warnings.push('MTD Sale is missing');
+  if (!rawNum('todaySale').trim()) warnings.push('Today Sale is missing');
+  if (!rawNum('totalResponses').trim()) warnings.push('MTD GES Total Responses is missing');
+  if (activeDate > todayStr) warnings.push('This message is for a FUTURE DRAFT report');
+  if (activeDate < todayStr) warnings.push('This message is for a HISTORICAL report');
+  document.getElementById('previewText').textContent =
+    (warnings.length ? 'CHECK BEFORE SENDING:\n• ' + warnings.join('\n• ') + '\n\n' : '') + pendingWhatsApp;
+  lastModalFocus = document.activeElement;
+  document.getElementById('previewOverlay').classList.add('open');
+  requestAnimationFrame(() => document.getElementById('previewOverlay').querySelector('button')?.focus({preventScroll:true}));
 }
-
+function closePreview() { document.getElementById('previewOverlay').classList.remove('open'); if (lastModalFocus?.isConnected) lastModalFocus.focus({preventScroll:true}); }
+function copyPreview() {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(pendingWhatsApp).then(() => toast('Message copied.', 'success'))
+      .catch(() => toast('Could not copy. Please select the text.', 'warning'));
+  } else toast('Copy is unavailable. Please select the text.', 'warning');
+}
+function openPreviewWhatsApp() {
+  if (!pendingWhatsApp) return;
+  window.open('https://wa.me/?text=' + encodeURIComponent(pendingWhatsApp), '_blank', 'noopener,noreferrer');
+  closePreview();
+}
+function openSettings() {
+  updateOutletDisplay();
+  updateUndoImportButton();
+  lastModalFocus = document.activeElement;
+  document.getElementById('settingsOverlay').classList.add('open');
+  requestAnimationFrame(() => document.getElementById('outletSelect').focus({preventScroll:true}));
+}
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); if (lastModalFocus?.isConnected) lastModalFocus.focus({preventScroll:true}); }
+function exportReportBackup() {
+  try {
+    if (!saveToStorage()) return;
+    const blob = new Blob([ReportStore.exportBackup()], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ph-report-backup-' + ReportStore.operationalDate().replace(/\./g,'-') + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    toast('Backup file downloaded.', 'success');
+  } catch (err) { toast('Could not export backup.', 'error'); }
+}
+function updateUndoImportButton() {
+  const btn = document.getElementById('undoBackupImportBtn');
+  if (btn) btn.style.display = ReportStore.canUndoImport() ? 'inline-block' : 'none';
+}
+function undoBackupImport() {
+  closeSettings();
+  showModal({
+    icon:'alert-triangle',title:'Undo previous backup import?',
+    msg:'This restores the entire saved report database to its pre-import state. Edits made after the import will also be undone.',
+    okLabel:'Undo import',cancelLabel:'Cancel',
+    onOk:() => {
+      try {
+        if (ReportStore.undoImport()) {
+          loadSelectedReport(activeDate,false);
+          calcAndRender();
+          updateUndoImportButton();
+          toast('Pre-import reports restored.', 'success');
+        }
+      } catch (err) {toast('Could not restore the pre-import snapshot.', 'error',4500);}
+    },
+    onCancel:()=>openSettings()
+  });
+}
+function handleBackupImport(event) {
+  const file = event.target.files[0];
+  event.target.value='';
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {toast('Backup file is too large.', 'error');return;}
+  const reader = new FileReader();
+  reader.onload = () => {
+    const text = String(reader.result);
+    let stats;
+    try { stats = ReportStore.previewBackup(text); }
+    catch (err) {toast('Backup rejected: '+err.message,'error',5000);return;}
+    closeSettings();
+    showModal({
+      icon:'file',title:'Confirm backup import',
+      msg:stats.incoming+' reports from '+stats.outlets+' outlets; '+stats.newReports+' new and '+stats.conflicts+
+        ' overlapping reports. Existing reports will be kept. A recovery snapshot will be saved.',
+      okLabel:'Import',cancelLabel:'Cancel',
+      onOk:() => {
+        try {
+          if (!saveToStorage()) return;
+          const result = ReportStore.importBackup(text);
+          loadSelectedReport(activeDate,false);
+          autoFillFromMIS();
+          calcAndRender();
+          updateUndoImportButton();
+          toast('Backup imported: '+result.added+' new; '+result.keptExisting+' existing preserved.','success',5000);
+        } catch (err) {toast('Import failed: '+err.message,'error',5500);}
+      },
+      onCancel:()=>openSettings()
+    });
+  };
+  reader.onerror=()=>toast('Could not read backup file.', 'error');
+  reader.readAsText(file);
+}
 // ==========================================
 // MIS REPORT CSV PARSING AND AUTO-FILL
 // ==========================================
@@ -1521,89 +1685,89 @@ function parseMISNumber(value) {
 
 function handleMISUpload(event) {
   const file = event.target.files[0];
+  event.target.value = '';
   if (!file) return;
-
+  if (file.size > 3 * 1024 * 1024 || !/\.csv$/i.test(file.name)) {
+    toast('Please choose a Gamma MIS CSV file under 3 MB.', 'warning', 4000);
+    return;
+  }
+  const uploadOutlet = selectedOutlet;
+  const selected = parseAppDate(activeDate);
+  if (!selected) { toast('Select a valid report date first.', 'error'); return; }
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const lines = String(e.target.result || '').replace(/^\uFEFF/, '').split(/\r?\n/);
-      let datesRow = null;
-      let dayTargetRow = null;
-      let mtdTargetRow = null;
-      let inTotalSystem = false;
-
+      if (lines.length < 4) throw new Error('Incomplete CSV');
+      let datesRow = null, dayTargetRow = null, mtdTargetRow = null, inTotalSystem = false;
       for (let i = 0; i < lines.length; i++) {
         const cols = parseCSVLine(lines[i]);
-        if (!cols[0]) continue;
-        const firstCol = cols[0].toUpperCase().trim();
-
+        const firstCol = (cols[0] || '').toUpperCase().trim();
         if (firstCol === 'TOTAL SYSTEM') {
-          inTotalSystem = true;
-          datesRow = cols;
-        } else if (inTotalSystem && (firstCol === 'DELIVERY' || firstCol === 'TAKE AWAY' || firstCol === 'DINE IN' || firstCol === 'AGGEGATOR')) {
+          inTotalSystem = true; datesRow = cols;
+        } else if (inTotalSystem && ['DELIVERY','TAKE AWAY','DINE IN','AGGREGATOR','AGGEGATOR'].includes(firstCol)) {
           break;
         } else if (inTotalSystem && datesRow && firstCol === 'NET SALES - TARGET' && !dayTargetRow) {
           dayTargetRow = cols;
         } else if (inTotalSystem && datesRow && firstCol === 'MTD NET SALES - TARGET' && !mtdTargetRow) {
           mtdTargetRow = cols;
         }
-
         if (datesRow && dayTargetRow && mtdTargetRow) break;
       }
-
-      if (datesRow && dayTargetRow && mtdTargetRow) {
-        const parsedData = {};
-        for (let i = 1; i < datesRow.length; i++) {
-          const parsedDate = parseMISDateHeader(datesRow[i]);
-          if (!parsedDate) continue;
-          const key = parsedDate.year !== null
-            ? `${parsedDate.year}-${String(parsedDate.month).padStart(2,'0')}-${String(parsedDate.day).padStart(2,'0')}`
-            : `${parsedDate.day}-${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parsedDate.month-1]}`;
-          parsedData[key] = {
-            day: parseMISNumber(dayTargetRow[i]),
-            mtd: parseMISNumber(mtdTargetRow[i]),
-            dateDay: parsedDate.day,
-            dateMonth: parsedDate.month,
-            dateYear: parsedDate.year
-          };
-        }
-
-        if (Object.keys(parsedData).length > 0) {
-          localStorage.setItem('ph_mis_data', JSON.stringify({ filename: file.name, data: parsedData }));
-          toast('✅ MIS Report successfully loaded!', 'success');
-          autoFillFromMIS();
-        } else {
-          try { localStorage.removeItem('ph_mis_data'); } catch(err) {}
-          const statusEl = document.getElementById('misUploadStatus');
-          if (statusEl) { statusEl.innerText = 'No valid dates found'; statusEl.style.color = '#DC2626'; }
-          clearMISAutoFilledTargets(true);
-          toast('⚠️ No valid date headings found in the MIS file.', 'error');
-        }
-      } else {
-        // Do not keep displaying values from a previous file after an unreadable upload.
-        try { localStorage.removeItem('ph_mis_data'); } catch(err) {}
-        const statusEl = document.getElementById('misUploadStatus');
-        if (statusEl) { statusEl.innerText = 'No report loaded'; statusEl.style.color = 'var(--muted)'; }
-        clearMISAutoFilledTargets(true);
-        toast('⚠️ Could not parse the CSV. Make sure it is a Gamma MIS Report.', 'error');
+      if (!datesRow || !dayTargetRow || !mtdTargetRow || datesRow.length < 2) throw new Error('Gamma MIS headings are missing');
+      if (dayTargetRow.length < datesRow.length || mtdTargetRow.length < datesRow.length) throw new Error('Incomplete target columns');
+      const parsedData = {}; let count = 0;
+      for (let i = 1; i < datesRow.length; i++) {
+        const header = String(datesRow[i] || '').trim();
+        if (!header) continue;
+        const date = parseMISDateHeader(header);
+        if (!date) throw new Error('Invalid date heading: ' + header);
+        const effectiveYear = date.year === null ? selected.year : date.year;
+        if (effectiveYear !== selected.year || date.month !== selected.month) throw new Error('CSV dates do not match the selected reporting month/year');
+        if (date.day > new Date(effectiveYear,date.month,0).getDate()) throw new Error('Invalid calendar date');
+        const key = effectiveYear + '-' + String(date.month).padStart(2,'0') + '-' + String(date.day).padStart(2,'0');
+        if (parsedData[key]) throw new Error('Duplicate date: ' + header);
+        const daily = parseMISNumber(dayTargetRow[i]), mtd = parseMISNumber(mtdTargetRow[i]);
+        if (daily === null && mtd === null) throw new Error('Missing target values: ' + header);
+        if ((daily !== null && daily < 0) || (mtd !== null && mtd < 0)) throw new Error('Negative sales target');
+        parsedData[key] = {day:daily,mtd:mtd,dateDay:date.day,dateMonth:date.month,dateYear:effectiveYear};
+        count++;
       }
-    } catch(err) {
-      try { localStorage.removeItem('ph_mis_data'); } catch(storageErr) {}
-      clearMISAutoFilledTargets(true);
-      toast('⚠️ Could not read this MIS file. Please check the CSV and try again.', 'error');
-    }
+      if (!count) throw new Error('No valid dates');
+      // Verify outlet name if the export identifies it; otherwise require explicit confirmation.
+      const headerText = (file.name + ' ' + lines.slice(0,20).join(' ')).toLowerCase().replace(/matara[\s_-]*0?2/g,'matara 02');
+      const identified = ReportStore.OUTLETS.filter(name => {
+        const phrase = name.toLowerCase();
+        const at = headerText.indexOf(phrase);
+        if (at < 0) return false;
+        const before = at === 0 ? ' ' : headerText[at-1];
+        const after = headerText[at+phrase.length] || ' ';
+        return !/[a-z]/.test(before) && !/[a-z0-9]/.test(after);
+      }).filter(name => name !== 'Matara' || !headerText.includes('matara 02'));
+      if (identified.length && (identified.length !== 1 || identified[0] !== uploadOutlet)) throw new Error('CSV appears to belong to another outlet: ' + identified.join(', '));
+      const verified = identified.length === 1;
+      showModal({
+        icon:'📄',title:'Confirm MIS file',
+        msg:count + ' valid dates for ' + selected.year + '-' + String(selected.month).padStart(2,'0') + ', outlet ' + uploadOutlet + '. ' +
+          (verified ? 'Outlet identity matched.' : 'Outlet identity not found. Check the CSV source before confirming.') +
+          ' Replace the saved MIS file?',
+        okLabel:'Save MIS',cancelLabel:'Cancel',
+        onOk:() => {
+          if (selectedOutlet !== uploadOutlet) {toast('Outlet changed. Upload again.', 'warning');return;}
+          try {
+            ReportStore.setMIS(uploadOutlet,{filename:file.name,data:parsedData,reportYear:selected.year,reportMonth:selected.month,verifiedOutlet:verified});
+            reportSkipMIS = false;
+            autoFillFromMIS();
+            saveToStorage();
+            toast('MIS saved for '+uploadOutlet, 'success');
+          } catch (err) {toast('MIS could not be saved; previous MIS remains.', 'error');}
+        }
+      });
+    } catch(err) {toast('MIS rejected: '+err.message+'. Previous data was preserved.', 'error',5500);}
   };
-  reader.onerror = function() {
-    try { localStorage.removeItem('ph_mis_data'); } catch(err) {}
-    const statusEl = document.getElementById('misUploadStatus');
-    if (statusEl) { statusEl.innerText = 'No report loaded'; statusEl.style.color = 'var(--muted)'; }
-    clearMISAutoFilledTargets(true);
-    toast('⚠️ Could not read this MIS file. Please try again.', 'error');
-  };
+  reader.onerror = function(){toast('CSV could not be read; previous MIS remains.', 'error');};
   reader.readAsText(file);
-  event.target.value = '';
 }
-
 function normaliseMISRecord(key, record) {
   if (!record || typeof record !== 'object') return null;
   if (Number.isInteger(record.dateDay) && Number.isInteger(record.dateMonth)) {
@@ -1617,8 +1781,9 @@ function normaliseMISRecord(key, record) {
 
 function autoFillFromMIS() {
   try {
-    const raw = localStorage.getItem('ph_mis_data');
-    if (!raw) return;
+    if (reportSkipMIS) { const status = document.getElementById('misUploadStatus'); if (status) status.textContent='Report reset: MIS auto-fill paused'; return; }
+    const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet));
+    if (!raw || raw === 'null') { const status=document.getElementById('misUploadStatus'); if(status)status.textContent='No MIS file for this outlet'; return; }
     const mis = JSON.parse(raw);
 
     const statusEl = document.getElementById('misUploadStatus');
@@ -1634,7 +1799,7 @@ function autoFillFromMIS() {
     }
 
     const records = Object.entries(mis.data).map(([key, row]) => normaliseMISRecord(key, row)).filter(Boolean);
-    const matchesSelectedYear = record => record.year === null || record.year === selected.year;
+    const matchesSelectedYear = record => record.year === selected.year;
     const monthRecords = records.filter(record => record.month === selected.month && matchesSelectedYear(record));
     const dateRecord = monthRecords.find(record => record.day === selected.day);
 
@@ -1657,10 +1822,9 @@ function autoFillFromMIS() {
 
     // Keep the existing month-end rule for Monthly Target, but only use the selected month/year.
     let monthlyTargetVal = null;
-    for (let d = 31; d >= 28; d--) {
-      const record = monthRecords.find(item => item.day === d && item.mtdTarget !== null && item.mtdTarget !== undefined && Number.isFinite(Number(item.mtdTarget)) && Number(item.mtdTarget) > 0);
-      if (record) { monthlyTargetVal = Number(record.mtdTarget); break; }
-    }
+    const lastDay = new Date(selected.year, selected.month, 0).getDate();
+    const finalRecord = monthRecords.find(item => item.day === lastDay && item.mtdTarget !== null && item.mtdTarget !== undefined && Number.isFinite(Number(item.mtdTarget)) && Number(item.mtdTarget) > 0);
+    if (finalRecord) monthlyTargetVal = Number(finalRecord.mtdTarget);
     if (monthlyEl && monthlyTargetVal !== null) {
       monthlyEl.value = monthlyTargetVal.toLocaleString('en-US');
     }
@@ -1697,8 +1861,8 @@ function closeCalendar(e) {
   document.getElementById('calendarOverlay').classList.remove('open');
 }
 
-function prevMonth() { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); }
-function nextMonth() { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); }
+function prevMonth() { calDate.setDate(1); calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); }
+function nextMonth() { calDate.setDate(1); calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); }
 
 function renderCalendar() {
   const year = calDate.getFullYear();
@@ -1742,13 +1906,59 @@ function renderCalendar() {
 
 function selectDate(y, m, d) {
   const formatted = y + '.' + String(m + 1).padStart(2, '0') + '.' + String(d).padStart(2, '0');
-  document.getElementById('date').value = formatted;
+  if (!ReportStore.validDate(formatted)) return;
+  if (!saveToStorage()) return;
   document.getElementById('calendarOverlay').classList.remove('open');
+  if (formatted > todayStr) {
+    showModal({icon:'📅',title:'Future reporting date',msg:'This is a future date. Your entry is stored separately from today. Continue?',okLabel:'Open date',cancelLabel:'Cancel',onOk:()=>openReportDate(formatted)});
+    return;
+  }
+  openReportDate(formatted);
+}
+function openReportDate(formatted) {
+  if (!loadSelectedReport(formatted, formatted === todayStr)) return;
   autoFillFromMIS();
   calcAndRender();
-  autoSave();
+  saveToStorage();
 }
-
+function checkOperationalRollover() {
+  const actualDay = ReportStore.operationalDate();
+  if (actualDay === todayStr) return;
+  if (!saveToStorage()) return;
+  todayStr = actualDay;
+  if (!loadSelectedReport(todayStr, true)) return;
+  autoFillFromMIS();
+  calcAndRender();
+  saveToStorage();
+  toast('New reporting day. Today and selected MTD fields are ready for fresh entries.', 'info', 4500);
+}
+function changeOutlet() {
+  const next = document.getElementById('outletSelect').value;
+  if (next === selectedOutlet) { closeSettings(); return; }
+  if (!ReportStore.OUTLETS.includes(next)) return;
+  // The settings sheet is above the confirmation dialog in the stacking order.
+  // Close it first so confirmation is immediately visible.
+  closeSettings();
+  showModal({
+    icon: 'store', title: 'Change outlet?',
+    msg: 'Switch from ' + selectedOutlet + ' to ' + next + '? Each outlet has its own saved reports. Nothing will be deleted.',
+    okLabel: 'Change outlet', cancelLabel: 'Cancel',
+    onCancel: () => updateOutletDisplay(),
+    onOk: () => {
+      if (!saveToStorage()) return;
+      try {
+        ReportStore.setOutlet(next);
+        selectedOutlet = next;
+        closeSettings();
+        loadSelectedReport(todayStr, true);
+        autoFillFromMIS();
+        calcAndRender();
+        saveToStorage();
+        toast('Outlet changed to ' + next, 'success');
+      } catch (err) { toast('Could not change the outlet.', 'error'); }
+    }
+  });
+}
 
 let _asrTarget = null;
 function openASR(fieldId) {
@@ -1790,6 +2000,7 @@ function showModal(opts) {
   cancelBtn.textContent = opts.cancelLabel || 'Cancel';
   cancelBtn.style.display = opts.cancelLabel === null ? 'none' : '';
   overlay.classList.add('open');
+  requestAnimationFrame(() => okBtn.focus({preventScroll:true}));
   function cleanup() {
     overlay.classList.remove('open');
     okBtn.onclick = null; cancelBtn.onclick = null;
@@ -1833,22 +2044,12 @@ function onPctBlur(el) {
     return;
   }
   const clean = raw.replace(/%/g,'').trim();
-  const num = parseFloat(clean);
-  if (!isNaN(num) && num > 100) {
-    blurAndShowModal(el, {
-      icon: '⚠️',
-      title: '100% ඉක්මවයි',
-      msg: 'ඔබ ඇතුළත් කළ අගය ' + num + '% \nඑය නිවැරදිද?',
-      okLabel: 'ඔව්, නිවැරදිය',
-      cancelLabel: 'නැත, නැවත ඇතුළත් කරන්න',
-      onOk: () => { el.value = clean + '%'; calcAndRender(); autoSave(); },
-      onCancel: () => { el.value = ''; autoSave(); }
-    });
-    return;
-  }
-  if (clean !== '') el.value = clean + '%';
-  calcAndRender();
-  autoSave();
+  const num = Number(clean);
+  if (!Number.isFinite(num) || num < 0 || num > 100) {
+  el.value = ''; calcAndRender(); autoSave(); toast('Enter a percentage from 0 to 100.', 'warning', 4500); return;
+}
+el.value = num.toLocaleString('en-US',{maximumFractionDigits:2})+'%';
+calcAndRender(); autoSave();
 }
 function onPctFocus(el) {
   el.value = el.value.replace(/%/g,'').trim();
@@ -1932,8 +2133,50 @@ function _uiClose(closeFn) {
   history.back();
 }
 
+function closeTopOverlay() {
+  const found = [
+    ['confirmOverlay', () => document.getElementById('confirmCancelBtn')?.click()],
+    ['settingsOverlay', () => {closeSettings();updateOutletDisplay();}],
+    ['previewOverlay', closePreview],
+    ['calendarOverlay', () => document.getElementById('calendarOverlay').classList.remove('open')],
+    ['asrOverlay', () => closeASR()],
+    ['chromeGuideOverlay', () => {document.getElementById('chromeGuideOverlay').style.display='none';}]
+  ].find(([id]) => {
+    const el=document.getElementById(id);
+    return el && (el.classList.contains('open') || (id==='chromeGuideOverlay' && el.style.display==='flex'));
+  });
+  if (!found) return false;
+  found[1]();
+  return true;
+}
+let lastModalFocus = null;
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    if (closeTopOverlay()) {event.preventDefault();event.stopPropagation();}
+    return;
+  }
+  if (event.key !== 'Tab') return;
+  const open = ['confirmOverlay','settingsOverlay','previewOverlay','calendarOverlay','asrOverlay']
+    .map(id => document.getElementById(id)).find(el => el && el.classList.contains('open'));
+  if (!open) return;
+  const controls = [...open.querySelectorAll('button:not([disabled]),input:not([disabled]):not([type=hidden]),select,textarea,[tabindex]:not([tabindex="-1"])')]
+    .filter(el => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
+  if (!controls.length) return;
+  const first=controls[0],last=controls[controls.length-1];
+  if (event.shiftKey && (document.activeElement===first || !open.contains(document.activeElement))) {
+    last.focus();event.preventDefault();
+  } else if (!event.shiftKey && (document.activeElement===last || !open.contains(document.activeElement))) {
+    first.focus();event.preventDefault();
+  }
+});
 window.addEventListener('popstate', function(e) {
   if (_ignoreNextPop) { _ignoreNextPop = false; return; }
+  if (closeTopOverlay()) {
+    _exitReady=false;
+    clearTimeout(_exitTimer);
+    _pushGuard();
+    return;
+  }
 
   if (_exitReady) {
     _exitReady = false;
@@ -1953,15 +2196,12 @@ window.addEventListener('popstate', function(e) {
 });
 
 // Auto-focus logic correctly prioritizing MTD Sale on startup
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const startEl = document.getElementById('mtdSale');
-    if (startEl) {
-      startEl.focus();
-      try { startEl.select(); } catch(e){}
-    }
-  }, 300);
+setInterval(checkOperationalRollover, 30000);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) checkOperationalRollover();
 });
+window.addEventListener('pageshow', checkOperationalRollover);
+window.addEventListener('focus', checkOperationalRollover);
 
 </script>
 </body>

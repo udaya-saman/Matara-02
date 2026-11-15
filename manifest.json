@@ -1,11 +1,11 @@
 {
   "name": "PH Daily Report",
   "short_name": "PH Report",
-  "description": "Pizza Hut Akuressa Outlet Daily Report",
+  "description": "Offline-first Pizza Hut daily performance reports with selectable outlets",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f0f0f",
-  "theme_color": "#ffffff",
+  "background_color": "#f6f7fa",
+  "theme_color": "#c91331",
   "orientation": "portrait",
   "icons": [
     {
