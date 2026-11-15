@@ -5,7 +5,10 @@ const script=html.split('<script>').at(-1).split('</script>')[0];
 const start=script.indexOf('function parseCSVLine(text) {');
 const end=script.indexOf('function normaliseMISRecord(',start);
 assert.ok(start>=0&&end>start,'Original Gamma MIS import functions are present');
-const source=script.slice(start,end);
+const helperStart=script.indexOf('function extractMISOutlet(');
+const helperEnd=script.indexOf('function getMatchingMISForDate(',helperStart);
+assert.ok(helperStart>=0&&helperEnd>helperStart);
+const source=script.slice(helperStart,helperEnd)+script.slice(start,end);
 const expected=[
   {month:'Apr',days:30,target:5537226,file:'4 Gamma MIS Report - April 2026.csv',other:['1-May','1-Jun']},
   {month:'May',days:31,target:4979780,file:'5 Gamma MIS Report - May 2026.csv',other:['1-Jun']},
