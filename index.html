@@ -1884,10 +1884,14 @@ function changeOutlet() {
   const next = document.getElementById('outletSelect').value;
   if (next === selectedOutlet) { closeSettings(); return; }
   if (!ReportStore.OUTLETS.includes(next)) return;
+  // The settings sheet is above the confirmation dialog in the stacking order.
+  // Close it first so confirmation is immediately visible.
+  closeSettings();
   showModal({
     icon: 'store', title: 'Change outlet?',
     msg: 'Switch from ' + selectedOutlet + ' to ' + next + '? Each outlet has its own saved reports. Nothing will be deleted.',
     okLabel: 'Change outlet', cancelLabel: 'Cancel',
+    onCancel: () => updateOutletDisplay(),
     onOk: () => {
       if (!saveToStorage()) return;
       try {
