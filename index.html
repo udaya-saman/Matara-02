@@ -682,7 +682,7 @@ input[readonly] {background:#F6F8FA;}
 </div>
 
 <div class="main">
-<section class="overview"><span class="eyebrow">DAILY OPERATIONS</span><h1 id="overviewOutlet">Matara 02</h1><p>Operational report · <span id="summaryDate"></span></p><small>Separate saved reports by outlet and date · Operational day begins at 6:00 AM</small></section>
+<section class="overview"><span class="eyebrow">DAILY OPERATIONS</span><h1 id="overviewOutlet">Matara 02</h1><p>Operational report · <span id="summaryDate"></span></p><p id="reportDateNotice" role="status" aria-live="polite" style="font-size:12px;font-weight:700"></p><small>Separate saved reports by outlet and date · Operational day begins at 6:00 AM</small></section>
 <div class="toolbar"><button onclick="openCalendar()">📅 Choose date</button><button onclick="openSettings()">⚙ Outlet & backups</button></div>
 
   <!-- PWA INSTALL BANNER -->
@@ -884,15 +884,16 @@ function collectReportValues() {
   FIELDS.forEach(f => {
     if (f.readonly) return;
     const el = document.getElementById(f.id);
-    if (el) data[f.id] = el.value;
+    if (el) data[f.id] = isInputValidForSave(el) ? el.value : '';
   });
   return data;
 }
 
 let storageWarningShown = false;
+let reportSkipMIS = false;
 function saveToStorage() {
   try {
-    ReportStore.save(selectedOutlet, activeDate, collectReportValues(), customCalcs);
+    ReportStore.save(selectedOutlet, activeDate, {...collectReportValues(), ...(reportSkipMIS ? {_skipMISAutoFill:true} : {})}, customCalcs);
     storageWarningShown = false;
     return true;
   } catch (err) {
@@ -907,6 +908,7 @@ function saveToStorage() {
 
 function applyReportData(record) {
   const values = record && record.values && typeof record.values === 'object' ? record.values : {};
+  reportSkipMIS = values._skipMISAutoFill === true;
   const legacy = {mtdU20:['mtdHF'], hutTodayOnTime:['hutbotToday'], hutMtdOnTime:['hutbotMTD']};
   FIELDS.forEach(f => {
     const el = document.getElementById(f.id);
@@ -941,6 +943,7 @@ function applyReportData(record) {
   });
   document.getElementById('date').value = activeDate;
   updateOutletDisplay();
+  updateReportingDateNotice();
   refreshRestoreButton();
 }
 
@@ -977,6 +980,27 @@ function updateOutletDisplay() {
   document.title = 'PH Daily Report | ' + selectedOutlet;
 }
 
+function updateReportingDateNotice() {
+  const el = document.getElementById('reportDateNotice');
+  if (!el) return;
+  const status = activeDate > todayStr ? 'FUTURE DRAFT' : (activeDate < todayStr ? 'HISTORICAL REPORT' : 'CURRENT REPORT');
+  el.textContent = status + ' · ' + activeDate + (activeDate !== todayStr ? ' · Edits affect only this date.' : '');
+  el.style.color = activeDate > todayStr ? '#9A3412' : '#475467';
+}
+function isInputValidForSave(el) {
+  const field = FIELDS.find(f => f.id === el.id);
+  if (!field || !el.value.trim()) return true;
+  const raw = el.value.replace(/[, %]/g,'').trim();
+  if (field.type === 'asr') return ['AS','M','UP'].includes(el.value);
+  if (field.type === 'pct') return raw !== '' && Number.isFinite(Number(raw)) && Number(raw) >= 0 && Number(raw) <= 100;
+  if (field.type === 'nodec') return /^\d+$/.test(raw);
+  if (field.type === 'time') return Number.isFinite(Number(raw)) && Number(raw) >= 0;
+  if (field.type === 'num') {
+    if (!Number.isFinite(Number(raw)) || Number(raw) < 0) return false;
+    if (['overallRating','annualTMTurnover','winScore','hutbotOnTime','brandRating','fsccRating','deliveredU30'].includes(el.id) && Number(raw) > 5) return false;
+  }
+  return true;
+}
 function autoSave() { saveToStorage(); }
 
 let backupData   = {};
@@ -1053,7 +1077,7 @@ function resetData() {
         saveToStorage();
         ReportStore.reset(selectedOutlet, activeDate);
         loadSelectedReport(activeDate, false);
-        autoFillFromMIS();
+        // Reset is intentional: do not automatically repopulate MIS targets.
         calcAndRender();
         saveToStorage();
         refreshRestoreButton();
@@ -1135,27 +1159,13 @@ function onFieldInput(el) {
 function onGesBlur(el) { calcAndRender(); }
 function onRatingBlur(el) {
   const raw = (el.value||'').replace(/,/g,'').trim();
-  if (raw === '') return;
-  const num = parseFloat(raw);
-  if (isNaN(num) || num < 0 || num > 5) {
-    el.blur();
-    setTimeout(() => {
-      const overlay   = document.getElementById('confirmOverlay');
-      const btnsEl    = document.getElementById('confirmBtns');
-      document.getElementById('confirmIcon').textContent  = '⭐';
-      document.getElementById('confirmTitle').textContent = 'Rating පරාසයෙන් පිටය';
-      document.getElementById('confirmMsg').textContent   = 'ඇතුළත් කළ අගය ' + raw + ' : \nවලංගු පරාසය 0 සිට 5 දක්වා පමණයි.\nනිවැරදි අගය ඇතුළත් කරන්න.';
-      btnsEl.innerHTML = '<button class="confirm-cancel" id="confirmCancelBtn" style="display:none"></button><button class="confirm-ok" id="confirmOkBtn">හරි</button>';
-      overlay.classList.add('open');
-      document.getElementById('confirmOkBtn').onclick = () => {
-        overlay.classList.remove('open');
-        el.value = '';
-        calcAndRender();
-        autoSave();
-        requestAnimationFrame(() => { el.focus(); try { el.setSelectionRange(9999,9999); } catch(e){} });
-      };
-    }, 80);
+  if (raw === '') { autoSave(); return; }
+  const num = Number(raw);
+  if (!Number.isFinite(num) || num < 0 || num > 5) {
+    el.value = '';
+    toast('Rating must be between 0 and 5.', 'warning', 4000);
   }
+  calcAndRender(); autoSave();
 }
 function onSmartGesBlur(el) {
   const raw = (el.value||'').replace(/,/g,'').trim();
@@ -1264,7 +1274,7 @@ function getTomorrowTarget(dateVal) {
     const record = Object.entries(mis.data)
       .map(([key, row]) => normaliseMISRecord(key, row))
       .find(item => item && item.day === tmrw.getDate() && item.month === tmrw.getMonth() + 1 &&
-        (item.year === null || item.year === tmrw.getFullYear()));
+        item.year === tmrw.getFullYear());
     return record && record.dayTarget !== null && record.dayTarget !== undefined && Number.isFinite(Number(record.dayTarget))
       ? fmt(Number(record.dayTarget)) : '---';
   } catch(e) {
@@ -1490,6 +1500,8 @@ function sendWA(n) {
   if (!rawNum('mtdSale').trim()) warnings.push('MTD Sale is missing');
   if (!rawNum('todaySale').trim()) warnings.push('Today Sale is missing');
   if (!rawNum('totalResponses').trim()) warnings.push('MTD GES Total Responses is missing');
+  if (activeDate > todayStr) warnings.push('This message is for a FUTURE DRAFT report');
+  if (activeDate < todayStr) warnings.push('This message is for a HISTORICAL report');
   document.getElementById('previewText').textContent =
     (warnings.length ? 'CHECK BEFORE SENDING:\n• ' + warnings.join('\n• ') + '\n\n' : '') + pendingWhatsApp;
   document.getElementById('previewOverlay').classList.add('open');
@@ -1736,6 +1748,7 @@ function normaliseMISRecord(key, record) {
 
 function autoFillFromMIS() {
   try {
+    if (reportSkipMIS) { const status = document.getElementById('misUploadStatus'); if (status) status.textContent='Report reset: MIS auto-fill paused'; return; }
     const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet));
     if (!raw || raw === 'null') { const status=document.getElementById('misUploadStatus'); if(status)status.textContent='No MIS file for this outlet'; return; }
     const mis = JSON.parse(raw);
@@ -1753,7 +1766,7 @@ function autoFillFromMIS() {
     }
 
     const records = Object.entries(mis.data).map(([key, row]) => normaliseMISRecord(key, row)).filter(Boolean);
-    const matchesSelectedYear = record => record.year === null || record.year === selected.year;
+    const matchesSelectedYear = record => record.year === selected.year;
     const monthRecords = records.filter(record => record.month === selected.month && matchesSelectedYear(record));
     const dateRecord = monthRecords.find(record => record.day === selected.day);
 
@@ -1776,10 +1789,9 @@ function autoFillFromMIS() {
 
     // Keep the existing month-end rule for Monthly Target, but only use the selected month/year.
     let monthlyTargetVal = null;
-    for (let d = 31; d >= 28; d--) {
-      const record = monthRecords.find(item => item.day === d && item.mtdTarget !== null && item.mtdTarget !== undefined && Number.isFinite(Number(item.mtdTarget)) && Number(item.mtdTarget) > 0);
-      if (record) { monthlyTargetVal = Number(record.mtdTarget); break; }
-    }
+    const lastDay = new Date(selected.year, selected.month, 0).getDate();
+    const finalRecord = monthRecords.find(item => item.day === lastDay && item.mtdTarget !== null && item.mtdTarget !== undefined && Number.isFinite(Number(item.mtdTarget)) && Number(item.mtdTarget) > 0);
+    if (finalRecord) monthlyTargetVal = Number(finalRecord.mtdTarget);
     if (monthlyEl && monthlyTargetVal !== null) {
       monthlyEl.value = monthlyTargetVal.toLocaleString('en-US');
     }
@@ -1864,6 +1876,13 @@ function selectDate(y, m, d) {
   if (!ReportStore.validDate(formatted)) return;
   if (!saveToStorage()) return;
   document.getElementById('calendarOverlay').classList.remove('open');
+  if (formatted > todayStr) {
+    showModal({icon:'📅',title:'Future reporting date',msg:'This is a future date. Your entry is stored separately from today. Continue?',okLabel:'Open date',cancelLabel:'Cancel',onOk:()=>openReportDate(formatted)});
+    return;
+  }
+  openReportDate(formatted);
+}
+function openReportDate(formatted) {
   if (!loadSelectedReport(formatted, formatted === todayStr)) return;
   autoFillFromMIS();
   calcAndRender();
