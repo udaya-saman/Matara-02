@@ -19,7 +19,7 @@ const context={
   reportSkipMIS:false,
   toast:(msg,type)=>{if(type==='error')throw Error(msg);},
   document:{getElementById:id=>id==='date'?{value:'2026.11.15'}:{innerText:'',style:{},value:''}},
-  ReportStore:{setMIS:(outlet,mis)=>{stored[mis.period]=mis;assert.equal(outlet,'Akuressa');count++;}},
+  ReportStore:{OUTLETS:['Akuressa','Embilipitiya','Monaragala','Matara','Matara 02','Tangalle'],setMIS:(outlet,mis)=>{stored[mis.period]=mis;assert.equal(outlet,'Akuressa');count++;}},
   autoFillFromMIS:()=>{},saveToStorage:()=>true,
   clearMISAutoFilledTargets:()=>{throw Error('Should not discard saved data')}
 };
