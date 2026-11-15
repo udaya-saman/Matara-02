@@ -1269,32 +1269,74 @@ function focusNext(el) {
   }
 }
 
+function extractMISOutlet(lines) {
+  for (const line of lines.slice(0, 50)) {
+    const cols = parseCSVLine(line);
+    const first = String(cols[0] || '').trim();
+    if (!/^LOCATION\s*:/i.test(first)) continue;
+    const raw = String(cols[1] || first.replace(/^LOCATION\s*:/i, '')).trim();
+    const normalized = raw.toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ')
+      .replace(/\b0?2\b/g, '02').trim();
+    const outlet = ReportStore.OUTLETS.find(name =>
+      name.toLowerCase().replace(/\b0?2\b/g, '02') === normalized);
+    return {found: true, outlet: outlet || null};
+  }
+  return {found: false, outlet: null};
+}
+function getMatchingMISForDate(dateValue) {
+  const selected = parseAppDate(dateValue);
+  if (!selected) return null;
+  const expectedPeriod = selected.year + '-' + String(selected.month).padStart(2, '0');
+  const mis = ReportStore.getMIS(selectedOutlet, expectedPeriod);
+  if (!mis || !mis.data || typeof mis.data !== 'object' || Array.isArray(mis.data)) return null;
+  // A CSV identified as belonging to another outlet can never auto-fill here.
+  if (mis.sourceOutlet && mis.sourceOutlet !== selectedOutlet) return null;
+  const records = Object.entries(mis.data)
+    .map(([key, value]) => normaliseMISRecord(key, value))
+    .filter(Boolean);
+  if (!records.length) return null;
+  let declaredPeriod = typeof mis.period === 'string' ? mis.period : null;
+  if (!declaredPeriod && Number.isInteger(Number(mis.reportYear)) &&
+      Number.isInteger(Number(mis.reportMonth)) && Number(mis.reportMonth) >= 1 &&
+      Number(mis.reportMonth) <= 12) {
+    declaredPeriod = Number(mis.reportYear) + '-' + String(mis.reportMonth).padStart(2, '0');
+  }
+  // Some older saved files have no metadata; accept them only if their
+  // explicitly dated rows identify one unambiguous dominant year/month.
+  if (!declaredPeriod) {
+    const counts = Object.create(null);
+    for (const record of records) {
+      if (!Number.isInteger(record.year)) continue;
+      const key = record.year + '-' + String(record.month).padStart(2, '0');
+      counts[key] = (counts[key] || 0) + 1;
+    }
+    const ranked = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    if (!ranked.length || (ranked[1] && ranked[0][1] === ranked[1][1])) return null;
+    declaredPeriod = ranked[0][0];
+  }
+  if (declaredPeriod !== expectedPeriod) return null;
+  const monthRecords = records.filter(record =>
+    record.month === selected.month && (record.year === selected.year || record.year === null));
+  if (!monthRecords.length) return null;
+  return {mis, selected, monthRecords};
+}
+
 function getTomorrowTarget(dateVal) {
   try {
-    const selected = parseAppDate(dateVal);
-    if (!selected) return '---';
-    const d = new Date(selected.year, selected.month - 1, selected.day);
-    const tmrw = new Date(selected.year, selected.month - 1, selected.day + 1);
-
-    // Preserve the existing rule: do not show next month's target in this field.
-    if (d.getMonth() !== tmrw.getMonth()) return '---';
-
-    const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet, dateVal.slice(0,7).replace('.', '-')));
-    if (!raw || raw === 'null') return '---';
-    const mis = JSON.parse(raw);
-    if (!mis || !mis.data) return '---';
-
-    const record = Object.entries(mis.data)
-      .map(([key, row]) => normaliseMISRecord(key, row))
-      .find(item => item && item.day === tmrw.getDate() && item.month === tmrw.getMonth() + 1 &&
-        (item.year === null || item.year === tmrw.getFullYear()));
-    return record && record.dayTarget !== null && record.dayTarget !== undefined && Number.isFinite(Number(record.dayTarget))
+    const match = getMatchingMISForDate(dateVal);
+    if (!match) return '---';
+    const {selected, monthRecords} = match;
+    const next = new Date(selected.year, selected.month - 1, selected.day + 1);
+    // Tomorrow's target is only available inside the *same* verified MIS month.
+    if (next.getMonth() + 1 !== selected.month || next.getFullYear() !== selected.year) return '---';
+    const record = monthRecords.find(item => item.day === next.getDate());
+    return record && record.dayTarget !== null && record.dayTarget !== undefined &&
+      Number.isFinite(Number(record.dayTarget)) && Number(record.dayTarget) >= 0
       ? fmt(Number(record.dayTarget)) : '---';
-  } catch(e) {
+  } catch (err) {
     return '---';
   }
 }
-
 
 function calcAndRender() {
   const dateVal = document.getElementById('date')?.value || todayStr;
@@ -1684,107 +1726,97 @@ function parseMISNumber(value) {
 function handleMISUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const lines = String(e.target.result || '').replace(/^\uFEFF/, '').split(/\r?\n/);
-      let datesRow = null;
-      let dayTargetRow = null;
-      let mtdTargetRow = null;
-      let inTotalSystem = false;
-
-      for (let i = 0; i < lines.length; i++) {
-        const cols = parseCSVLine(lines[i]);
-        if (!cols[0]) continue;
-        const firstCol = cols[0].toUpperCase().trim();
-
-        if (firstCol === 'TOTAL SYSTEM') {
-          inTotalSystem = true;
-          datesRow = cols;
-        } else if (inTotalSystem && (firstCol === 'DELIVERY' || firstCol === 'TAKE AWAY' || firstCol === 'DINE IN' || firstCol === 'AGGEGATOR')) {
-          break;
-        } else if (inTotalSystem && datesRow && firstCol === 'NET SALES - TARGET' && !dayTargetRow) {
-          dayTargetRow = cols;
-        } else if (inTotalSystem && datesRow && firstCol === 'MTD NET SALES - TARGET' && !mtdTargetRow) {
-          mtdTargetRow = cols;
-        }
-
+      const identity = extractMISOutlet(lines);
+      if (identity.found && identity.outlet !== selectedOutlet) {
+        toast('This MIS file belongs to a different outlet. Select the correct outlet before uploading.', 'warning', 5000);
+        return;
+      }
+      let datesRow = null, dayTargetRow = null, mtdTargetRow = null, inTotalSystem = false;
+      for (const line of lines) {
+        const cols = parseCSVLine(line);
+        const firstCol = String(cols[0] || '').toUpperCase().trim();
+        if (firstCol === 'TOTAL SYSTEM') { inTotalSystem = true; datesRow = cols; }
+        else if (inTotalSystem && ['DELIVERY','TAKE AWAY','DINE IN','AGGREGATOR','AGGEGATOR'].includes(firstCol)) break;
+        else if (inTotalSystem && datesRow && firstCol === 'NET SALES - TARGET' && !dayTargetRow) dayTargetRow = cols;
+        else if (inTotalSystem && datesRow && firstCol === 'MTD NET SALES - TARGET' && !mtdTargetRow) mtdTargetRow = cols;
         if (datesRow && dayTargetRow && mtdTargetRow) break;
       }
-
-      if (datesRow && dayTargetRow && mtdTargetRow) {
-        const parsedData = {};
-        for (let i = 1; i < datesRow.length; i++) {
-          const parsedDate = parseMISDateHeader(datesRow[i]);
-          if (!parsedDate) continue;
-          const key = parsedDate.year !== null
-            ? `${parsedDate.year}-${String(parsedDate.month).padStart(2,'0')}-${String(parsedDate.day).padStart(2,'0')}`
-            : `${parsedDate.day}-${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parsedDate.month-1]}`;
-          if (parsedData[key]) continue; // Keep the first date when the spreadsheet has an extra repeated column.
-          parsedData[key] = {
-            day: parseMISNumber(dayTargetRow[i]),
-            mtd: parseMISNumber(mtdTargetRow[i]),
-            dateDay: parsedDate.day,
-            dateMonth: parsedDate.month,
-            dateYear: parsedDate.year
-          };
-        }
-
-        if (Object.keys(parsedData).length > 0) {
-          // The original date/target parsing is retained. Index the file by its
-          // reporting month only so existing per-outlet reports stay independent.
-          const counts = Object.create(null);
-          for (const row of Object.values(parsedData)) {
-            if (row && row.dateMonth >= 1 && row.dateMonth <= 12) {
-              counts[row.dateMonth] = (counts[row.dateMonth] || 0) + 1;
-            }
-          }
-          const dominant = Object.entries(counts).sort((a,b) => b[1]-a[1])[0];
-          const fileYear = file.name.match(/\b(20\d{2})\b/);
-          const current = parseAppDate(document.getElementById('date').value);
-          const reportYear = fileYear ? Number(fileYear[1]) : (current ? current.year : new Date().getFullYear());
-          const reportMonth = dominant ? Number(dominant[0]) : (current ? current.month : new Date().getMonth()+1);
-          // Yearless date headings are native to Gamma CSV exports.
-          Object.values(parsedData).forEach(row => {
-            if (row && row.dateYear == null) row.dateYear = reportYear;
-          });
-          const period = reportYear + '-' + String(reportMonth).padStart(2,'0');
-          ReportStore.setMIS(selectedOutlet, {filename:file.name,period,reportYear,reportMonth,data:parsedData});
-          toast('✅ MIS Report successfully loaded!', 'success');
-          reportSkipMIS = false;
-          autoFillFromMIS();
-          saveToStorage();
-        } else {
-          /* Existing MIS files are preserved if a new upload is invalid. */
-          const statusEl = document.getElementById('misUploadStatus');
-          if (statusEl) { statusEl.innerText = 'No valid dates found'; statusEl.style.color = '#DC2626'; }
-          /* Preserve previous target values on a failed upload. */
-          toast('⚠️ No valid date headings found in the MIS file.', 'error');
-        }
-      } else {
-        // Do not keep displaying values from a previous file after an unreadable upload.
-        /* Existing MIS files are preserved if a new upload is invalid. */
-        const statusEl = document.getElementById('misUploadStatus');
-        if (statusEl) { statusEl.innerText = 'No report loaded'; statusEl.style.color = 'var(--muted)'; }
-        /* Preserve previous target values on a failed upload. */
-        toast('⚠️ Could not parse the CSV. Make sure it is a Gamma MIS Report.', 'error');
+      if (!datesRow || !dayTargetRow || !mtdTargetRow) {
+        toast('This does not appear to be a Gamma MIS report.', 'warning', 4500);
+        return;
       }
-    } catch(err) {
-      /* Existing MIS files are preserved if a new upload is invalid. */
-      /* Preserve previous target values on a failed upload. */
-      toast('⚠️ Could not read this MIS file. Please check the CSV and try again.', 'error');
+      const dates = [];
+      const explicitYears = new Set();
+      for (let i = 1; i < datesRow.length; i++) {
+        const date = parseMISDateHeader(datesRow[i]);
+        if (date) {
+          dates.push({date, index:i});
+          if (date.year !== null) explicitYears.add(date.year);
+        }
+      }
+      const yearMatch = file.name.match(/\b(20\d{2})\b/);
+      const filenameYear = yearMatch ? Number(yearMatch[1]) : null;
+      if (explicitYears.size > 1 ||
+          (filenameYear && explicitYears.size && !explicitYears.has(filenameYear))) {
+        toast('The reporting year does not match the dates in the MIS file.', 'warning', 5000);
+        return;
+      }
+      const reportYear = filenameYear || (explicitYears.size ? [...explicitYears][0] : null);
+      if (!reportYear) {
+        toast('The reporting year is missing. Use a CSV filename that includes the year.', 'warning', 5000);
+        return;
+      }
+      const counts = Object.create(null);
+      dates.forEach(item => {
+        if (item.date.year !== null && item.date.year !== reportYear) return;
+        counts[item.date.month] = (counts[item.date.month] || 0) + 1;
+      });
+      const ranked = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+      if (!ranked.length || (ranked[1] && ranked[0][1] === ranked[1][1])) {
+        toast('Could not identify one reporting month in the MIS file.', 'warning', 5000);
+        return;
+      }
+      const reportMonth = Number(ranked[0][0]);
+      const parsedData = {};
+      const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      for (const item of dates) {
+        const date = item.date;
+        // Ignore unrelated trailing columns, including dates in another month.
+        if (date.month !== reportMonth || (date.year !== null && date.year !== reportYear)) continue;
+        const key = date.year !== null
+          ? reportYear + '-' + String(reportMonth).padStart(2,'0') + '-' + String(date.day).padStart(2,'0')
+          : date.day + '-' + monthNames[reportMonth-1];
+        if (Object.prototype.hasOwnProperty.call(parsedData,key)) continue;
+        parsedData[key] = {
+          day: parseMISNumber(dayTargetRow[item.index]),
+          mtd: parseMISNumber(mtdTargetRow[item.index]),
+          dateDay: date.day, dateMonth: reportMonth, dateYear: reportYear
+        };
+      }
+      if (!Object.keys(parsedData).length) {
+        toast('No valid dates were found in the MIS file.', 'warning', 4000);
+        return;
+      }
+      const period = reportYear + '-' + String(reportMonth).padStart(2,'0');
+      ReportStore.setMIS(selectedOutlet, {
+        filename:file.name, period, reportYear, reportMonth, data:parsedData,
+        sourceOutlet: selectedOutlet, verifiedOutlet: identity.found && !!identity.outlet
+      });
+      reportSkipMIS = false;
+      autoFillFromMIS();
+      saveToStorage();
+      toast('MIS file saved. Targets appear only for matching dates.', 'success', 3500);
+    } catch (err) {
+      console.error('MIS upload failed',err);
+      toast('Could not read this MIS file. Your existing reports are unchanged.', 'error', 4500);
     }
   };
-  reader.onerror = function() {
-    /* Existing MIS files are preserved if a new upload is invalid. */
-    const statusEl = document.getElementById('misUploadStatus');
-    if (statusEl) { statusEl.innerText = 'No report loaded'; statusEl.style.color = 'var(--muted)'; }
-    /* Preserve previous target values on a failed upload. */
-    toast('⚠️ Could not read this MIS file. Please try again.', 'error');
-  };
+  reader.onerror = () => toast('Could not open this CSV file.', 'error', 4000);
   reader.readAsText(file);
-  event.target.value = '';
 }
 
 
@@ -1806,67 +1838,50 @@ function autoFillFromMIS() {
       if (status) status.textContent = 'Report reset: MIS auto-fill paused';
       return;
     }
-    const selectedValue = document.getElementById('date').value;
-    const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet, selectedValue.slice(0,7).replace('.', '-')));
-    if (!raw || raw === 'null') {
+    const dateVal = document.getElementById('date').value;
+    const match = getMatchingMISForDate(dateVal);
+    if (!match) {
       const status = document.getElementById('misUploadStatus');
-      if (status) status.textContent = 'No MIS report saved for this outlet and month';
-      return;
-    }
-    const mis = JSON.parse(raw);
-
-    const statusEl = document.getElementById('misUploadStatus');
-    if (statusEl && mis.filename) {
-      statusEl.innerText = 'Loaded: ' + mis.filename;
-      statusEl.style.color = '#059669';
-    }
-
-    const selected = parseAppDate(document.getElementById('date').value);
-    if (!selected || !mis.data || typeof mis.data !== 'object') {
+      if (status) {
+        status.textContent = 'No matching MIS for this outlet, month and year';
+        status.style.color = 'var(--muted)';
+      }
+      // Clear only MIS-dependent targets, never sales, GES, Dragontail, or HutBot.
       clearMISAutoFilledTargets(true);
       return;
     }
-
-    const records = Object.entries(mis.data).map(([key, row]) => normaliseMISRecord(key, row)).filter(Boolean);
-    const matchesSelectedYear = record => record.year === null || record.year === selected.year;
-    const monthRecords = records.filter(record => record.month === selected.month && matchesSelectedYear(record));
-    const dateRecord = monthRecords.find(record => record.day === selected.day);
-
-    // Clear first, so mismatched or missing dates can never leave stale targets visible.
-    const mtdEl = document.getElementById('mtdTarget');
-    const dayEl = document.getElementById('dayTarget');
-    const monthlyEl = document.getElementById('monthlyTarget');
-    if (mtdEl) mtdEl.value = '';
-    if (dayEl) dayEl.value = '';
-    if (monthlyEl) monthlyEl.value = '';
-
-    if (dateRecord) {
-      if (mtdEl && dateRecord.mtdTarget !== null && dateRecord.mtdTarget !== undefined && Number.isFinite(Number(dateRecord.mtdTarget))) {
-        mtdEl.value = Number(dateRecord.mtdTarget).toLocaleString('en-US');
-      }
-      if (dayEl && dateRecord.dayTarget !== null && dateRecord.dayTarget !== undefined && Number.isFinite(Number(dateRecord.dayTarget))) {
-        dayEl.value = Number(dateRecord.dayTarget).toLocaleString('en-US');
-      }
+    const {mis, selected, monthRecords} = match;
+    const status = document.getElementById('misUploadStatus');
+    if (status) {
+      status.textContent = 'Loaded: ' + (mis.filename || 'matching MIS');
+      status.style.color = '#059669';
     }
-
-    // Keep the existing month-end rule for Monthly Target, but only use the selected month/year.
-    let monthlyTargetVal = null;
-    for (let d = 31; d >= 28; d--) {
-      const record = monthRecords.find(item => item.day === d && item.mtdTarget !== null && item.mtdTarget !== undefined && Number.isFinite(Number(item.mtdTarget)) && Number(item.mtdTarget) > 0);
-      if (record) { monthlyTargetVal = Number(record.mtdTarget); break; }
-    }
-    if (monthlyEl && monthlyTargetVal !== null) {
-      monthlyEl.value = monthlyTargetVal.toLocaleString('en-US');
-    }
-
+    const daily = monthRecords.find(record => record.day === selected.day);
+    const lastDay = new Date(selected.year, selected.month, 0).getDate();
+    const monthEnd = monthRecords.find(record => record.day === lastDay);
+    const fields = {
+      dayTarget: daily && daily.dayTarget,
+      mtdTarget: daily && daily.mtdTarget,
+      monthlyTarget: monthEnd && monthEnd.mtdTarget
+    };
+    Object.entries(fields).forEach(([id,value]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const n = value === null || value === undefined ? NaN : Number(value);
+      el.value = Number.isFinite(n) && n >= 0 ? n.toLocaleString('en-US') : '';
+    });
     calcAndRender();
     autoSave();
-  } catch(e) {
-    // Fail closed if the stored MIS data is invalid.
+  } catch (err) {
+    console.error('MIS matching failed', err);
+    const status = document.getElementById('misUploadStatus');
+    if (status) {
+      status.textContent = 'Could not verify the MIS reporting period';
+      status.style.color = 'var(--muted)';
+    }
     clearMISAutoFilledTargets(true);
   }
 }
-
 
 // ==========================================
 // CALENDAR PICKER LOGIC
