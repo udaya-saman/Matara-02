@@ -69,4 +69,43 @@ localStorage.setItem('ph_saved_day','2026.11.14');
 assert.equal(app.load('Matara 02','2026.11.14',false).values.todaySale,'451');
 assert.equal(localStorage.getItem('ph_daily_report_v2') !== null,true);
 assert.equal(app.load('Matara 02','2026.11.14',false).customCalcs.ADS,90);
-console.log('PASS: six outlets, Colombo 6 AM, date validation, rollover, restore, isolation, MIS, backups, migration');
+
+// Reset reports must not be silently repopulated by a stored MIS file.
+storage.clear();
+app.save('Matara 02','2026.11.14',{dayTarget:'500',todaySale:'400',mtdSale:'1200'},{});
+app.reset('Matara 02','2026.11.14');
+assert.equal(app.load('Matara 02','2026.11.14',false).values._skipMISAutoFill,true);
+assert.equal(app.load('Matara 02','2026.11.14',false).values.dayTarget,undefined);
+// Marker must clear when the operational day changes.
+const nextReport=app.load('Matara 02','2026.11.15',true);
+assert.equal(nextReport.values._skipMISAutoFill,undefined);
+// Backup preview rejects malformed files before mutating existing reports.
+const originalBackup=app.exportBackup();
+const payload=JSON.parse(originalBackup);
+const before=localStorage.getItem('ph_report_database_v3');
+payload.database.outlets['Matara 02'].reports['2026.02.30']={
+  values:{todaySale:'999'},customCalcs:{},updatedAt:1
+};
+assert.throws(()=>app.previewBackup(JSON.stringify(payload)),/Invalid date/);
+assert.equal(localStorage.getItem('ph_report_database_v3'),before);
+delete payload.database.outlets['Matara 02'].reports['2026.02.30'];
+payload.database.outlets['Matara 02'].reports['2026.11.14'].values.todaySale='999';
+payload.database.outlets['Matara 02'].reports['2026.11.14'].updatedAt=9999999999999;
+assert.equal(app.previewBackup(JSON.stringify(payload)).conflicts >= 1,true);
+const safeMerge=app.importBackup(JSON.stringify(payload));
+assert.equal(safeMerge.keptExisting>=1,true);
+assert.equal(app.load('Matara 02','2026.11.14',false).values.todaySale,undefined);
+// Forced replacement is explicit, and can be undone.
+const overwrite=app.importBackup(JSON.stringify(payload),true);
+assert.equal(overwrite.replaced>=1,true);
+assert.equal(app.load('Matara 02','2026.11.14',false).values.todaySale,'999');
+assert.equal(app.canUndoImport(),true);
+assert.equal(app.undoImport(),true);
+assert.equal(app.canUndoImport(),false);
+assert.equal(app.load('Matara 02','2026.11.14',false).values.todaySale,undefined);
+assert.throws(()=>app.importBackup(JSON.stringify({...payload,version:5})),/compatible/);
+// Corrupted stored databases must not be reset to empty without warning.
+storage.set('ph_report_database_v3','{"broken":true}');
+assert.throws(()=>app.load('Matara 02','2026.11.14',false),/not valid/);
+
+console.log('PASS: six outlets, Colombo 6 AM, date validation, rollover, restore, isolation, MIS, backups, migration, reset protection, safe backup preview, conflicting reports, import undo, corrupted storage');
