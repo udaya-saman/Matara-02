@@ -191,12 +191,15 @@
       throw new Error('Invalid MIS report');
     }
     var monthKey = inferMISMonth(value);
-    if (!monthKey) throw new Error('MIS reporting month could not be determined.');
     var db = getDB(), a = area(db, outlet);
     var next = clone(value);
-    next.period = monthKey;
-    a.misByMonth[monthKey] = next;
-    a.mis = clone(next); // Legacy last-uploaded access, without removing older months.
+    if (monthKey) {
+      next.period = monthKey;
+      a.misByMonth[monthKey] = next;
+    }
+    // An old report without year metadata stays accessible by the legacy
+    // single-MIS API. Only identifiable reporting periods are indexed.
+    a.mis = clone(next);
     saveDB(db);
   }
   function exportBackup() {
