@@ -647,7 +647,7 @@ input[readonly] {background:#F6F8FA;}
 <div class="settings-overlay" id="previewOverlay" onclick="if(event.target===this)closePreview()">
 <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><div class="settings-head"><h2 id="previewTitle">Preview WhatsApp message</h2><button onclick="closePreview()" aria-label="Close">✕</button></div><pre class="message-preview" id="previewText"></pre><div class="settings-actions"><button onclick="copyPreview()">Copy</button><button class="settings-primary" onclick="openPreviewWhatsApp()">Open WhatsApp</button></div></section></div>
 <!-- CUSTOM CONFIRM MODAL -->
-<div class="confirm-overlay" id="confirmOverlay">
+<div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
   <div class="confirm-sheet">
     <div class="confirm-icon" id="confirmIcon">⚠️</div>
     <div class="confirm-title" id="confirmTitle"></div>
@@ -1504,9 +1504,11 @@ function sendWA(n) {
   if (activeDate < todayStr) warnings.push('This message is for a HISTORICAL report');
   document.getElementById('previewText').textContent =
     (warnings.length ? 'CHECK BEFORE SENDING:\n• ' + warnings.join('\n• ') + '\n\n' : '') + pendingWhatsApp;
+  lastModalFocus = document.activeElement;
   document.getElementById('previewOverlay').classList.add('open');
+  requestAnimationFrame(() => document.getElementById('previewOverlay').querySelector('button')?.focus({preventScroll:true}));
 }
-function closePreview() { document.getElementById('previewOverlay').classList.remove('open'); }
+function closePreview() { document.getElementById('previewOverlay').classList.remove('open'); if (lastModalFocus?.isConnected) lastModalFocus.focus({preventScroll:true}); }
 function copyPreview() {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(pendingWhatsApp).then(() => toast('Message copied.', 'success'))
@@ -1521,9 +1523,11 @@ function openPreviewWhatsApp() {
 function openSettings() {
   updateOutletDisplay();
   updateUndoImportButton();
+  lastModalFocus = document.activeElement;
   document.getElementById('settingsOverlay').classList.add('open');
+  requestAnimationFrame(() => document.getElementById('outletSelect').focus({preventScroll:true}));
 }
-function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); if (lastModalFocus?.isConnected) lastModalFocus.focus({preventScroll:true}); }
 function exportReportBackup() {
   try {
     if (!saveToStorage()) return;
@@ -1996,6 +2000,7 @@ function showModal(opts) {
   cancelBtn.textContent = opts.cancelLabel || 'Cancel';
   cancelBtn.style.display = opts.cancelLabel === null ? 'none' : '';
   overlay.classList.add('open');
+  requestAnimationFrame(() => okBtn.focus({preventScroll:true}));
   function cleanup() {
     overlay.classList.remove('open');
     okBtn.onclick = null; cancelBtn.onclick = null;
@@ -2128,8 +2133,50 @@ function _uiClose(closeFn) {
   history.back();
 }
 
+function closeTopOverlay() {
+  const found = [
+    ['confirmOverlay', () => document.getElementById('confirmCancelBtn')?.click()],
+    ['settingsOverlay', () => {closeSettings();updateOutletDisplay();}],
+    ['previewOverlay', closePreview],
+    ['calendarOverlay', () => document.getElementById('calendarOverlay').classList.remove('open')],
+    ['asrOverlay', () => closeASR()],
+    ['chromeGuideOverlay', () => {document.getElementById('chromeGuideOverlay').style.display='none';}]
+  ].find(([id]) => {
+    const el=document.getElementById(id);
+    return el && (el.classList.contains('open') || (id==='chromeGuideOverlay' && el.style.display==='flex'));
+  });
+  if (!found) return false;
+  found[1]();
+  return true;
+}
+let lastModalFocus = null;
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    if (closeTopOverlay()) {event.preventDefault();event.stopPropagation();}
+    return;
+  }
+  if (event.key !== 'Tab') return;
+  const open = ['confirmOverlay','settingsOverlay','previewOverlay','calendarOverlay','asrOverlay']
+    .map(id => document.getElementById(id)).find(el => el && el.classList.contains('open'));
+  if (!open) return;
+  const controls = [...open.querySelectorAll('button:not([disabled]),input:not([disabled]):not([type=hidden]),select,textarea,[tabindex]:not([tabindex="-1"])')]
+    .filter(el => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
+  if (!controls.length) return;
+  const first=controls[0],last=controls[controls.length-1];
+  if (event.shiftKey && (document.activeElement===first || !open.contains(document.activeElement))) {
+    last.focus();event.preventDefault();
+  } else if (!event.shiftKey && (document.activeElement===last || !open.contains(document.activeElement))) {
+    first.focus();event.preventDefault();
+  }
+});
 window.addEventListener('popstate', function(e) {
   if (_ignoreNextPop) { _ignoreNextPop = false; return; }
+  if (closeTopOverlay()) {
+    _exitReady=false;
+    clearTimeout(_exitTimer);
+    _pushGuard();
+    return;
+  }
 
   if (_exitReady) {
     _exitReady = false;
