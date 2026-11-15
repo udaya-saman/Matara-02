@@ -8,7 +8,7 @@ function part(start,end){
   assert.ok(i>=0&&j>i,'Missing test source: '+start);
   return full.slice(i,j);
 }
-const parser=part('function parseCSVLine(text) {','function getMatchingMISForDate(');
+const parser=part('function parseCSVLine(text) {','function handleMISUpload(event) {');
 const matching=part('function getMatchingMISForDate(', 'function calcAndRender() {');
 const normalise=part('function normaliseMISRecord(', 'function autoFillFromMIS(');
 const fill=part('function autoFillFromMIS()', '// ==========================================\n// CALENDAR PICKER LOGIC');
