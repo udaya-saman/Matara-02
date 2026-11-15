@@ -79,11 +79,43 @@
     return db;
   }
   function saveDB(db) { global.localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+  function validMonthKey(s) {
+    if (!/^\d{4}-(?:0[1-9]|1[0-2])$/.test(String(s || ''))) return false;
+    return Number(s.slice(0,4)) >= 2000 && Number(s.slice(0,4)) <= 2200;
+  }
+  function inferMISMonth(mis) {
+    if (!mis || typeof mis !== 'object') return null;
+    var direct = mis.period || (mis.reportYear && mis.reportMonth
+      ? String(mis.reportYear) + '-' + String(mis.reportMonth).padStart(2,'0') : '');
+    if (validMonthKey(direct)) return direct;
+    var entries = mis.data && Object.values(mis.data);
+    if (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        var r = entries[i];
+        if (r && Number.isInteger(r.dateYear) && Number.isInteger(r.dateMonth)) {
+          var k = String(r.dateYear) + '-' + String(r.dateMonth).padStart(2,'0');
+          if (validMonthKey(k)) return k;
+        }
+      }
+    }
+    var name = String(mis.filename || '');
+    var match = name.match(/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s*[-_ ]*\s*(20\d{2})\b/i);
+    if (match) {
+      var months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+      return match[2] + '-' + String(months.indexOf(match[1].toLowerCase().slice(0,3)) + 1).padStart(2,'0');
+    }
+    return null;
+  }
   function area(db, outlet) {
     if (OUTLETS.indexOf(outlet) < 0) throw new Error('Unknown outlet');
     if (!db.outlets[outlet]) db.outlets[outlet] = {reports: {}, backup: null, mis: null};
     if (!db.outlets[outlet].reports || typeof db.outlets[outlet].reports !== 'object') db.outlets[outlet].reports = {};
-    return db.outlets[outlet];
+    var a = db.outlets[outlet];
+    if (!a.misByMonth || typeof a.misByMonth !== 'object' || Array.isArray(a.misByMonth)) a.misByMonth = {};
+    // The original single MIS report is preserved, while being lazily indexed by month.
+    var oldMonth = inferMISMonth(a.mis);
+    if (oldMonth && !a.misByMonth[oldMonth]) a.misByMonth[oldMonth] = clone(a.mis);
+    return a;
   }
   function rollover(previous, oldDate, newDate) {
     var next = clone(previous);
@@ -139,16 +171,35 @@
     saveDB(db);
     return true;
   }
-  function getMIS(outlet) {
-    var mis = area(getDB(), outlet).mis;
-    return mis ? clone(mis) : null;
+  function getMIS(outlet, monthKey) {
+    var a = area(getDB(), outlet);
+    if (monthKey != null) {
+      if (!validMonthKey(monthKey)) return null;
+      var periodMIS = a.misByMonth[monthKey];
+      return periodMIS ? clone(periodMIS) : null;
+    }
+    if (a.mis) return clone(a.mis);
+    var months = Object.keys(a.misByMonth).filter(validMonthKey).sort();
+    return months.length ? clone(a.misByMonth[months[months.length - 1]]) : null;
+  }
+  function getMISMonths(outlet) {
+    return Object.keys(area(getDB(),outlet).misByMonth).filter(validMonthKey).sort();
   }
   function setMIS(outlet, value) {
-    if (!value || !value.data || typeof value.data !== 'object' || !Object.keys(value.data).length) {
+    if (!value || !value.data || typeof value.data !== 'object' ||
+        Array.isArray(value.data) || !Object.keys(value.data).length) {
       throw new Error('Invalid MIS report');
     }
-    var db = getDB();
-    area(db, outlet).mis = clone(value);
+    var monthKey = inferMISMonth(value);
+    var db = getDB(), a = area(db, outlet);
+    var next = clone(value);
+    if (monthKey) {
+      next.period = monthKey;
+      a.misByMonth[monthKey] = next;
+    }
+    // An old report without year metadata stays accessible by the legacy
+    // single-MIS API. Only identifiable reporting periods are indexed.
+    a.mis = clone(next);
     saveDB(db);
   }
   function exportBackup() {
@@ -188,6 +239,15 @@
       });
       if (source.mis != null && (!isRecordMap(source.mis) || !isRecordMap(source.mis.data))) {
         throw new Error('Backup contains an invalid MIS report for ' + outlet);
+      }
+      if (source.misByMonth != null) {
+        if (!isRecordMap(source.misByMonth)) throw new Error('Invalid monthly MIS collection for ' + outlet);
+        Object.keys(source.misByMonth).forEach(function (month) {
+          var mis = source.misByMonth[month];
+          if (!validMonthKey(month) || !isRecordMap(mis) || !isRecordMap(mis.data) || !Object.keys(mis.data).length) {
+            throw new Error('Invalid monthly MIS data for ' + outlet + ' (' + month + ')');
+          }
+        });
       }
       if (source.backup != null) {
         if (!isRecordMap(source.backup) || !validDate(source.backup.date)) {
@@ -263,6 +323,9 @@
         };
       });
       if (!dest.mis && src.mis && src.mis.data) dest.mis = clone(src.mis);
+      if (src.misByMonth) Object.keys(src.misByMonth).forEach(function (month) {
+        if (!dest.misByMonth[month]) dest.misByMonth[month] = clone(src.misByMonth[month]);
+      });
       if (!dest.backup && src.backup) dest.backup = clone(src.backup);
     });
     // Fail safely if storage is full, rather than importing without an undo snapshot.
@@ -304,7 +367,7 @@
   global.ReportStore = {
     OUTLETS: OUTLETS.slice(), getOutlet: getOutlet, setOutlet: setOutlet,
     load: load, save: save, reset: reset, canRestore: canRestore, restore: restore,
-    getMIS: getMIS, setMIS: setMIS, exportBackup: exportBackup, importBackup: importBackup,
+    getMIS: getMIS, getMISMonths: getMISMonths, setMIS: setMIS, exportBackup: exportBackup, importBackup: importBackup,
     previewBackup: previewBackup, canUndoImport: canUndoImport, undoImport: undoImport,
     operationalDate: operationalDate, rollover: rollover, validDate: validDate
   };

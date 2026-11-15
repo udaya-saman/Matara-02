@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Pizza Hut Daily Report</title>
-<meta name="theme-color" content="#E31837">
+<meta name="theme-color" content="#C92026">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PH Report">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Local system font stack ensures a polished offline-first interface. -->
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
   :root {
@@ -581,6 +581,80 @@ input[readonly] {background:#F6F8FA;}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 
+
+/* DAY END visual language: quiet white header, compact data cards, soft boundaries. */
+:root {
+ --accent:#C92026; --accent-hover:#AC171F;--bg:#F4F6FA;--card:#FFFFFF;
+ --text:#161B27;--text2:#475467;--muted:#657084;--border:#E2E7EF;
+ --shadow:0 12px 44px rgba(30,38,52,.055);
+}
+html{-webkit-text-size-adjust:100%;}
+body {font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(ellipse at 15% 0%,#fff 0%,var(--bg) 55%);font-size:16px;}
+.header {background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);color:var(--text);box-shadow:none;position:sticky;top:0;z-index:100;min-height:77px;}
+.header .title {color:var(--text);font-size:16px;font-weight:850;letter-spacing:.055em;}
+.header .sub-title {color:var(--muted);font-size:12px;letter-spacing:0;font-weight:550;}
+.header .logo.brand-mark{object-fit:cover;background:transparent;padding:0;box-shadow:0 4px 14px rgba(201,32,38,.15);width:44px;height:44px;}
+.outlet-button {max-width:48%;display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--text);min-height:46px;border:1px solid #DCE1E9;border-radius:13px;padding:9px 12px;font-family:inherit;font-weight:750;font-size:13px;line-height:1.2;box-shadow:none;cursor:pointer;}
+.outlet-button:hover{background:#FFF8F8;border-color:#D1A6AA;}
+.outlet-button #headerOutletText {max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:750;}
+.outlet-pin{font-size:20px;color:var(--accent);}
+.main{max-width:860px;padding:27px 20px 40px;}
+.modern-toolbar{display:flex;align-items:stretch;gap:10px;margin:0 0 8px;}
+.modern-toolbar button {font-family:inherit;}
+.date-quick {display:flex;align-items:center;gap:12px;flex:1;text-align:left;padding:12px 16px;min-height:64px;border:1px solid var(--border);border-radius:16px;background:#fff;box-shadow:var(--shadow);cursor:pointer;}
+.date-quick .tool-icon {display:grid;place-items:center;width:40px;height:40px;font-size:23px;color:var(--accent);background:#FFF2F2;border-radius:11px;}
+.date-quick small{display:block;margin-bottom:3px;font-size:10px;color:var(--muted);letter-spacing:.09em;font-weight:800;}
+.date-quick strong{display:block;font-size:15px;color:var(--text);font-weight:800;}
+.date-quick .tool-chevron {margin-left:auto;font-size:18px;color:#667085;}
+.settings-quick{width:64px;min-width:64px;min-height:64px;border-radius:16px;background:white;border:1px solid var(--border);font-size:22px;color:var(--text);cursor:pointer;box-shadow:var(--shadow);}
+.report-date-indicator {min-height:18px;font-size:12px;margin:5px 6px 19px;font-weight:650;}
+.mis-panel{background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.mis-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:17px;}
+.mis-eyebrow{font-size:10px;letter-spacing:.12em;font-weight:850;color:var(--accent);}
+.mis-head h2{font-size:21px;color:var(--text);font-weight:850;letter-spacing:-.6px;margin:5px 0 5px;}
+.mis-head p{font-size:13px;color:var(--muted);max-width:470px;line-height:1.5;}
+.mis-head-icon{display:grid;place-items:center;background:#FFF1F1;color:var(--accent);border-radius:13px;width:45px;height:45px;font-size:30px;flex:none;}
+.mis-dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:168px;width:100%;border:1.5px dashed #BBC6D6;background:#FAFBFD;border-radius:16px;padding:20px;color:var(--text);font-family:inherit;cursor:pointer;}
+.mis-dropzone:hover,.mis-dropzone:focus-visible{background:#FFF6F6;border-color:var(--accent);}
+.mis-dropzone .drop-icon{display:grid;place-items:center;background:#F1F3F8;color:var(--accent);height:43px;width:43px;border-radius:12px;font-size:27px;}
+.mis-dropzone strong{font-size:15px;font-weight:800;}
+.mis-dropzone>span:last-child{font-size:12px;color:var(--muted);}
+.mis-panel .upload-status{text-align:left;font-size:12px;margin:12px 0 18px;color:var(--muted);}
+.mis-month-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 9px;font-size:13px;font-weight:800;}
+.mis-month-sub{font-size:11px;font-weight:550;color:var(--muted);}
+.mis-month-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+.mis-month-item{display:flex;justify-content:space-between;align-items:center;text-align:left;gap:9px;background:#F9FAFC;border:1px solid var(--border);min-height:45px;border-radius:11px;padding:11px 12px;color:var(--text);font-family:inherit;font-weight:700;font-size:13px;line-height:1.3;cursor:pointer;}
+.mis-month-item span:last-child{color:var(--accent);white-space:nowrap;}
+.mis-month-item:hover{background:#FFF7F7;border-color:#E6B6BA;}
+.mis-empty{font-size:12px;color:var(--muted);grid-column:1/-1;padding:7px 0;}
+.card{background:#fff;border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:25px;}
+.sec-title{color:var(--text);letter-spacing:-.25px;font-size:17px;}
+.cat-label{background:#F6F8FB!important;color:#49566C!important;border-left:3px solid #C92026;border-radius:8px;font-size:11px;letter-spacing:.075em;}
+.input-group input[type=text]{background:white;border:1px solid #D4DCE7;border-radius:11px;min-height:47px;}
+.input-group input[type=text]:focus{border-color:var(--accent);}
+.btn-small{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:10px;min-height:41px;}
+.btn-whatsapp{box-shadow:none!important;border-radius:12px;}
+.toast{top:auto!important;bottom:27px!important;left:50%!important;transform:translateX(-50%)!important;max-width:min(92vw,490px)!important;padding:14px 18px!important;font-family:inherit!important;font-weight:650!important;font-size:13px!important;line-height:1.5!important;border:1px solid var(--border)!important;box-shadow:0 12px 32px rgba(16,24,40,.15)!important;}
+@media(max-width:600px){
+ .main{padding:15px 12px 32px;}
+ .header{padding:13px 14px;gap:10px;min-height:72px;}
+ .header .title{font-size:14px;}
+ .outlet-button {padding:9px 10px;gap:5px;}
+ .outlet-button #headerOutletText{max-width:85px;}
+ .date-quick{padding:11px 12px;}
+ .mis-panel{padding:19px 15px;border-radius:17px;}
+ .mis-head h2{font-size:19px;}
+ .mis-month-list{grid-template-columns:1fr;}
+ .mis-head-icon{height:40px;width:40px;}
+ .card{padding:17px 14px;}
+}
+
+
+.section-jump{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--border);}
+.section-jump button{background:#F7F9FC;border:1px solid #E0E5ED;color:#455164;border-radius:999px;min-height:40px;padding:9px 14px;font:750 12px system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;}
+.section-jump button:hover,.section-jump button:focus-visible{border-color:#C92026;background:#FFF5F5;color:#B71923;}
+#cat-gamma,#cat-dragon,#cat-ges,#cat-5star,#cat-hutbot{scroll-margin-top:100px;}
+@media(max-width:600px){.section-jump{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}.section-jump button{padding:9px 7px;}}
 </style>
 </head>
 <body>
@@ -602,12 +676,14 @@ input[readonly] {background:#F6F8FA;}
 </div>
 
 <div class="header">
-  <div class="logo">🍕</div>
+  <img class="logo brand-mark" src="./icons/icon-192.png" alt="" width="44" height="44">
   <div style="flex:1">
-    <div class="title">Pizza Hut Daily Report</div>
-    <div class="sub-title" id="selectedOutletLabel">Matara 02</div>
+    <div class="title">PH DAILY REPORT</div>
+    <div class="sub-title">Outlet performance</div>
   </div>
-  <button class="header-settings" onclick="openSettings()">⚙ Settings</button>
+  <button class="outlet-button" id="selectedOutletLabel" type="button" onclick="openSettings()" aria-label="Change outlet">
+    <span class="outlet-pin">⌖</span><span id="headerOutletText">Matara 02</span><span aria-hidden="true">⌄</span>
+  </button>
 </div>
 
 <!-- TOAST -->
@@ -644,8 +720,6 @@ input[readonly] {background:#F6F8FA;}
 <div class="settings-actions"><button onclick="exportReportBackup()">↓ Export backup</button><button onclick="document.getElementById('backupFileInput').click()">↑ Import backup</button></div>
 <input id="backupFileInput" type="file" accept=".json,application/json" hidden onchange="handleBackupImport(event)"><button id="undoBackupImportBtn" type="button" onclick="undoBackupImport()" style="display:none;margin-top:12px;min-height:44px">Undo last backup import</button>
 </section></div>
-<div class="settings-overlay" id="previewOverlay" onclick="if(event.target===this)closePreview()">
-<section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><div class="settings-head"><h2 id="previewTitle">Preview WhatsApp message</h2><button onclick="closePreview()" aria-label="Close">✕</button></div><pre class="message-preview" id="previewText"></pre><div class="settings-actions"><button onclick="copyPreview()">Copy</button><button class="settings-primary" onclick="openPreviewWhatsApp()">Open WhatsApp</button></div></section></div>
 <!-- CUSTOM CONFIRM MODAL -->
 <div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
   <div class="confirm-sheet">
@@ -682,8 +756,21 @@ input[readonly] {background:#F6F8FA;}
 </div>
 
 <div class="main">
-<section class="overview"><span class="eyebrow">DAILY OPERATIONS</span><h1 id="overviewOutlet">Matara 02</h1><p>Operational report · <span id="summaryDate"></span></p><p id="reportDateNotice" role="status" aria-live="polite" style="font-size:12px;font-weight:700"></p><small>Separate saved reports by outlet and date · Operational day begins at 6:00 AM</small></section>
-<div class="toolbar"><button onclick="openCalendar()">📅 Choose date</button><button onclick="openSettings()">⚙ Outlet & backups</button></div>
+<div class="toolbar modern-toolbar">
+ <button class="date-quick" onclick="openCalendar()" type="button"><span class="tool-icon">▦</span><span><small>REPORT DATE</small><strong id="summaryDate">Choose date</strong></span><span class="tool-chevron">⌄</span></button>
+ <button class="settings-quick" type="button" onclick="openSettings()" aria-label="Open report settings">⚙</button>
+</div>
+<p class="report-date-indicator" id="reportDateNotice" role="status" aria-live="polite"></p>
+<section class="mis-panel">
+  <div class="mis-head"><div><span class="mis-eyebrow">DATA IMPORT</span><h2>Gamma MIS Report</h2><p>Upload your monthly CSV. The outlet and reporting month are detected automatically.</p></div><span class="mis-head-icon">⇧</span></div>
+  <input type="file" id="misCsvFile" accept=".csv,text/csv" hidden onchange="handleMISUpload(event)">
+  <button class="mis-dropzone" type="button" onclick="document.getElementById('misCsvFile').click()">
+    <span class="drop-icon">↥</span><strong>Select Gamma MIS File</strong><span>CSV file · automatic outlet detection</span>
+  </button>
+  <div id="misUploadStatus" class="upload-status">No MIS report for this outlet and month.</div>
+  <div class="mis-month-heading"><span>Saved MIS months</span><span class="mis-month-sub">Separate records per outlet</span></div>
+  <div id="misMonthList" class="mis-month-list"></div>
+</section>
 
   <!-- PWA INSTALL BANNER -->
   <div class="pwa-banner" id="pwaBanner">
@@ -704,7 +791,14 @@ input[readonly] {background:#F6F8FA;}
       </div>
     </div>
 
-    <div class="cat-label">📊 Gamma MIS &amp; DESTINITY</div>
+    <nav class="section-jump" aria-label="Jump to report section">
+  <button type="button" onclick="goToReportSection('cat-gamma')">Gamma</button>
+  <button type="button" onclick="goToReportSection('cat-dragon')">Dragontail</button>
+  <button type="button" onclick="goToReportSection('cat-ges')">GES</button>
+  <button type="button" onclick="goToReportSection('cat-5star')">5 Star</button>
+  <button type="button" onclick="goToReportSection('cat-hutbot')">HutBot</button>
+</nav>
+<div class="cat-label">📊 Gamma MIS &amp; DESTINITY</div>
     <!-- Date field: full-width, standalone -->
     <div class="input-group" style="margin-bottom:12px;">
       <label>Date</label>
@@ -745,16 +839,7 @@ input[readonly] {background:#F6F8FA;}
       <button class="btn-whatsapp m2" onclick="sendWA(2)">💬 Message 2</button>
     </div>
     
-    <hr style="margin:0;">
 
-    <!-- CSV Upload Section -->
-    <div class="input-group">
-      <input type="file" id="misCsvFile" accept=".csv" style="display:none" onchange="handleMISUpload(event)">
-      <button class="btn-upload" onclick="document.getElementById('misCsvFile').click()">
-        <span style="font-size:22px;">📁</span> Select MIS File
-      </button>
-      <div id="misUploadStatus" class="upload-status">No report loaded</div>
-    </div>
     
   </div>
 
@@ -765,6 +850,7 @@ input[readonly] {background:#F6F8FA;}
 </footer>
 
 <script src="./report-store.js"></script>
+<script src="./gamma-mis.js"></script>
 <script>
 // FORCE SERVICE WORKER UPDATE IMMEDIATELY
 if ('serviceWorker' in navigator) {
@@ -884,16 +970,18 @@ function collectReportValues() {
   FIELDS.forEach(f => {
     if (f.readonly) return;
     const el = document.getElementById(f.id);
-    if (el) data[f.id] = isInputValidForSave(el) ? el.value : '';
+    if (el) data[f.id] = isInputValidForSave(el) ? el.value : (lastValidValues[f.id] ?? '');
   });
   return data;
 }
 
 let storageWarningShown = false;
+let lastValidValues = Object.create(null);
 let reportSkipMIS = false;
 function saveToStorage() {
   try {
     ReportStore.save(selectedOutlet, activeDate, {...collectReportValues(), ...(reportSkipMIS ? {_skipMISAutoFill:true} : {})}, customCalcs);
+    FIELDS.forEach(f => { const el=document.getElementById(f.id); if(el && !f.readonly && isInputValidForSave(el)) lastValidValues[f.id]=el.value; });
     storageWarningShown = false;
     return true;
   } catch (err) {
@@ -909,6 +997,7 @@ function saveToStorage() {
 function applyReportData(record) {
   const values = record && record.values && typeof record.values === 'object' ? record.values : {};
   reportSkipMIS = values._skipMISAutoFill === true;
+  lastValidValues = Object.create(null);
   const legacy = {mtdU20:['mtdHF'], hutTodayOnTime:['hutbotToday'], hutMtdOnTime:['hutbotMTD']};
   FIELDS.forEach(f => {
     const el = document.getElementById(f.id);
@@ -922,6 +1011,7 @@ function applyReportData(record) {
     value = value == null ? '' : String(value);
     if (f.type === 'pct' && value && !value.endsWith('%')) value += '%';
     el.value = value;
+    lastValidValues[f.id] = value;
     if (f.type === 'asr') {
       const display = document.getElementById(f.id + '-display');
       if (display) display.textContent = value || 'AS';
@@ -970,16 +1060,23 @@ function refreshRestoreButton() {
 
 function updateOutletDisplay() {
   const label = document.getElementById('selectedOutletLabel');
-  if (label) label.textContent = selectedOutlet;
+  if (label) label.setAttribute("aria-label", "Change outlet, current: " + selectedOutlet);
+  const headerOutlet = document.getElementById("headerOutletText");
+  if (headerOutlet) headerOutlet.textContent = selectedOutlet;
   const overview = document.getElementById('overviewOutlet');
   if (overview) overview.textContent = selectedOutlet;
   const selector = document.getElementById('outletSelect');
   if (selector) selector.value = selectedOutlet;
   const summary = document.getElementById('summaryDate');
   if (summary) summary.textContent = activeDate;
+  renderMISMonthList();
   document.title = 'PH Daily Report | ' + selectedOutlet;
 }
 
+function goToReportSection(id) {
+  const target = document.getElementById(id);
+  if (target) target.scrollIntoView({behavior:'smooth',block:'start'});
+}
 function updateReportingDateNotice() {
   const el = document.getElementById('reportDateNotice');
   if (!el) return;
@@ -1061,7 +1158,7 @@ function toast(msg, type='info', duration=1800) {
   const s = styles[type] || styles.info;
   el.style.backgroundColor = s.bg;
   el.style.color = s.color;
-  el.innerHTML = msg;
+  el.textContent = String(msg);
   el.style.display = 'block';
   if (duration > 0) toastTimer = setTimeout(() => { el.style.display='none'; }, duration);
 }
@@ -1162,8 +1259,8 @@ function onRatingBlur(el) {
   if (raw === '') { autoSave(); return; }
   const num = Number(raw);
   if (!Number.isFinite(num) || num < 0 || num > 5) {
-    el.value = '';
-    toast('Rating must be between 0 and 5.', 'warning', 4000);
+    el.value = lastValidValues[el.id] ?? '';
+    toast('Rating must be between 0 and 5. Previous valid value restored.', 'warning', 4000);
   }
   calcAndRender(); autoSave();
 }
@@ -1266,7 +1363,7 @@ function getTomorrowTarget(dateVal) {
     // Preserve the existing rule: do not show next month's target in this field.
     if (d.getMonth() !== tmrw.getMonth()) return '---';
 
-    const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet));
+    const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet, dateVal.slice(0,7).replace('.', '-')));
     if (!raw || raw === 'null') return '---';
     const mis = JSON.parse(raw);
     if (!mis || !mis.data) return '---';
@@ -1281,6 +1378,7 @@ function getTomorrowTarget(dateVal) {
     return '---';
   }
 }
+
 
 function calcAndRender() {
   const dateVal = document.getElementById('date')?.value || todayStr;
@@ -1491,34 +1589,18 @@ function formatPercentValue(id) {
   const n = Number(raw.replace(/[,%]/g,''));
   return Number.isFinite(n) && n >= 0 && n <= 100 ? n.toLocaleString('en-US',{maximumFractionDigits:2}) + '%' : '---';
 }
-let pendingWhatsApp = '';
 function sendWA(n) {
+  // Called directly by Message 1 or Message 2. Keep the existing message
+  // generation and all business calculations unchanged.
   calcAndRender();
-  pendingWhatsApp = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput').value;
-  if (!pendingWhatsApp.trim()) { toast('No report message is available.', 'warning'); return; }
-  const warnings = [];
-  if (!rawNum('mtdSale').trim()) warnings.push('MTD Sale is missing');
-  if (!rawNum('todaySale').trim()) warnings.push('Today Sale is missing');
-  if (!rawNum('totalResponses').trim()) warnings.push('MTD GES Total Responses is missing');
-  if (activeDate > todayStr) warnings.push('This message is for a FUTURE DRAFT report');
-  if (activeDate < todayStr) warnings.push('This message is for a HISTORICAL report');
-  document.getElementById('previewText').textContent =
-    (warnings.length ? 'CHECK BEFORE SENDING:\n• ' + warnings.join('\n• ') + '\n\n' : '') + pendingWhatsApp;
-  lastModalFocus = document.activeElement;
-  document.getElementById('previewOverlay').classList.add('open');
-  requestAnimationFrame(() => document.getElementById('previewOverlay').querySelector('button')?.focus({preventScroll:true}));
-}
-function closePreview() { document.getElementById('previewOverlay').classList.remove('open'); if (lastModalFocus?.isConnected) lastModalFocus.focus({preventScroll:true}); }
-function copyPreview() {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(pendingWhatsApp).then(() => toast('Message copied.', 'success'))
-      .catch(() => toast('Could not copy. Please select the text.', 'warning'));
-  } else toast('Copy is unavailable. Please select the text.', 'warning');
-}
-function openPreviewWhatsApp() {
-  if (!pendingWhatsApp) return;
-  window.open('https://wa.me/?text=' + encodeURIComponent(pendingWhatsApp), '_blank', 'noopener,noreferrer');
-  closePreview();
+  const output = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput');
+  const message = output ? output.value : '';
+  if (!message.trim()) {
+    toast('No report message is available.', 'warning');
+    return;
+  }
+  // Open WhatsApp directly from the user's click, without an intermediate dialog.
+  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
 }
 function openSettings() {
   updateOutletDisplay();
@@ -1684,89 +1766,58 @@ function parseMISNumber(value) {
 }
 
 function handleMISUpload(event) {
-  const file = event.target.files[0];
-  event.target.value = '';
-  if (!file) return;
-  if (file.size > 3 * 1024 * 1024 || !/\.csv$/i.test(file.name)) {
-    toast('Please choose a Gamma MIS CSV file under 3 MB.', 'warning', 4000);
-    return;
-  }
-  const uploadOutlet = selectedOutlet;
-  const selected = parseAppDate(activeDate);
-  if (!selected) { toast('Select a valid report date first.', 'error'); return; }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const lines = String(e.target.result || '').replace(/^\uFEFF/, '').split(/\r?\n/);
-      if (lines.length < 4) throw new Error('Incomplete CSV');
-      let datesRow = null, dayTargetRow = null, mtdTargetRow = null, inTotalSystem = false;
-      for (let i = 0; i < lines.length; i++) {
-        const cols = parseCSVLine(lines[i]);
-        const firstCol = (cols[0] || '').toUpperCase().trim();
-        if (firstCol === 'TOTAL SYSTEM') {
-          inTotalSystem = true; datesRow = cols;
-        } else if (inTotalSystem && ['DELIVERY','TAKE AWAY','DINE IN','AGGREGATOR','AGGEGATOR'].includes(firstCol)) {
-          break;
-        } else if (inTotalSystem && datesRow && firstCol === 'NET SALES - TARGET' && !dayTargetRow) {
-          dayTargetRow = cols;
-        } else if (inTotalSystem && datesRow && firstCol === 'MTD NET SALES - TARGET' && !mtdTargetRow) {
-          mtdTargetRow = cols;
-        }
-        if (datesRow && dayTargetRow && mtdTargetRow) break;
+  const file=event.target.files?.[0];event.target.value='';
+  if(!file)return;
+  if(file.size>4*1024*1024||!/\.csv$/i.test(file.name)){toast('Choose a Gamma MIS CSV file under 4 MB.','warning',4500);return;}
+  const reader=new FileReader();
+  reader.onerror=()=>toast('This file could not be opened. Your reports are unchanged.','error',4500);
+  reader.onload=()=>{
+    let parsed;try{parsed=GammaMIS.parse(String(reader.result),file.name);}
+    catch(err){toast(err.message||'Please choose a valid Gamma MIS report.','warning',5500);return;}
+    const originalOutlet=selectedOutlet;
+    const lastDay=new Date(parsed.year,parsed.month,0).getDate();
+    const targetDate=parsed.year+'.'+String(parsed.month).padStart(2,'0')+'.'+String(lastDay).padStart(2,'0');
+    showModal({
+      icon:'📄',title:'Confirm Gamma MIS import',
+      msg:'Outlet: '+parsed.outlet+'. Period: '+parsed.monthLabel+'. Monthly target: Rs. '+
+          Number(parsed.monthlyTarget).toLocaleString('en-US')+'. '+
+          (parsed.outlet!==originalOutlet?'Switch from '+originalOutlet+' to '+parsed.outlet+'. ':'')+
+          'Save this MIS and open '+targetDate+'? Existing reports will be kept.',
+      okLabel:'Confirm & Save',cancelLabel:'Cancel',
+      onOk:()=>{
+        if(!saveToStorage())return;
+        try{
+          ReportStore.setMIS(parsed.outlet,{filename:file.name,period:parsed.period,reportYear:parsed.year,
+            reportMonth:parsed.month,verifiedOutlet:true,data:parsed.data});
+          ReportStore.setOutlet(parsed.outlet);selectedOutlet=parsed.outlet;
+          if(!loadSelectedReport(targetDate,false)){
+            toast('MIS saved, but the selected report could not be opened.','warning',4500);return;
+          }
+          reportSkipMIS=false;
+          autoFillFromMIS();calcAndRender();saveToStorage();renderMISMonthList();
+          toast(parsed.monthLabel+' MIS saved for '+parsed.outlet+'.','success',4000);
+        }catch(err){toast('The MIS report could not be saved. Previous reports were kept.','error',5000);console.error(err);}
       }
-      if (!datesRow || !dayTargetRow || !mtdTargetRow || datesRow.length < 2) throw new Error('Gamma MIS headings are missing');
-      if (dayTargetRow.length < datesRow.length || mtdTargetRow.length < datesRow.length) throw new Error('Incomplete target columns');
-      const parsedData = {}; let count = 0;
-      for (let i = 1; i < datesRow.length; i++) {
-        const header = String(datesRow[i] || '').trim();
-        if (!header) continue;
-        const date = parseMISDateHeader(header);
-        if (!date) throw new Error('Invalid date heading: ' + header);
-        const effectiveYear = date.year === null ? selected.year : date.year;
-        if (effectiveYear !== selected.year || date.month !== selected.month) throw new Error('CSV dates do not match the selected reporting month/year');
-        if (date.day > new Date(effectiveYear,date.month,0).getDate()) throw new Error('Invalid calendar date');
-        const key = effectiveYear + '-' + String(date.month).padStart(2,'0') + '-' + String(date.day).padStart(2,'0');
-        if (parsedData[key]) throw new Error('Duplicate date: ' + header);
-        const daily = parseMISNumber(dayTargetRow[i]), mtd = parseMISNumber(mtdTargetRow[i]);
-        if (daily === null && mtd === null) throw new Error('Missing target values: ' + header);
-        if ((daily !== null && daily < 0) || (mtd !== null && mtd < 0)) throw new Error('Negative sales target');
-        parsedData[key] = {day:daily,mtd:mtd,dateDay:date.day,dateMonth:date.month,dateYear:effectiveYear};
-        count++;
-      }
-      if (!count) throw new Error('No valid dates');
-      // Verify outlet name if the export identifies it; otherwise require explicit confirmation.
-      const headerText = (file.name + ' ' + lines.slice(0,20).join(' ')).toLowerCase().replace(/matara[\s_-]*0?2/g,'matara 02');
-      const identified = ReportStore.OUTLETS.filter(name => {
-        const phrase = name.toLowerCase();
-        const at = headerText.indexOf(phrase);
-        if (at < 0) return false;
-        const before = at === 0 ? ' ' : headerText[at-1];
-        const after = headerText[at+phrase.length] || ' ';
-        return !/[a-z]/.test(before) && !/[a-z0-9]/.test(after);
-      }).filter(name => name !== 'Matara' || !headerText.includes('matara 02'));
-      if (identified.length && (identified.length !== 1 || identified[0] !== uploadOutlet)) throw new Error('CSV appears to belong to another outlet: ' + identified.join(', '));
-      const verified = identified.length === 1;
-      showModal({
-        icon:'📄',title:'Confirm MIS file',
-        msg:count + ' valid dates for ' + selected.year + '-' + String(selected.month).padStart(2,'0') + ', outlet ' + uploadOutlet + '. ' +
-          (verified ? 'Outlet identity matched.' : 'Outlet identity not found. Check the CSV source before confirming.') +
-          ' Replace the saved MIS file?',
-        okLabel:'Save MIS',cancelLabel:'Cancel',
-        onOk:() => {
-          if (selectedOutlet !== uploadOutlet) {toast('Outlet changed. Upload again.', 'warning');return;}
-          try {
-            ReportStore.setMIS(uploadOutlet,{filename:file.name,data:parsedData,reportYear:selected.year,reportMonth:selected.month,verifiedOutlet:verified});
-            reportSkipMIS = false;
-            autoFillFromMIS();
-            saveToStorage();
-            toast('MIS saved for '+uploadOutlet, 'success');
-          } catch (err) {toast('MIS could not be saved; previous MIS remains.', 'error');}
-        }
-      });
-    } catch(err) {toast('MIS rejected: '+err.message+'. Previous data was preserved.', 'error',5500);}
+    });
   };
-  reader.onerror = function(){toast('CSV could not be read; previous MIS remains.', 'error');};
   reader.readAsText(file);
+}
+function renderMISMonthList(){
+  const host=document.getElementById('misMonthList');
+  if(!host)return;
+  host.replaceChildren();
+  try{
+    const months=ReportStore.getMISMonths(selectedOutlet).slice().reverse();
+    if(!months.length){const p=document.createElement('p');p.className='mis-empty';p.textContent='No saved MIS months for this outlet.';host.appendChild(p);return;}
+    months.forEach(month=>{
+      const button=document.createElement('button');button.type='button';button.className='mis-month-item';
+      const name=document.createElement('span');const [year,m]=month.split('-').map(Number);
+      name.textContent=new Date(year,m-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
+      const right=document.createElement('span');right.textContent='View →';button.append(name,right);
+      button.onclick=()=>{if(!saveToStorage())return;const last=new Date(year,m,0).getDate();openReportDate(year+'.'+String(m).padStart(2,'0')+'.'+String(last).padStart(2,'0'));};
+      host.appendChild(button);
+    });
+  }catch(err){const p=document.createElement('p');p.className='mis-empty';p.textContent='Saved MIS months could not be listed.';host.appendChild(p);}
 }
 function normaliseMISRecord(key, record) {
   if (!record || typeof record !== 'object') return null;
@@ -1782,8 +1833,8 @@ function normaliseMISRecord(key, record) {
 function autoFillFromMIS() {
   try {
     if (reportSkipMIS) { const status = document.getElementById('misUploadStatus'); if (status) status.textContent='Report reset: MIS auto-fill paused'; return; }
-    const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet));
-    if (!raw || raw === 'null') { const status=document.getElementById('misUploadStatus'); if(status)status.textContent='No MIS file for this outlet'; return; }
+    const raw = JSON.stringify(ReportStore.getMIS(selectedOutlet, document.getElementById('date').value.slice(0,7).replace('.', '-')));
+    if (!raw || raw === 'null') { const status=document.getElementById('misUploadStatus'); if(status)status.textContent='No MIS report saved for this outlet and reporting month.'; return; }
     const mis = JSON.parse(raw);
 
     const statusEl = document.getElementById('misUploadStatus');
@@ -1836,6 +1887,7 @@ function autoFillFromMIS() {
     clearMISAutoFilledTargets(true);
   }
 }
+
 
 // ==========================================
 // CALENDAR PICKER LOGIC
@@ -2046,7 +2098,7 @@ function onPctBlur(el) {
   const clean = raw.replace(/%/g,'').trim();
   const num = Number(clean);
   if (!Number.isFinite(num) || num < 0 || num > 100) {
-  el.value = ''; calcAndRender(); autoSave(); toast('Enter a percentage from 0 to 100.', 'warning', 4500); return;
+  el.value = lastValidValues[el.id] ?? ''; calcAndRender(); autoSave(); toast('Enter a percentage from 0 to 100. Previous valid value restored.', 'warning', 4500); return;
 }
 el.value = num.toLocaleString('en-US',{maximumFractionDigits:2})+'%';
 calcAndRender(); autoSave();
@@ -2137,7 +2189,6 @@ function closeTopOverlay() {
   const found = [
     ['confirmOverlay', () => document.getElementById('confirmCancelBtn')?.click()],
     ['settingsOverlay', () => {closeSettings();updateOutletDisplay();}],
-    ['previewOverlay', closePreview],
     ['calendarOverlay', () => document.getElementById('calendarOverlay').classList.remove('open')],
     ['asrOverlay', () => closeASR()],
     ['chromeGuideOverlay', () => {document.getElementById('chromeGuideOverlay').style.display='none';}]
@@ -2186,7 +2237,7 @@ window.addEventListener('popstate', function(e) {
   }
 
   _exitReady = true;
-  toast('<div style="font-size:32px;margin-bottom:8px;">⚠️</div>ඉවත් වීමට නැවත වරක් Back Button එක ඔබන්න.', 'error', 1200);
+  toast('Press Back again to exit the app.', 'warning', 1800);
   clearTimeout(_exitTimer);
   _exitTimer = setTimeout(() => {
     _exitReady = false;
