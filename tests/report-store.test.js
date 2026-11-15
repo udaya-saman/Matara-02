@@ -106,6 +106,6 @@ assert.equal(app.load('Matara 02','2026.11.14',false).values.todaySale,undefined
 assert.throws(()=>app.importBackup(JSON.stringify({...payload,version:5})),/compatible/);
 // Corrupted stored databases must not be reset to empty without warning.
 storage.set('ph_report_database_v3','{"broken":true}');
-assert.throws(()=>app.load('Matara 02','2026.11.14',false),/not valid/);
+assert.throws(()=>app.load('Matara 02','2026.11.14',false),/Saved reports could not be read|not valid/);
 
 console.log('PASS: six outlets, Colombo 6 AM, date validation, rollover, restore, isolation, MIS, backups, migration, reset protection, safe backup preview, conflicting reports, import undo, corrupted storage');
