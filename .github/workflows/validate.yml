@@ -16,6 +16,8 @@ jobs:
           node-version: '22'
       - name: Test storage migrations and reporting periods
         run: node tests/report-store.test.js
+      - name: Test MIS import and report date behavior
+        run: node tests/report-ui.test.js
       - name: Validate JavaScript syntax
         run: |
           node --check report-store.js
