@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Pizza Hut Daily Report</title>
-<meta name="theme-color" content="#E31837">
+<meta name="theme-color" content="#C92026">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PH Report">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Local system font stack ensures a polished offline-first interface. -->
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
   :root {
@@ -959,16 +959,18 @@ function collectReportValues() {
   FIELDS.forEach(f => {
     if (f.readonly) return;
     const el = document.getElementById(f.id);
-    if (el) data[f.id] = isInputValidForSave(el) ? el.value : '';
+    if (el) data[f.id] = isInputValidForSave(el) ? el.value : (lastValidValues[f.id] ?? '');
   });
   return data;
 }
 
 let storageWarningShown = false;
+let lastValidValues = Object.create(null);
 let reportSkipMIS = false;
 function saveToStorage() {
   try {
     ReportStore.save(selectedOutlet, activeDate, {...collectReportValues(), ...(reportSkipMIS ? {_skipMISAutoFill:true} : {})}, customCalcs);
+    FIELDS.forEach(f => { const el=document.getElementById(f.id); if(el && !f.readonly && isInputValidForSave(el)) lastValidValues[f.id]=el.value; });
     storageWarningShown = false;
     return true;
   } catch (err) {
@@ -984,6 +986,7 @@ function saveToStorage() {
 function applyReportData(record) {
   const values = record && record.values && typeof record.values === 'object' ? record.values : {};
   reportSkipMIS = values._skipMISAutoFill === true;
+  lastValidValues = Object.create(null);
   const legacy = {mtdU20:['mtdHF'], hutTodayOnTime:['hutbotToday'], hutMtdOnTime:['hutbotMTD']};
   FIELDS.forEach(f => {
     const el = document.getElementById(f.id);
@@ -997,6 +1000,7 @@ function applyReportData(record) {
     value = value == null ? '' : String(value);
     if (f.type === 'pct' && value && !value.endsWith('%')) value += '%';
     el.value = value;
+    lastValidValues[f.id] = value;
     if (f.type === 'asr') {
       const display = document.getElementById(f.id + '-display');
       if (display) display.textContent = value || 'AS';
@@ -1045,7 +1049,7 @@ function refreshRestoreButton() {
 
 function updateOutletDisplay() {
   const label = document.getElementById('selectedOutletLabel');
-  if (label) label.textContent = selectedOutlet;
+  if (label) label.setAttribute("aria-label", "Change outlet, current: " + selectedOutlet);
   const headerOutlet = document.getElementById("headerOutletText");
   if (headerOutlet) headerOutlet.textContent = selectedOutlet;
   const overview = document.getElementById('overviewOutlet');
@@ -1054,6 +1058,7 @@ function updateOutletDisplay() {
   if (selector) selector.value = selectedOutlet;
   const summary = document.getElementById('summaryDate');
   if (summary) summary.textContent = activeDate;
+  renderMISMonthList();
   document.title = 'PH Daily Report | ' + selectedOutlet;
 }
 
@@ -1138,7 +1143,7 @@ function toast(msg, type='info', duration=1800) {
   const s = styles[type] || styles.info;
   el.style.backgroundColor = s.bg;
   el.style.color = s.color;
-  el.innerHTML = msg;
+  el.textContent = String(msg);
   el.style.display = 'block';
   if (duration > 0) toastTimer = setTimeout(() => { el.style.display='none'; }, duration);
 }
@@ -1239,8 +1244,8 @@ function onRatingBlur(el) {
   if (raw === '') { autoSave(); return; }
   const num = Number(raw);
   if (!Number.isFinite(num) || num < 0 || num > 5) {
-    el.value = '';
-    toast('Rating must be between 0 and 5.', 'warning', 4000);
+    el.value = lastValidValues[el.id] ?? '';
+    toast('Rating must be between 0 and 5. Previous valid value restored.', 'warning', 4000);
   }
   calcAndRender(); autoSave();
 }
@@ -2094,7 +2099,7 @@ function onPctBlur(el) {
   const clean = raw.replace(/%/g,'').trim();
   const num = Number(clean);
   if (!Number.isFinite(num) || num < 0 || num > 100) {
-  el.value = ''; calcAndRender(); autoSave(); toast('Enter a percentage from 0 to 100.', 'warning', 4500); return;
+  el.value = lastValidValues[el.id] ?? ''; calcAndRender(); autoSave(); toast('Enter a percentage from 0 to 100. Previous valid value restored.', 'warning', 4500); return;
 }
 el.value = num.toLocaleString('en-US',{maximumFractionDigits:2})+'%';
 calcAndRender(); autoSave();
@@ -2234,7 +2239,7 @@ window.addEventListener('popstate', function(e) {
   }
 
   _exitReady = true;
-  toast('<div style="font-size:32px;margin-bottom:8px;">⚠️</div>ඉවත් වීමට නැවත වරක් Back Button එක ඔබන්න.', 'error', 1200);
+  toast('Press Back again to exit the app.', 'warning', 1800);
   clearTimeout(_exitTimer);
   _exitTimer = setTimeout(() => {
     _exitReady = false;
