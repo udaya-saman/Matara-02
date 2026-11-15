@@ -1381,13 +1381,85 @@ function onTimeBlur(el) {
   autoSave();
 }
 
+
+function formatPercentValue(id) {
+  const raw = document.getElementById(id)?.value.trim();
+  if (!raw) return '---';
+  const n = Number(raw.replace(/[,%]/g,''));
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? n.toLocaleString('en-US',{maximumFractionDigits:2}) + '%' : '---';
+}
+let pendingWhatsApp = '';
 function sendWA(n) {
   calcAndRender();
-  const text = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput').value;
-  if (!text.trim()) { toast('⚠️ Send කිරීමට message නොමැත.','warning'); return; }
-  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  pendingWhatsApp = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput').value;
+  if (!pendingWhatsApp.trim()) { toast('No report message is available.', 'warning'); return; }
+  const warnings = [];
+  if (!rawNum('mtdSale').trim()) warnings.push('MTD Sale is missing');
+  if (!rawNum('todaySale').trim()) warnings.push('Today Sale is missing');
+  if (!rawNum('totalResponses').trim()) warnings.push('MTD GES Total Responses is missing');
+  document.getElementById('previewText').textContent =
+    (warnings.length ? 'CHECK BEFORE SENDING:\n• ' + warnings.join('\n• ') + '\n\n' : '') + pendingWhatsApp;
+  document.getElementById('previewOverlay').classList.add('open');
 }
-
+function closePreview() { document.getElementById('previewOverlay').classList.remove('open'); }
+function copyPreview() {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(pendingWhatsApp).then(() => toast('Message copied.', 'success'))
+      .catch(() => toast('Could not copy. Please select the text.', 'warning'));
+  } else toast('Copy is unavailable. Please select the text.', 'warning');
+}
+function openPreviewWhatsApp() {
+  if (!pendingWhatsApp) return;
+  window.open('https://wa.me/?text=' + encodeURIComponent(pendingWhatsApp), '_blank', 'noopener,noreferrer');
+  closePreview();
+}
+function openSettings() {
+  updateOutletDisplay();
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
+function exportReportBackup() {
+  try {
+    if (!saveToStorage()) return;
+    const blob = new Blob([ReportStore.exportBackup()], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ph-report-backup-' + ReportStore.operationalDate().replace(/\./g,'-') + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    toast('Backup file downloaded.', 'success');
+  } catch (err) { toast('Could not export backup.', 'error'); }
+}
+function handleBackupImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Backup file is too large.', 'error'); event.target.value=''; return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    showModal({
+      icon: 'file', title: 'Import backup?',
+      msg: 'Valid reports will be merged. Newer existing reports will be kept.',
+      okLabel: 'Import', cancelLabel: 'Cancel',
+      onOk: () => {
+        try {
+          if (!saveToStorage()) return;
+          ReportStore.importBackup(String(reader.result));
+          loadSelectedReport(activeDate, false);
+          autoFillFromMIS();
+          calcAndRender();
+          toast('Backup imported successfully.', 'success');
+          closeSettings();
+        } catch (err) { toast('Backup is invalid or could not be imported.', 'error', 5000); }
+      }
+    });
+  };
+  reader.onerror = () => toast('Could not read backup file.', 'error');
+  reader.readAsText(file);
+  event.target.value='';
+}
 // ==========================================
 // MIS REPORT CSV PARSING AND AUTO-FILL
 // ==========================================
