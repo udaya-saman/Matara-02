@@ -744,7 +744,6 @@
 </footer>
 
 <script src="./report-store.js"></script>
-<script src="./gamma-mis.js"></script>
 <script>
 // FORCE SERVICE WORKER UPDATE IMMEDIATELY
 if ('serviceWorker' in navigator) {
@@ -1699,6 +1698,7 @@ function handleMISUpload(event) {
           const key = parsedDate.year !== null
             ? `${parsedDate.year}-${String(parsedDate.month).padStart(2,'0')}-${String(parsedDate.day).padStart(2,'0')}`
             : `${parsedDate.day}-${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parsedDate.month-1]}`;
+          if (parsedData[key]) continue; // Keep the first date when the spreadsheet has an extra repeated column.
           parsedData[key] = {
             day: parseMISNumber(dayTargetRow[i]),
             mtd: parseMISNumber(mtdTargetRow[i]),
