@@ -526,7 +526,7 @@ body { font-size:14px; background:var(--bg); line-height:1.5; padding-bottom:28p
 .overview small {display:block;color:var(--muted);font-size:12px;}
 .eyebrow {color:var(--accent);font-size:11px;letter-spacing:1.1px;font-weight:800;}
 .toolbar {display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px;}
-.toolbar button {background:white;border:1px solid var(--border);padding:11px 17px;border-radius:12px;color:var(--text2);font:700 13px inherit;min-height:44px;cursor:pointer;}
+.toolbar button {background:white;border:1px solid var(--border);padding:11px 17px;border-radius:12px;color:var(--text2);font-family:inherit;font-weight:700;font-size:13px;min-height:44px;cursor:pointer;}
 .card {border:1px solid #E9EBF0;box-shadow:0 4px 16px rgba(16,24,40,.035);border-radius:18px;padding:22px 24px;margin-bottom:15px;}
 .sec-title {font-size:17px;letter-spacing:-.3px;margin-bottom:18px;gap:10px;}
 .cat-label {font-size:11px;letter-spacing:.8px;margin-top:25px;margin-bottom:12px;border-radius:7px;padding:7px 10px;}
@@ -550,7 +550,7 @@ input[readonly] {background:#F6F8FA;}
 .settings-head h2 {font-size:21px;letter-spacing:-.5px;}
 .settings-head button {background:#F2F4F7;border:0;border-radius:9px;padding:9px 12px;cursor:pointer;min-height:42px;min-width:42px;}
 .settings-dialog label {font-size:12px;font-weight:750;}
-.settings-dialog select {display:block;width:100%;min-height:49px;padding:11px 13px;margin:8px 0 10px;font:600 16px inherit;color:var(--text);background:white;border:1px solid var(--border);border-radius:10px;}
+.settings-dialog select {display:block;width:100%;min-height:49px;padding:11px 13px;margin:8px 0 10px;font-family:inherit;font-weight:600;font-size:16px;color:var(--text);background:white;border:1px solid var(--border);border-radius:10px;}
 .settings-dialog h3 {font-size:16px;margin-bottom:8px;}
 .settings-dialog p {font-size:13px;color:var(--muted);line-height:1.55;margin:9px 0 14px;}
 .settings-dialog button {font-family:inherit;font-weight:650;}
@@ -1144,6 +1144,7 @@ function onRatingBlur(el) {
         overlay.classList.remove('open');
         el.value = '';
         calcAndRender();
+        autoSave();
         requestAnimationFrame(() => { el.focus(); try { el.setSelectionRange(9999,9999); } catch(e){} });
       };
     }, 80);
@@ -1313,12 +1314,24 @@ function calcAndRender() {
   ];
 
 
-  document.getElementById('calcContainer').innerHTML = calcs.map(c=>
-    `<div class="calc-box${c.span2?' calc-center':''}" onclick="editCalc('${c.key}','${c.val}')">
-       <div class="calc-lbl">${c.key}</div>
-       <div class="calc-val" style="color:${c.color}">${c.disp}</div>
-     </div>`
-  ).join('');
+  // Create interactive calculated cards without interpolating saved values into HTML.
+  const container = document.getElementById('calcContainer');
+  container.replaceChildren();
+  calcs.forEach(c => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'calc-box' + (c.span2 ? ' calc-center' : '');
+    const label = document.createElement('span');
+    label.className = 'calc-lbl';
+    label.textContent = c.key;
+    const amount = document.createElement('span');
+    amount.className = 'calc-val';
+    amount.style.color = c.color;
+    amount.textContent = String(c.disp);
+    card.append(label, amount);
+    card.addEventListener('click', () => editCalc(c.key, c.val));
+    container.appendChild(card);
+  });
 
   const v = id => document.getElementById(id)?.value || '---';
   const msg =
@@ -1446,7 +1459,10 @@ function onTimeBlur(el) {
   const raw = (el.value || '').replace(/,/g, '').trim();
   if (raw === '') return;
   const n = parseFloat(raw);
-  if (!isNaN(n)) el.value = n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (!Number.isFinite(Number(raw)) || Number(raw) < 0) {
+    el.value = ''; toast('Enter a valid positive number of minutes.', 'warning'); autoSave(); return;
+  }
+  el.value = Number(raw).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
   calcAndRender();
   autoSave();
 }
