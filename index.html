@@ -642,7 +642,7 @@ input[readonly] {background:#F6F8FA;}
 <p>Resetting a report never changes this selection.</p><button class="settings-primary" onclick="changeOutlet()">Save outlet</button>
 <hr><h3>Backup & recovery</h3><p>Export before changing devices or clearing app storage.</p>
 <div class="settings-actions"><button onclick="exportReportBackup()">↓ Export backup</button><button onclick="document.getElementById('backupFileInput').click()">↑ Import backup</button></div>
-<input id="backupFileInput" type="file" accept=".json,application/json" hidden onchange="handleBackupImport(event)">
+<input id="backupFileInput" type="file" accept=".json,application/json" hidden onchange="handleBackupImport(event)"><button id="undoBackupImportBtn" type="button" onclick="undoBackupImport()" style="display:none;margin-top:12px;min-height:44px">Undo last backup import</button>
 </section></div>
 <div class="settings-overlay" id="previewOverlay" onclick="if(event.target===this)closePreview()">
 <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="previewTitle"><div class="settings-head"><h2 id="previewTitle">Preview WhatsApp message</h2><button onclick="closePreview()" aria-label="Close">✕</button></div><pre class="message-preview" id="previewText"></pre><div class="settings-actions"><button onclick="copyPreview()">Copy</button><button class="settings-primary" onclick="openPreviewWhatsApp()">Open WhatsApp</button></div></section></div>
@@ -1520,6 +1520,7 @@ function openPreviewWhatsApp() {
 }
 function openSettings() {
   updateOutletDisplay();
+  updateUndoImportButton();
   document.getElementById('settingsOverlay').classList.add('open');
 }
 function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
@@ -1536,34 +1537,62 @@ function exportReportBackup() {
     toast('Backup file downloaded.', 'success');
   } catch (err) { toast('Could not export backup.', 'error'); }
 }
+function updateUndoImportButton() {
+  const btn = document.getElementById('undoBackupImportBtn');
+  if (btn) btn.style.display = ReportStore.canUndoImport() ? 'inline-block' : 'none';
+}
+function undoBackupImport() {
+  closeSettings();
+  showModal({
+    icon:'alert-triangle',title:'Undo previous backup import?',
+    msg:'This restores the entire saved report database to its pre-import state. Edits made after the import will also be undone.',
+    okLabel:'Undo import',cancelLabel:'Cancel',
+    onOk:() => {
+      try {
+        if (ReportStore.undoImport()) {
+          loadSelectedReport(activeDate,false);
+          calcAndRender();
+          updateUndoImportButton();
+          toast('Pre-import reports restored.', 'success');
+        }
+      } catch (err) {toast('Could not restore the pre-import snapshot.', 'error',4500);}
+    },
+    onCancel:()=>openSettings()
+  });
+}
 function handleBackupImport(event) {
   const file = event.target.files[0];
+  event.target.value='';
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) {
-    toast('Backup file is too large.', 'error'); event.target.value=''; return;
-  }
+  if (file.size > 5 * 1024 * 1024) {toast('Backup file is too large.', 'error');return;}
   const reader = new FileReader();
   reader.onload = () => {
+    const text = String(reader.result);
+    let stats;
+    try { stats = ReportStore.previewBackup(text); }
+    catch (err) {toast('Backup rejected: '+err.message,'error',5000);return;}
+    closeSettings();
     showModal({
-      icon: 'file', title: 'Import backup?',
-      msg: 'Valid reports will be merged. Newer existing reports will be kept.',
-      okLabel: 'Import', cancelLabel: 'Cancel',
-      onOk: () => {
+      icon:'file',title:'Confirm backup import',
+      msg:stats.incoming+' reports from '+stats.outlets+' outlets; '+stats.newReports+' new and '+stats.conflicts+
+        ' overlapping reports. Existing reports will be kept. A recovery snapshot will be saved.',
+      okLabel:'Import',cancelLabel:'Cancel',
+      onOk:() => {
         try {
           if (!saveToStorage()) return;
-          ReportStore.importBackup(String(reader.result));
-          loadSelectedReport(activeDate, false);
+          const result = ReportStore.importBackup(text);
+          loadSelectedReport(activeDate,false);
           autoFillFromMIS();
           calcAndRender();
-          toast('Backup imported successfully.', 'success');
-          closeSettings();
-        } catch (err) { toast('Backup is invalid or could not be imported.', 'error', 5000); }
-      }
+          updateUndoImportButton();
+          toast('Backup imported: '+result.added+' new; '+result.keptExisting+' existing preserved.','success',5000);
+        } catch (err) {toast('Import failed: '+err.message,'error',5500);}
+      },
+      onCancel:()=>openSettings()
     });
   };
-  reader.onerror = () => toast('Could not read backup file.', 'error');
+  reader.onerror=()=>toast('Could not read backup file.', 'error');
   reader.readAsText(file);
-  event.target.value='';
 }
 // ==========================================
 // MIS REPORT CSV PARSING AND AUTO-FILL
