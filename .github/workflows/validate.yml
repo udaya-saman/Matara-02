@@ -1,0 +1,23 @@
+name: Validate report app
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [improve/multi-outlet-daily-report-2026-11]
+permissions:
+  contents: read
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test storage migrations and reporting periods
+        run: node tests/report-store.test.js
+      - name: Validate JavaScript syntax
+        run: |
+          node --check report-store.js
+          node --check sw.js
+          node -e "const fs=require('fs');const html=fs.readFileSync('index.html','utf8');const s=html.match(/<script>\s*([\s\S]*?)<\/script>/);if(!s)throw Error('Missing app script');new Function(s[1]);"
