@@ -26,6 +26,8 @@ jobs:
         run: node tests/original-mis-rollback.test.js
       - name: Test outlet selector and date navigation
         run: node tests/outlet-date-navigation.test.js
+      - name: Validate strict Gamma MIS month year and outlet matching
+        run: node tests/mis-strict-match.test.js
       - name: Validate JavaScript syntax
         run: |
           node --check gamma-mis.js
