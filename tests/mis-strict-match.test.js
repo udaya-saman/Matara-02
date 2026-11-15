@@ -101,6 +101,7 @@ for(const [str,month,day] of parsedCases){
 assert.ok(updates>0&&saves>0);
 // Exercise the real lightweight Gamma upload handler with a selected-outlet check.
 const uploader=part('function handleMISUpload(event) {','function normaliseMISRecord(');
+vm.runInContext(uploader,context);
 class FakeReader {
  readAsText(file){this.onload({target:{result:file.csv}});}
 }
