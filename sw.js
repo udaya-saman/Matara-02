@@ -1,7 +1,7 @@
 // Path-independent service worker for GitHub Pages project subpaths.
 const BASE = self.registration.scope;
 const CACHE_PREFIX = "ph-report:" + BASE + ":";
-const CACHE_NAME = CACHE_PREFIX + "v16";
+const CACHE_NAME = CACHE_PREFIX + "v17";
 const APP_SHELL = ["", "index.html", "report-store.js", "manifest.json", "icons/icon-192.png", "icons/icon-512.png"]
   .map(path => new URL(path, BASE).href);
 
