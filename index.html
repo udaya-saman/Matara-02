@@ -543,7 +543,7 @@
 
 
 :root{color-scheme:dark;--bg:#17181b;--surface:#24262b;--card:#24262b;--border:#41434a;--border-soft:#34363c;--text:#fff;--text2:#e7e8eb;--muted:#bec1c8;--input-bg:#17181b;--modal-bg:#24262b;--accent:#e31837;--shadow:0 8px 24px #0003;--ring:#e3183740}
-.main{padding:16px 12px;max-width:760px}.card{padding:18px 14px;border:1px solid var(--border-soft);border-radius:18px}.input-group{min-width:0}.input-group label{font-size:13px;line-height:1.3;letter-spacing:0;text-transform:none;color:var(--text2)}input[type=text],input[type=password]{font-size:16px;min-height:48px;padding:12px}input[type=text]:focus,input[type=password]:focus{background:var(--input-bg)}input[readonly].num{background:#20392e!important;color:#83e5a8!important}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}.grp-band.today{background:#393122;color:#f3c454;border-color:#f3c454}.grp-band.mtd{background:#20392e;color:#83e5a8;border-color:#52c68b}.grp-band.ytd{background:#33343a;color:#e4e5e8;border-color:#aaa}.input-group.g-today input[type=text]{border-left-color:#f3c454}.input-group.g-mtd input[type=text]{border-left-color:#52c68b}.input-group.g-ytd input[type=text]{border-left-color:#aaa}.report-group{border:1px solid var(--border);border-radius:14px;padding:12px;margin:12px 0;background:#202125}.report-group summary{cursor:pointer;font-weight:750;font-size:16px;padding:8px 0;min-height:40px}.report-group[open] summary{margin-bottom:12px}.calc-box,.settings-dialog,.settings-dialog select,.settings-actions button,.settings-head button,.calendar-header button,.confirm-cancel,.btn-small,.advanced-tools #undoBackupImportBtn{background:var(--surface);color:var(--text);border-color:var(--border)}.settings-primary{font-family:inherit;font-size:17px;font-weight:800;margin-top:16px}.calc-lbl{font-size:12px}.calc-val{font-size:19px}.btn-upload{background:#b70d2b;color:white;border-color:#e31837}.btn-upload:active{background:#960923;color:white}.period-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin:14px 0;color:var(--text2)}.period-legend b{font-weight:700}.report-preview{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.6 inherit;color:var(--text);padding:12px;background:var(--bg);border-radius:10px}.report-preview p{margin:0;min-height:1em}.btn-small{font-size:14px}.calc-box:active{background:#34363c}.advanced-tools summary{color:var(--muted)}
+.main{padding:16px 12px;max-width:760px}.card{padding:18px 14px;border:1px solid var(--border-soft);border-radius:18px}.input-group{min-width:0}.input-group label{font-size:13px;line-height:1.3;letter-spacing:0;text-transform:none;color:var(--text2)}input[type=text],input[type=password]{font-size:16px;min-height:48px;padding:12px}input[type=text]:focus,input[type=password]:focus{background:var(--input-bg)}input[readonly].num{background:#20392e!important;color:#83e5a8!important}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}.grp-band.today{background:#393122;color:#f3c454;border-color:#f3c454}.grp-band.mtd{background:#20392e;color:#83e5a8;border-color:#52c68b}.grp-band.ytd{background:#33343a;color:#e4e5e8;border-color:#aaa}.input-group.g-today input[type=text]{border-left-color:#f3c454}.input-group.g-mtd input[type=text]{border-left-color:#52c68b}.input-group.g-ytd input[type=text]{border-left-color:#aaa}.report-group{border:1px solid var(--border);border-radius:14px;padding:12px;margin:12px 0;background:#202125}.report-group summary{cursor:pointer;font-weight:750;font-size:16px;padding:8px 0;min-height:40px}.report-group[open] summary{margin-bottom:12px}.calc-box,.settings-dialog,.settings-dialog select,.settings-actions button,.settings-head button,.calendar-header button,.confirm-cancel,.btn-small,.advanced-tools #undoBackupImportBtn{background:var(--surface);color:var(--text);border-color:var(--border)}.settings-primary{font-family:inherit;font-size:17px;font-weight:800;margin-top:16px}.calc-lbl{font-size:12px}.calc-val{font-size:19px}.btn-upload{background:#b70d2b;color:white;border-color:#e31837}.btn-upload:active{background:#960923;color:white}.period-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin:14px 0;color:var(--text2)}.period-legend b{font-weight:700}.report-preview{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;color:var(--text);padding:12px;background:var(--bg);border-radius:10px}.report-preview p{margin:0;min-height:1em}.btn-small{font-size:14px}.calc-box:active{background:#34363c}.advanced-tools summary{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -1030,7 +1030,7 @@ function buildInput(f) {
   if (f.type==='num' || f.type==='time') cls = 'num';
   if (f.type==='nodec') cls = 'num nodec';
   const extra = f.type==='pct' ? ' onblur="onPctBlur(this)" onfocus="onPctFocus(this)"' : '';
-  const isLast = f.id === 'hutYtdOnTime';
+  const isLast = f.id === 'fsccRating';
   const enterHint = isLast ? ' enterkeyhint="done"' : ' enterkeyhint="next"';
   const kd = isLast
     ? ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();scrollToBottom();}"'
@@ -1213,21 +1213,10 @@ function scrollToBottom() {
 }
 
 function focusNext(el) {
-  if (el.id === 'mtdSale') {
-    const nextEl = document.getElementById('mtdTx');
-    if (nextEl) { nextEl.focus(); try { nextEl.select(); } catch(e){} return; }
-  }
-  if (el.id === 'mtdTx') {
-    const nextEl = document.getElementById('todaySale');
-    if (nextEl) { nextEl.focus(); try { nextEl.select(); } catch(e){} return; }
-  }
-
-  const inputs = Array.from(document.querySelectorAll('input[type=text]:not([readonly])'));
-  const idx = inputs.indexOf(el);
-  if (idx >= 0 && idx < inputs.length - 1) {
-    inputs[idx + 1].focus();
-    try { inputs[idx+1].select(); } catch(e){}
-  }
+  const inputs = Array.from(document.querySelectorAll('.report-group input[type=text]:not([readonly])'));
+  const next = inputs[inputs.indexOf(el)+1];
+  if (next) { const group=next.closest('details'); if(group) group.open=true; next.focus(); try{next.select()}catch(e){} }
+  else { el.blur(); scrollToBottom(); }
 }
 
 function extractMISOutlet(lines) {
@@ -1369,7 +1358,7 @@ function calcAndRender() {
   const v = id => { const raw = document.getElementById(id)?.value?.trim(); if (!raw) return '---'; return FIELDS.find(f=>f.id===id)?.type==='pct' ? formatPercentValue(id) : raw; };
   const pc = (has, key, val) => (has || customCalcs[key] !== undefined) ? val + '%' : '---';
   const minVal = id => {
-    const sRaw = rawNum(id).trim(); const n = parseFloat(sRaw);
+    const sRaw = rawNum(id).trim().replace(/,/g,''); const n = Number(sRaw);
     return (sRaw === '' || isNaN(n)) ? '---' : n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' min';
   };
   const hasM = autoTot > 0, hasT = todayTot > 0;
@@ -1671,7 +1660,7 @@ function handleMISUpload(event) {
     try {
       const lines = String(e.target.result || '').replace(/^\uFEFF/, '').split(/\r?\n/);
       const identity = extractMISOutlet(lines);
-      if (identity.found && identity.outlet !== selectedOutlet) {
+      if (identity.outlet && identity.outlet !== selectedOutlet) {
         toast('This MIS file belongs to a different outlet. Select the correct outlet before uploading.', 'warning', 5000);
         return;
       }
@@ -1696,7 +1685,9 @@ function handleMISUpload(event) {
           dates.push({date, index:i});
         }
       }
-      const reportYear = parseAppDate(document.getElementById('date').value).year;
+      const selectedPeriod = parseAppDate(document.getElementById('date').value);
+      if (!selectedPeriod) { toast('Select a report date first.', 'warning'); return; }
+      const reportYear = selectedPeriod.year;
       const counts = Object.create(null);
       dates.forEach(item => {
         counts[item.date.month] = (counts[item.date.month] || 0) + 1;
