@@ -767,13 +767,13 @@ const CATS = [
   { id:'cat-dragon', fields:[
     {band:'today', label:'📅 TODAY'},
     {id:'under30',         label:'Under 30',              type:'pct',   grp:'today', today:true},
-    {id:'hotFresh',        label:'Hot & Fresh',           type:'pct',   grp:'today', today:true},
+    {id:'hotFresh',        label:'Hot and Fresh U20',           type:'pct',   grp:'today', today:true},
     {id:'outOfDoor',       label:'Out of Door U12',       type:'pct',   grp:'today', today:true},
     {id:'productionU3',    label:'Production U3',         type:'pct',   grp:'today', today:true},
     {id:'deliveryTx',      label:"Today's No. of Deliveries", type:'nodec', grp:'today', today:true},
     {id:'dispatchDev',     label:'Dispatch Deviation',    type:'pct',   grp:'today', today:true},
     {id:'todayRiders',     label:"Today's No of Riders",  type:'nodec', grp:'today', today:true},
-    {id:'todayDriveTime',  label:"Today's Avg. Drive Time (min)", type:'time', grp:'today', today:true},
+    {id:'todayDriveTime',  label:"Today's Avg. Drive Time", type:'time', grp:'today', today:true},
     {band:'mtd', label:'📆 MTD'},
     {id:'mtdDel200',       label:'MTD Delivered at Place 200m', type:'pct',  grp:'mtd', keepOnReset:true},
     {id:'mtdDel500',       label:'MTD Delivered at Place 500m', type:'pct',  grp:'mtd', keepOnReset:true},
@@ -784,29 +784,29 @@ const CATS = [
   ]},
   { id:'cat-ges',    fields:[
     {band:'today', label:'📅 TODAY'},
-    {id:'todayStar1',      label:'1 Star Responses',      type:'nodec', grp:'today', today:true},
-    {id:'todayStar2',      label:'2 Star Responses',      type:'nodec', grp:'today', today:true},
-    {id:'todayStar3',      label:'3 Star Responses',      type:'nodec', grp:'today', today:true},
-    {id:'todayStar4',      label:'4 Star Responses',      type:'nodec', grp:'today', today:true},
-    {id:'todayStar5',      label:'5 Star Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar1',      label:'1 ★ Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar2',      label:'2 ★ Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar3',      label:'3 ★ Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar4',      label:'4 ★ Responses',      type:'nodec', grp:'today', today:true},
+    {id:'todayStar5',      label:'5 ★ Responses',      type:'nodec', grp:'today', today:true},
     {id:'todayGes',        label:"Today's GES Count",     type:'nodec', readonly:true, grp:'today'},
     {band:'mtd', label:'📆 MTD'},
-    {id:'star1',           label:'1 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
-    {id:'star2',           label:'2 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
-    {id:'star3',           label:'3 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
-    {id:'star4',           label:'4 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
-    {id:'star5',           label:'5 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star1',           label:'1 ★ Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star2',           label:'2 ★ Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star3',           label:'3 ★ Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star4',           label:'4 ★ Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'star5',           label:'5 ★ Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
     {id:'totalResponses', label:'MTD GES Count', type:'nodec', readonly:true, grp:'mtd'},
     {id:'mtdWinScore',     label:'MTD Win Score',         type:'pct',   keepOnReset:true, grp:'mtd'},
   ]},
   { id:'cat-5star', fields:[
     {id:'overallRating',   label:'5★ Overall Rating',     type:'num'},
-    {id:'deliveredU30',    label:'Delivered U30',         type:'num'},
     {id:'annualTMTurnover',label:'Annual TM Turnover',          type:'num'},
     {id:'winScore',        label:'Win-Score',                   type:'num'},
-    {id:'hutbotOnTime',    label:'Hutbot On Time Star Rating',  type:'num'},
-    {id:'brandRating',     label:'Brand Star Rating',           type:'num'},
+    {id:'deliveredU30',    label:'Delivered U30',         type:'num'},
     {id:'fsccRating',      label:'FSCC Star Rating',            type:'num'},
+    {id:'brandRating',     label:'Brand Star Rating',           type:'num'},
+    {id:'hutbotOnTime',    label:'Hutbot On Time Star Rating',  type:'num'},
   ]},
   { id:'cat-hutbot', fields:[
     {band:'today', label:'📅 TODAY'},
@@ -1034,11 +1034,12 @@ function buildInput(f) {
   if (f.type==='num' || f.type==='time') cls = 'num';
   if (f.type==='nodec') cls = 'num nodec';
   const extra = f.type==='pct' ? ' onblur="onPctBlur(this)" onfocus="onPctFocus(this)"' : '';
-  const isLast = f.id === 'fsccRating';
+  const isLast = f.id === 'hutbotOnTime';
   const enterHint = isLast ? ' enterkeyhint="done"' : ' enterkeyhint="next"';
   const kd = isLast
     ? ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();this.blur();scrollToBottom();}"'
     : ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();focusNext(this);}"';
+  const tabOrder = ['dayTarget','mtdTarget','monthlyTarget'].includes(f.id) ? ' tabindex="-1"' : '';
   const focusSel = f.type==='pct' ? '' : ' onfocus="try{this.select();}catch(e){}"';
   const gesIds = ['star1','star2','star3','star4','star5','todayStar1','todayStar2','todayStar3','todayStar4','todayStar5'];
   const ratingIds = ['overallRating','annualTMTurnover','winScore','hutbotOnTime','brandRating','fsccRating','deliveredU30'];
@@ -1049,7 +1050,7 @@ function buildInput(f) {
   if (f.readonly) {
     return '<div class="input-group'+gcls+'">\n    <label for="'+f.id+'">'+f.label+' <span style="font-size:9px;color:#10B981;font-weight:700;margin-left:4px;">AUTO</span></label>\n    <input type="text" id="'+f.id+'" class="num nodec" readonly style="background:#F0FDF4;cursor:default;color:#059669;font-weight:700;" placeholder="-">\n  </div>';
   }
-  return '<div class="input-group'+gcls+'">\n    <label for="'+f.id+'">'+f.label+'</label>\n    <input type="text" id="'+f.id+'"'+(cls?' class="'+cls+'"':'')+' '+inputMode+enterHint+kd+focusSel+' placeholder="-" oninput="onFieldInput(this)"'+extra+blurExtra+'>\n  </div>';
+  return '<div class="input-group'+gcls+'">\n    <label for="'+f.id+'">'+f.label+'</label>\n    <input type="text" id="'+f.id+'"'+(cls?' class="'+cls+'"':'')+' '+inputMode+tabOrder+enterHint+kd+focusSel+' placeholder="-" oninput="onFieldInput(this)"'+extra+blurExtra+'>\n  </div>';
 }
 CATS.forEach(cat => {
   const el = document.getElementById(cat.id);
@@ -1218,7 +1219,7 @@ function scrollToBottom() {
 
 function focusNext(el) {
   const inputs = Array.from(document.querySelectorAll('.report-group input[type=text]:not([readonly])'));
-  const next = inputs[inputs.indexOf(el)+1];
+  const next = inputs.slice(inputs.indexOf(el)+1).find(input=>input.tabIndex !== -1 && !input.disabled);
   if (next) { const group=next.closest('details'); if(group) group.open=true; next.focus(); try{next.select()}catch(e){} }
   else { el.blur(); scrollToBottom(); }
 }
