@@ -541,6 +541,9 @@
 @media(max-width:390px){.header{gap:8px;padding:12px 14px;}
  .header .title{font-size:16px;}.header-outlet{font-size:12px;padding:9px 10px;}}
 
+
+:root{color-scheme:dark;--bg:#17181b;--surface:#24262b;--card:#24262b;--border:#41434a;--border-soft:#34363c;--text:#fff;--text2:#e7e8eb;--muted:#bec1c8;--input-bg:#17181b;--modal-bg:#24262b;--accent:#e31837;--shadow:0 8px 24px #0003;--ring:#e3183740}
+.main{padding:16px 12px;max-width:760px}.card{padding:18px 14px;border:1px solid var(--border-soft);border-radius:18px}.input-group{min-width:0}.input-group label{font-size:13px;line-height:1.3;letter-spacing:0;text-transform:none;color:var(--text2)}input[type=text],input[type=password]{font-size:16px;min-height:48px;padding:12px}input[type=text]:focus,input[type=password]:focus{background:var(--input-bg)}input[readonly].num{background:#20392e!important;color:#83e5a8!important}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}.grp-band.today{background:#393122;color:#f3c454;border-color:#f3c454}.grp-band.mtd{background:#20392e;color:#83e5a8;border-color:#52c68b}.grp-band.ytd{background:#33343a;color:#e4e5e8;border-color:#aaa}.input-group.g-today input[type=text]{border-left-color:#f3c454}.input-group.g-mtd input[type=text]{border-left-color:#52c68b}.input-group.g-ytd input[type=text]{border-left-color:#aaa}.report-group{border:1px solid var(--border);border-radius:14px;padding:12px;margin:12px 0;background:#202125}.report-group summary{cursor:pointer;font-weight:750;font-size:16px;padding:8px 0;min-height:40px}.report-group[open] summary{margin-bottom:12px}.calc-box,.settings-dialog,.settings-dialog select,.settings-actions button,.settings-head button,.calendar-header button,.confirm-cancel,.btn-small,.advanced-tools #undoBackupImportBtn{background:var(--surface);color:var(--text);border-color:var(--border)}.settings-primary{font-family:inherit;font-size:17px;font-weight:800;margin-top:16px}.calc-lbl{font-size:12px}.calc-val{font-size:19px}.btn-upload{background:#b70d2b;color:white;border-color:#e31837}.btn-upload:active{background:#960923;color:white}.period-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin:14px 0;color:var(--text2)}.period-legend b{font-weight:700}.report-preview{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.6 inherit;color:var(--text);padding:12px;background:var(--bg);border-radius:10px}.report-preview p{margin:0;min-height:1em}.btn-small{font-size:14px}.calc-box:active{background:#34363c}.advanced-tools summary{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -612,7 +615,7 @@
       <option>Matara 02</option>
       <option>Tangalle</option>
     </select>
-    <p>Your selected outlet is saved on this device. Reports are stored separately for each outlet.</p>
+
     <button type="button" class="settings-primary" onclick="changeOutlet()">Save Outlet</button>
     <details class="advanced-tools">
       <summary>Backup and restore (optional)</summary>
@@ -663,6 +666,15 @@
 </div>
 
 <div class="main">
+<div class="card">    <!-- CSV Upload Section -->
+    <div class="input-group">
+      <input type="file" id="misCsvFile" accept=".csv" style="display:none" onchange="handleMISUpload(event)">
+      <button class="btn-upload" onclick="document.getElementById('misCsvFile').click()">
+        <span style="font-size:22px;">📁</span> Select MIS File
+      </button>
+      <div id="misUploadStatus" class="upload-status">No report loaded</div>
+    </div></div>
+
 
   <!-- PWA INSTALL BANNER -->
   <div class="pwa-banner" id="pwaBanner">
@@ -683,8 +695,7 @@
       </div>
     </div>
 
-    <div class="cat-label">📊 Gamma MIS &amp; DESTINITY</div>
-    <!-- Date field: full-width, standalone -->
+<!-- Date field: full-width, standalone -->
     <div class="input-group" style="margin-bottom:12px;">
       <label>Date</label>
       <input type="text" id="date" readonly 
@@ -692,20 +703,12 @@
         placeholder="-" 
         style="font-size:15px; cursor:pointer;">
     </div>
-    <div class="grid-2" id="cat-gamma"></div>
-
-    <div class="cat-label">🐉 DragonTail</div>
-    <div class="grid-2" id="cat-dragon"></div>
-
-    <div class="cat-label">⭐ GES</div>
-    <div class="grid-2" id="cat-ges"></div>
-
-    <div class="cat-label">🌟 5 STAR</div>
-    <div class="grid-2" id="cat-5star"></div>
-
-    <div class="cat-label">🤖 HutBot</div>
-    <div class="grid-2" id="cat-hutbot"></div>
-
+<div class="period-legend"><b style="color:#f3c454">● Today</b><b style="color:#83e5a8">● MTD</b><b>● YTD</b></div>
+<details class="report-group" open><summary>💰 Sales Performance</summary><div class="grid-2" id="cat-gamma"></div></details>
+<details class="report-group"><summary>🏆 GES & Win Score</summary><div class="grid-2" id="cat-ges"></div></details>
+<details class="report-group"><summary>🤖 HutBot Performance</summary><div class="grid-2" id="cat-hutbot"></div></details>
+<details class="report-group"><summary>🐉 Dragontail Performance</summary><div class="grid-2" id="cat-dragon"></div></details>
+<details class="report-group"><summary>🌟 5 Star Ratings</summary><div class="grid-2" id="cat-5star"></div></details>
     <hr>
     <div class="sec-title" style="margin-bottom:16px;">🔢 Auto-Calculated <span style="font-size:10px; color:var(--muted); font-weight:600; letter-spacing:0.5px;">(Tap to Edit)</span></div>
     <div class="grid-3" id="calcContainer"></div>
@@ -720,18 +723,12 @@
     <!-- WhatsApp Button Styled Elegantly -->
     <div class="wa-row">
       <button class="btn-whatsapp" onclick="sendWA()">💬 Share Daily Report</button>
+<details class="report-group" id="previewPanel" ontoggle="if(this.open) calcAndRender()"><summary>Preview report</summary><div id="reportPreview" class="report-preview"></div></details>
     </div>
     
     <hr style="margin:0;">
 
-    <!-- CSV Upload Section -->
-    <div class="input-group">
-      <input type="file" id="misCsvFile" accept=".csv" style="display:none" onchange="handleMISUpload(event)">
-      <button class="btn-upload" onclick="document.getElementById('misCsvFile').click()">
-        <span style="font-size:22px;">📁</span> Select MIS File
-      </button>
-      <div id="misUploadStatus" class="upload-status">No report loaded</div>
-    </div>
+
     
   </div>
 
@@ -753,13 +750,15 @@ if ('serviceWorker' in navigator) {
 }
 
 const CATS = [
-  { id:'cat-gamma',  fields:[
-    {id:'monthlyTarget',   label:'Monthly Target',        type:'nodec'},
+  { id:'cat-gamma', fields:[
+    {band:'today',label:'TODAY'},
+    {id:'dayTarget',       label:'Day Target',            type:'nodec', grp:'today', today:true},
+    {id:'todaySale',       label:'Today Sale',            type:'nodec', grp:'today', today:true},
+    {band:'mtd',label:'MONTH TO DATE'},
     {id:'mtdTarget',       label:'MTD Target',            type:'nodec', keepOnReset:true, grp:'mtd'},
     {id:'mtdSale',         label:'MTD Sale',              type:'nodec', keepOnReset:true, grp:'mtd'},
     {id:'mtdTx',           label:'MTD Transactions',      type:'nodec', keepOnReset:true, grp:'mtd'},
-    {id:'dayTarget',       label:'Day Target',            type:'nodec', grp:'today', today:true},
-    {id:'todaySale',       label:'Today Sale',            type:'nodec', grp:'today', today:true},
+    {id:'monthlyTarget',   label:'Monthly Target',        type:'nodec'},
   ]},
   { id:'cat-dragon', fields:[
     {band:'today', label:'📅 TODAY'},
@@ -767,10 +766,10 @@ const CATS = [
     {id:'hotFresh',        label:'Hot & Fresh',           type:'pct',   grp:'today', today:true},
     {id:'outOfDoor',       label:'Out of Door U12',       type:'pct',   grp:'today', today:true},
     {id:'productionU3',    label:'Production U3',         type:'pct',   grp:'today', today:true},
-    {id:'deliveryTx',      label:'Delivery Transactions', type:'nodec', grp:'today', today:true},
+    {id:'deliveryTx',      label:"Today's No. of Deliveries", type:'nodec', grp:'today', today:true},
     {id:'dispatchDev',     label:'Dispatch Deviation',    type:'pct',   grp:'today', today:true},
     {id:'todayRiders',     label:"Today's No of Riders",  type:'nodec', grp:'today', today:true},
-    {id:'todayDriveTime',  label:"Today's Drive Time (min)", type:'time', grp:'today', today:true},
+    {id:'todayDriveTime',  label:"Today's Avg. Drive Time (min)", type:'time', grp:'today', today:true},
     {band:'mtd', label:'📆 MTD'},
     {id:'mtdDel200',       label:'MTD Delivered at Place 200m', type:'pct',  grp:'mtd', keepOnReset:true},
     {id:'mtdDel500',       label:'MTD Delivered at Place 500m', type:'pct',  grp:'mtd', keepOnReset:true},
@@ -793,8 +792,7 @@ const CATS = [
     {id:'star3',           label:'3 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
     {id:'star4',           label:'4 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
     {id:'star5',           label:'5 Star Responses',      type:'nodec', keepOnReset:true, grp:'mtd'},
-    {id:'smartGes',        label:'Smart GES',             type:'nodec', readonly:true, grp:'mtd'},
-    {id:'totalResponses',  label:'Total Responses',       type:'nodec', keepOnReset:true, grp:'mtd'},
+    {id:'totalResponses', label:'MTD GES Count', type:'nodec', readonly:true, grp:'mtd'},
     {id:'mtdWinScore',     label:'MTD Win Score',         type:'pct',   keepOnReset:true, grp:'mtd'},
   ]},
   { id:'cat-5star', fields:[
@@ -1043,7 +1041,6 @@ function buildInput(f) {
   const blurExtra = gesIds.includes(f.id)    ? ' onblur="onGesBlur(this)"'
                   : ratingIds.includes(f.id) ? ' onblur="onRatingBlur(this)"'
                   : f.type === 'time'        ? ' onblur="onTimeBlur(this)"'
-                  : f.id === 'smartGes'      ? ' onblur="onSmartGesBlur(this)"'
                   : '';
   if (f.readonly) {
     return '<div class="input-group'+gcls+'">\n    <label for="'+f.id+'">'+f.label+' <span style="font-size:9px;color:#10B981;font-weight:700;margin-left:4px;">AUTO</span></label>\n    <input type="text" id="'+f.id+'" class="num nodec" readonly style="background:#F0FDF4;cursor:default;color:#059669;font-weight:700;" placeholder="-">\n  </div>';
@@ -1067,7 +1064,7 @@ function toast(msg, type='info', duration=1800) {
     error:   {bg:'#FEF2F2',color:'#DC2626'},
     success: {bg:'#F0FDF4',color:'#059669'},
     warning: {bg:'#FFFBEB',color:'#D97706'},
-    info:    {bg:'#EFF6FF',color:'#2563EB'},
+    info:    {bg:'#EFF6FF',color:'#9fc5ff'},
   };
   const s = styles[type] || styles.info;
   el.style.backgroundColor = s.bg;
@@ -1178,40 +1175,6 @@ function onRatingBlur(el) {
   }
   calcAndRender(); autoSave();
 }
-function onSmartGesBlur(el) {
-  const raw = (el.value||'').replace(/,/g,'').trim();
-  if (raw === '') { calcAndRender(); return; }
-  const num = parseInt(raw, 10);
-  const totalResp = gn('star1')+gn('star2')+gn('star3')+gn('star4')+gn('star5');
-  const showErr = (icon, title, msg) => {
-    el.blur();
-    setTimeout(() => {
-      const overlay = document.getElementById('confirmOverlay');
-      const btnsEl  = document.getElementById('confirmBtns');
-      document.getElementById('confirmIcon').textContent  = icon;
-      document.getElementById('confirmTitle').textContent = title;
-      document.getElementById('confirmMsg').textContent   = msg;
-      btnsEl.innerHTML = '<button class="confirm-cancel" id="confirmCancelBtn" style="display:none"></button><button class="confirm-ok" id="confirmOkBtn">හරි</button>';
-      overlay.classList.add('open');
-      document.getElementById('confirmOkBtn').onclick = () => {
-        overlay.classList.remove('open');
-        el.value = '';
-        calcAndRender();
-        requestAnimationFrame(() => { el.focus(); try { el.setSelectionRange(9999,9999); } catch(e){} });
-      };
-    }, 80);
-  };
-  if (isNaN(num) || num < 0) {
-    showErr('⚠️', 'Smart GES අගය වැරදි ඇතුළත් කිරීමකි!', '\nඇතුළත් කළ අගය ' + raw + ' :\nSmart GES සඳහා ඍන අගයක් ඇතුළත් කළ නොහැකිය.');
-    return;
-  }
-  if (totalResp > 0 && num > totalResp) {
-    showErr('⭐', 'Smart GES ඉක්මවා ඇත', 'ඇතුළත් කළ අගය ' + num + ' :\nSmart GES, Total Responses (' + totalResp + ') ගණනට වඩා වැඩි විය නොහැකිය.\nනිවැරදි අගය ඇතුළත් කරන්න.');
-    return;
-  }
-  calcAndRender();
-  autoSave();
-}
 function editCalc(key, cur) {
   const overlay  = document.getElementById('confirmOverlay');
   const iconEl   = document.getElementById('confirmIcon');
@@ -1314,7 +1277,7 @@ function getMatchingMISForDate(dateValue) {
   }
   if (declaredPeriod !== expectedPeriod) return null;
   const monthRecords = records.filter(record =>
-    record.month === selected.month && (record.year === selected.year || record.year === null));
+    record.month === selected.month);
   if (!monthRecords.length) return null;
   return {mis, selected, monthRecords};
 }
@@ -1350,10 +1313,9 @@ function calcAndRender() {
   const s1=gn('star1'), s2=gn('star2'), s3=gn('star3'), s4=gn('star4'), s5=gn('star5');
   const autoTot = s1+s2+s3+s4+s5;
   const tot = autoTot || 1;
-  // Smart GES is the automatic sum of the five star-response fields.
-  // Total Responses is intentionally left for the user to enter manually.
-  const smartGesEl = document.getElementById('smartGes');
-  if (smartGesEl) smartGesEl.value = autoTot > 0 ? autoTot.toLocaleString('en-US') : '';
+  const mtdGesEl = document.getElementById('totalResponses');
+  const hasMtdCounts = ['star1','star2','star3','star4','star5'].some(id=>rawNum(id).trim() !== '');
+  if (mtdGesEl) mtdGesEl.value = hasMtdCounts ? autoTot.toLocaleString('en-US') : '';
 
   const mtdV  = customCalcs['MTD Variance'] !== undefined ? customCalcs['MTD Variance'] : mtdSale - mtdTarget;
   const dayV  = customCalcs['Day Variance']  !== undefined ? customCalcs['Day Variance']  : todaySale - dayTarget;
@@ -1373,15 +1335,15 @@ function calcAndRender() {
   if (todayGesEl) todayGesEl.value = todayTot > 0 ? todayTot.toLocaleString('en-US') : '';
 
   const calcs = [
-    {key:'MTD Variance', val:mtdV,  disp:rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtSign(mtdV) : '---',  color:mtdV>=0?'#059669':'#DC2626'},
-    {key:'Day Variance', val:dayV,  disp:rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtSign(dayV) : '---',  color:dayV>=0?'#059669':'#DC2626'},
-    {key:'ADS',          val:ads,   disp:shownCalculation('ADS',ads,!!rawNum('mtdSale').trim()),        color:'#2563EB'},
-    {key:'ADT',          val:adt,   disp:shownCalculation('ADT',adt,!!rawNum('mtdTx').trim()),        color:'#2563EB'},
-    {key:'MTD B2B',      val:b2b,   disp:autoTot > 0 || customCalcs['MTD B2B'] !== undefined ? b2b+'%' : '---',         color:b2b<=10?'#059669':'#DC2626'},
-    {key:'MTD Top Box',  val:topB,  disp:autoTot > 0 || customCalcs['MTD Top Box'] !== undefined ? topB+'%' : '---',        color:topB>=50?'#059669':'#DC2626'},
-    {key:'Today B2B',    val:todayB2B, disp:todayTot > 0 || customCalcs['Today B2B'] !== undefined ? todayB2B+'%' : '---', color:todayB2B<=10?'#059669':'#DC2626'},
-    {key:'Today Top Box',val:todayTop, disp:todayTot > 0 || customCalcs['Today Top Box'] !== undefined ? todayTop+'%' : '---', color:todayTop>=50?'#059669':'#DC2626'},
-    {key:'Overall Satisfaction', val:osat, disp:autoTot > 0 || customCalcs['Overall Satisfaction'] !== undefined ? osat+'%' : '---', color:osat>=70?'#059669':'#DC2626'},
+    {key:'MTD Variance', val:mtdV,  disp:rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtSign(mtdV) : '---',  color:mtdV>=0?'#83e5a8':'#ff8188'},
+    {key:'Day Variance', val:dayV,  disp:rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtSign(dayV) : '---',  color:dayV>=0?'#83e5a8':'#ff8188'},
+    {key:'ADS',          val:ads,   disp:shownCalculation('ADS',ads,!!rawNum('mtdSale').trim()),        color:'#9fc5ff'},
+    {key:'ADT',          val:adt,   disp:shownCalculation('ADT',adt,!!rawNum('mtdTx').trim()),        color:'#9fc5ff'},
+    {key:'MTD B2B',      val:b2b,   disp:autoTot > 0 || customCalcs['MTD B2B'] !== undefined ? b2b+'%' : '---',         color:b2b<=10?'#83e5a8':'#ff8188'},
+    {key:'MTD Top Box',  val:topB,  disp:autoTot > 0 || customCalcs['MTD Top Box'] !== undefined ? topB+'%' : '---',        color:topB>=50?'#83e5a8':'#ff8188'},
+    {key:'Today B2B',    val:todayB2B, disp:todayTot > 0 || customCalcs['Today B2B'] !== undefined ? todayB2B+'%' : '---', color:todayB2B<=10?'#83e5a8':'#ff8188'},
+    {key:'Today Top Box',val:todayTop, disp:todayTot > 0 || customCalcs['Today Top Box'] !== undefined ? todayTop+'%' : '---', color:todayTop>=50?'#83e5a8':'#ff8188'},
+    {key:'Overall Satisfaction', val:osat, disp:autoTot > 0 || customCalcs['Overall Satisfaction'] !== undefined ? osat+'%' : '---', color:osat>=70?'#83e5a8':'#ff8188'},
   ];
 
 
@@ -1404,7 +1366,7 @@ function calcAndRender() {
     container.appendChild(card);
   });
 
-  const v = id => document.getElementById(id)?.value || '---';
+  const v = id => { const raw = document.getElementById(id)?.value?.trim(); if (!raw) return '---'; return FIELDS.find(f=>f.id===id)?.type==='pct' ? formatPercentValue(id) : raw; };
   const pc = (has, key, val) => (has || customCalcs[key] !== undefined) ? val + '%' : '---';
   const minVal = id => {
     const sRaw = rawNum(id).trim(); const n = parseFloat(sRaw);
@@ -1412,39 +1374,40 @@ function calcAndRender() {
   };
   const hasM = autoTot > 0, hasT = todayTot > 0;
   const msg =
-`*🍕 Pizza Hut ${selectedOutlet}*
-*Daily Report - ${v('date')}*
-━━━━━━━━━━━━━━━━
+`*🍕 PIZZA HUT ${selectedOutlet.toUpperCase()}*
+_Daily Report_ | ${dateVal.split('.').reverse().join('.')}
+━━━━━━━━━━━━━━━━━━
 
-*💰 Sales Performance*
-━━━━━━━━━━━━━━━━
-*Monthly Target : ${shownNumber('monthlyTarget')}*
-MTD Target : ${shownNumber('mtdTarget')}
-MTD Sale : ${shownNumber('mtdSale')}
-MTD Variance : ${rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtVarianceMsg(mtdV) : '---'}
-
+*💰 SALES PERFORMANCE*
+──────────────────
 Day Target : ${shownNumber('dayTarget')}
 Today Sale : ${shownNumber('todaySale')}
-Day Variance : ${rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtVarianceMsg(dayV) : '---'}
+*Day Variance : ${rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtVarianceMsg(dayV) : '---'}*
+
+MTD Target : ${shownNumber('mtdTarget')}
+MTD Sale : ${shownNumber('mtdSale')}
+*MTD Variance : ${rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtVarianceMsg(mtdV) : '---'}*
+
+*Monthly Target : ${shownNumber('monthlyTarget')}*
 
 ADS : ${shownCalculation('ADS',ads,!!rawNum('mtdSale').trim())}
 ADT : ${shownCalculation('ADT',adt,!!rawNum('mtdTx').trim())}
 
-*🏆 GES & Win Score*
-━━━━━━━━━━━━━━━━
+*🏆 GES & WIN SCORE*
+──────────────────
 Today's GES Count : ${hasT ? todayTot.toLocaleString('en-US') : '---'}
 Today's Top Box : ${pc(hasT,'Today Top Box',todayTop)}
 Today's B2B : ${pc(hasT,'Today B2B',todayB2B)}
 
 MTD GES Count : ${v('totalResponses')}
-Smart GES : ${autoTot > 0 ? autoTot.toLocaleString('en-US') : '---'}
 MTD Top Box : ${pc(hasM,'MTD Top Box',topB)}
-MTD Win Score : ${formatPercentValue('mtdWinScore')}
 MTD B2B : ${pc(hasM,'MTD B2B',b2b)}
-MTD OSI (Overall Satisfaction) : ${pc(hasM,'Overall Satisfaction',osat)}
+MTD OSI : ${pc(hasM,'Overall Satisfaction',osat)}
 
-*🤖 HutBot Performance*
-━━━━━━━━━━━━━━━━
+*MTD Win Score : ${formatPercentValue('mtdWinScore')}*
+
+*🤖 HUTBOT PERFORMANCE*
+──────────────────
 Today's On Time : ${v('hutTodayOnTime')}
 Today's Late : ${v('hutTodayLate')}
 Today's Missed : ${v('hutTodayMissed')}
@@ -1453,42 +1416,42 @@ MTD On Time : ${v('hutMtdOnTime')}
 MTD Late : ${v('hutMtdLate')}
 MTD Missed : ${v('hutMtdMissed')}
 
-YTD On Time : ${v('hutYtdOnTime')}
+*YTD On Time : ${v('hutYtdOnTime')}*
 
-*🐉 Dragontail Performance*
-━━━━━━━━━━━━━━━━
-Today's No of Riders : ${v('todayRiders')}
-Today's No of Delivery (Transactions) : ${v('deliveryTx')}
-Today's Drive Time : ${minVal('todayDriveTime')}
-Today's Production Time U3 : ${v('productionU3')}
-Today's Out of Door Time U12 : ${v('outOfDoor')}
+*🐉 DRAGONTAIL PERFORMANCE*
+──────────────────
+Today's No. of Riders : ${v('todayRiders')}
+Today's No. of Deliveries : ${v('deliveryTx')}
+Today's Avg. Drive Time : ${minVal('todayDriveTime')}
+Today's U3 : ${v('productionU3')}
+Today's U12 : ${v('outOfDoor')}
+Today's U20 : ${v('hotFresh')}
 Today's U30 : ${v('under30')}
-Today's Hot & Fresh U20 : ${v('hotFresh')}
 Today's Dispatch Deviation : ${v('dispatchDev')}
 
-MTD Delivered at Place 200m : ${v('mtdDel200')}
-MTD Delivered at Place 500m : ${v('mtdDel500')}
 MTD U3 : ${v('mtdU3')}
 MTD U12 : ${v('mtdU12')}
-MTD Hot & Fresh U20 : ${v('mtdU20')}
+MTD U20 : ${v('mtdU20')}
 MTD U30 : ${v('mtdU30')}
+MTD Delivered @ Place 200m : ${v('mtdDel200')}
+MTD Delivered @ Place 500m : ${v('mtdDel500')}
 
-*🌟 5 Star Ratings*
-━━━━━━━━━━━━━━━━
-5 Star Overall Rating : ${v('overallRating')}
+*🌟 5 STAR RATINGS*
+──────────────────
+*5 Star Overall Rating : ${v('overallRating')}*
+Annual TMTO Star Rating : ${v('annualTMTurnover')}
+Win Score Star Rating : ${v('winScore')}
 Delivered U30 Star Rating : ${v('deliveredU30')}
-Annual TMTO star rating : ${v('annualTMTurnover')}
-Win-Score star Rating : ${v('winScore')}
-Brand Star Rating : ${v('brandRating')}
 FSCC Star Rating : ${v('fsccRating')}
-Hutbot On time Star Rating : ${v('hutbotOnTime')}
+Brand Rating Star Rating : ${v('brandRating')}
+HutBot On Time Star Rating : ${v('hutbotOnTime')}
 
-━━━━━━━━━━━━━━━━━
-🎯 *Tomorrow Target :* ${getTomorrowTarget(dateVal)}
-━━━━━━━━━━━━━━━━━
-`;
+━━━━━━━━━━━━━━━━━━
+*🎯 TOMORROW TARGET : ${getTomorrowTarget(dateVal)}*
+━━━━━━━━━━━━━━━━━━`;
 
   document.getElementById('msgOutput').value = msg;
+  const preview=document.getElementById('reportPreview'); if(preview && document.getElementById('previewPanel').open){ preview.replaceChildren(...msg.split('\n').map(line=>{const p=document.createElement('p'); const bold=line.startsWith('*')&&line.endsWith('*'); p.textContent=line.replace(/^\*|\*$/g,'').replace(/_Daily Report_/,'Daily Report'); if(bold)p.style.fontWeight='800'; return p;})); }
 
   updateSumNote('hutTodayNote', ['hutTodayOnTime','hutTodayLate','hutTodayMissed'], true);
   updateSumNote('hutMtdNote',   ['hutMtdOnTime','hutMtdLate','hutMtdMissed'], true);
@@ -1727,29 +1690,15 @@ function handleMISUpload(event) {
         return;
       }
       const dates = [];
-      const explicitYears = new Set();
       for (let i = 1; i < datesRow.length; i++) {
         const date = parseMISDateHeader(datesRow[i]);
         if (date) {
           dates.push({date, index:i});
-          if (date.year !== null) explicitYears.add(date.year);
         }
       }
-      const yearMatch = file.name.match(/\b(20\d{2})\b/);
-      const filenameYear = yearMatch ? Number(yearMatch[1]) : null;
-      if (explicitYears.size > 1 ||
-          (filenameYear && explicitYears.size && !explicitYears.has(filenameYear))) {
-        toast('The reporting year does not match the dates in the MIS file.', 'warning', 5000);
-        return;
-      }
-      const reportYear = filenameYear || (explicitYears.size ? [...explicitYears][0] : null);
-      if (!reportYear) {
-        toast('The reporting year is missing. Use a CSV filename that includes the year.', 'warning', 5000);
-        return;
-      }
+      const reportYear = parseAppDate(document.getElementById('date').value).year;
       const counts = Object.create(null);
       dates.forEach(item => {
-        if (item.date.year !== null && item.date.year !== reportYear) return;
         counts[item.date.month] = (counts[item.date.month] || 0) + 1;
       });
       const ranked = Object.entries(counts).sort((a,b) => b[1]-a[1]);
@@ -1763,7 +1712,7 @@ function handleMISUpload(event) {
       for (const item of dates) {
         const date = item.date;
         // Ignore unrelated trailing columns, including dates in another month.
-        if (date.month !== reportMonth || (date.year !== null && date.year !== reportYear)) continue;
+        if (date.month !== reportMonth) continue;
         const key = date.year !== null
           ? reportYear + '-' + String(reportMonth).padStart(2,'0') + '-' + String(date.day).padStart(2,'0')
           : date.day + '-' + monthNames[reportMonth-1];
