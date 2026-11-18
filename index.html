@@ -411,7 +411,7 @@
   .input-group.g-ytd input[type=text]   { border-left: 4px solid #8B5CF6; }
   .sum-note { grid-column: 1 / -1; font-size: 12px; font-weight: 700; }
   .sum-note:empty { display: none; }
-  .wa-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .wa-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
   .wa-row .btn-whatsapp { font-size: 18px; padding: 22px 8px; gap: 8px; }
   .btn-whatsapp.m2 { background: linear-gradient(135deg, #128C7E, #0E7A6E); box-shadow: 0 8px 24px rgba(18, 140, 126, 0.25); }
 
@@ -713,15 +713,13 @@
 
   <!-- HIDDEN TEXTAREA (JS compat) -->
   <textarea id="msgOutput" style="display:none;"></textarea>
-  <textarea id="msgOutput2" style="display:none;"></textarea>
 
   <!-- SEND & UPLOAD CARD -->
   <div class="card" style="display:flex;flex-direction:column;gap:24px;">
     
     <!-- WhatsApp Button Styled Elegantly -->
     <div class="wa-row">
-      <button class="btn-whatsapp" onclick="sendWA(1)">💬 Message 1</button>
-      <button class="btn-whatsapp m2" onclick="sendWA(2)">💬 Message 2</button>
+      <button class="btn-whatsapp" onclick="sendWA()">💬 Share Daily Report</button>
     </div>
     
     <hr style="margin:0;">
@@ -1407,45 +1405,78 @@ function calcAndRender() {
   });
 
   const v = id => document.getElementById(id)?.value || '---';
+  const pc = (has, key, val) => (has || customCalcs[key] !== undefined) ? val + '%' : '---';
+  const minVal = id => {
+    const sRaw = rawNum(id).trim(); const n = parseFloat(sRaw);
+    return (sRaw === '' || isNaN(n)) ? '---' : n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' min';
+  };
+  const hasM = autoTot > 0, hasT = todayTot > 0;
   const msg =
 `*🍕 Pizza Hut ${selectedOutlet}*
 *Daily Report - ${v('date')}*
 ━━━━━━━━━━━━━━━━
 
+*💰 Sales Performance*
+━━━━━━━━━━━━━━━━
 *Monthly Target : ${shownNumber('monthlyTarget')}*
-
 MTD Target : ${shownNumber('mtdTarget')}
 MTD Sale : ${shownNumber('mtdSale')}
 MTD Variance : ${rawNum('mtdSale').trim() && rawNum('mtdTarget').trim() ? fmtVarianceMsg(mtdV) : '---'}
 
 Day Target : ${shownNumber('dayTarget')}
 Today Sale : ${shownNumber('todaySale')}
-Variance : ${rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtVarianceMsg(dayV) : '---'}
+Day Variance : ${rawNum('todaySale').trim() && rawNum('dayTarget').trim() ? fmtVarianceMsg(dayV) : '---'}
 
 ADS : ${shownCalculation('ADS',ads,!!rawNum('mtdSale').trim())}
 ADT : ${shownCalculation('ADT',adt,!!rawNum('mtdTx').trim())}
 
-HUTBOT MTD : ${v('hutMtdOnTime')}
-HUTBOT Today : ${v('hutTodayOnTime')}
+*🏆 GES & Win Score*
+━━━━━━━━━━━━━━━━
+Today's GES Count : ${hasT ? todayTot.toLocaleString('en-US') : '---'}
+Today's Top Box : ${pc(hasT,'Today Top Box',todayTop)}
+Today's B2B : ${pc(hasT,'Today B2B',todayB2B)}
 
-MTD H&F U20 : ${v('mtdU20')}
+MTD GES Count : ${v('totalResponses')}
+Smart GES : ${autoTot > 0 ? autoTot.toLocaleString('en-US') : '---'}
+MTD Top Box : ${pc(hasM,'MTD Top Box',topB)}
+MTD Win Score : ${formatPercentValue('mtdWinScore')}
+MTD B2B : ${pc(hasM,'MTD B2B',b2b)}
+MTD OSI (Overall Satisfaction) : ${pc(hasM,'Overall Satisfaction',osat)}
+
+*🤖 HutBot Performance*
+━━━━━━━━━━━━━━━━
+Today's On Time : ${v('hutTodayOnTime')}
+Today's Late : ${v('hutTodayLate')}
+Today's Missed : ${v('hutTodayMissed')}
+
+MTD On Time : ${v('hutMtdOnTime')}
+MTD Late : ${v('hutMtdLate')}
+MTD Missed : ${v('hutMtdMissed')}
+
+YTD On Time : ${v('hutYtdOnTime')}
+
+*🐉 Dragontail Performance*
+━━━━━━━━━━━━━━━━
+Today's No of Riders : ${v('todayRiders')}
+Today's No of Delivery (Transactions) : ${v('deliveryTx')}
+Today's Drive Time : ${minVal('todayDriveTime')}
+Today's Production Time U3 : ${v('productionU3')}
+Today's Out of Door Time U12 : ${v('outOfDoor')}
+Today's U30 : ${v('under30')}
+Today's Hot & Fresh U20 : ${v('hotFresh')}
+Today's Dispatch Deviation : ${v('dispatchDev')}
+
+MTD Delivered at Place 200m : ${v('mtdDel200')}
+MTD Delivered at Place 500m : ${v('mtdDel500')}
+MTD U3 : ${v('mtdU3')}
+MTD U12 : ${v('mtdU12')}
+MTD Hot & Fresh U20 : ${v('mtdU20')}
 MTD U30 : ${v('mtdU30')}
 
-Under 30 : ${v('under30')}
-Hot & Fresh U20 : ${v('hotFresh')}
-Out of Door time U12 : ${v('outOfDoor')}
-Production time U3 : ${v('productionU3')}
-Delivery Transactions : ${v('deliveryTx')}
-Dispatch Deviation : ${v('dispatchDev')}
-
-MTD GES : ${v('totalResponses')}
-Smart GES : ${autoTot > 0 ? autoTot.toLocaleString('en-US') : '---'}
-Top Box : ${autoTot > 0 ? topB + '%' : '---'}
-B2B : ${autoTot > 0 ? b2b + '%' : '---'}
-Overall Satisfaction : ${autoTot > 0 ? osat + '%' : '---'}
-
+*🌟 5 Star Ratings*
+━━━━━━━━━━━━━━━━
 5 Star Overall Rating : ${v('overallRating')}
-Delivered U30 : ${v('deliveredU30')}
+Delivered U30 Star Rating : ${v('deliveredU30')}
 Annual TMTO star rating : ${v('annualTMTurnover')}
 Win-Score star Rating : ${v('winScore')}
 Brand Star Rating : ${v('brandRating')}
@@ -1458,59 +1489,6 @@ Hutbot On time Star Rating : ${v('hutbotOnTime')}
 `;
 
   document.getElementById('msgOutput').value = msg;
-
-  // ---- Message 2 ----
-  const pc = (has, key, val) => (has || customCalcs[key] !== undefined) ? val + '%' : '---';
-  const minVal = id => {
-    const sRaw = rawNum(id).trim(); const n = parseFloat(sRaw);
-    return (sRaw === '' || isNaN(n)) ? '---' : n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' min';
-  };
-  const hasM = autoTot > 0, hasT = todayTot > 0;
-  const msg2 =
-`*🍕 Daily Update - ${selectedOutlet}*
-*Date :* ${v('date')}
-━━━━━━━━━━━━━━━━
-
-*🏆 Win Score*
-━━━━━━━━━━━━━━━━
-Today's GES Count : ${hasT ? todayTot.toLocaleString('en-US') : '---'}
-Today's Top Box : ${pc(hasT,'Today Top Box',todayTop)}
-Today's B2B : ${pc(hasT,'Today B2B',todayB2B)}
-
-MTD GES Count : ${v('totalResponses')}
-MTD Top Box : ${pc(hasM,'MTD Top Box',topB)}
-MTD Win Score : ${formatPercentValue('mtdWinScore')}
-MTD B2B : ${pc(hasM,'MTD B2B',b2b)}
-MTD OSI : ${pc(hasM,'Overall Satisfaction',osat)}
-
-*🤖 Hut Bot Performance*
-━━━━━━━━━━━━━━━━
-Today's On Time : ${v('hutTodayOnTime')}
-Today's Late : ${v('hutTodayLate')}
-Today's Missed : ${v('hutTodayMissed')}
-
-MTD On Time : ${v('hutMtdOnTime')}
-MTD Late : ${v('hutMtdLate')}
-MTD Missed : ${v('hutMtdMissed')}
-YTD On Time : ${v('hutYtdOnTime')}
-
-*🐉 Dragontail Performance*
-━━━━━━━━━━━━━━━━
-Today's No of Riders : ${v('todayRiders')}
-Today's No of Delivery : ${v('deliveryTx')}
-Today's Drive Time : ${minVal('todayDriveTime')}
-Today's U3 : ${v('productionU3')}
-Today's U12 : ${v('outOfDoor')}
-Today's U30 : ${v('under30')}
-
-MTD Delivered at Place 200m : ${v('mtdDel200')}
-MTD Delivered at Place 500m : ${v('mtdDel500')}
-MTD U3 : ${v('mtdU3')}
-MTD U12 : ${v('mtdU12')}
-MTD U20 : ${v('mtdU20')}
-MTD U30 : ${v('mtdU30')}
-`;
-  document.getElementById('msgOutput2').value = msg2;
 
   updateSumNote('hutTodayNote', ['hutTodayOnTime','hutTodayLate','hutTodayMissed'], true);
   updateSumNote('hutMtdNote',   ['hutMtdOnTime','hutMtdLate','hutMtdMissed'], true);
@@ -1547,11 +1525,10 @@ function formatPercentValue(id) {
   const n = Number(raw.replace(/[,%]/g,''));
   return Number.isFinite(n) && n >= 0 && n <= 100 ? n.toLocaleString('en-US',{maximumFractionDigits:2}) + '%' : '---';
 }
-function sendWA(n) {
-  // Called directly by Message 1 or Message 2. Keep the existing message
-  // generation and all business calculations unchanged.
+function sendWA() {
+  // Generate the consolidated report directly from the current values.
   calcAndRender();
-  const output = document.getElementById(n === 2 ? 'msgOutput2' : 'msgOutput');
+  const output = document.getElementById('msgOutput');
   const message = output ? output.value : '';
   if (!message.trim()) {
     toast('No report message is available.', 'warning');
