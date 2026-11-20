@@ -743,6 +743,7 @@ html, body { touch-action: pan-x pan-y; }
 </footer>
 
 <script src="./report-store.js"></script>
+<script src="./mis-defaults.js"></script>
 <script>
 // FORCE SERVICE WORKER UPDATE IMMEDIATELY
 if ('serviceWorker' in navigator) {
@@ -1242,40 +1243,34 @@ function getMatchingMISForDate(dateValue) {
   const selected = parseAppDate(dateValue);
   if (!selected) return null;
   const expectedPeriod = selected.year + '-' + String(selected.month).padStart(2, '0');
-  const mis = ReportStore.getMIS(selectedOutlet, expectedPeriod);
-  if (!mis || !mis.data || typeof mis.data !== 'object' || Array.isArray(mis.data)) return null;
-  // A CSV identified as belonging to another outlet can never auto-fill here.
-  if (mis.sourceOutlet && mis.sourceOutlet !== selectedOutlet) return null;
+  let mis = ReportStore.getMIS(selectedOutlet, expectedPeriod);
+  const defaults = window.PH_MIS_DEFAULTS;
+  const verified = defaults && defaults.period === expectedPeriod &&
+    defaults.outlets && defaults.outlets[selectedOutlet];
+  const belongsToOutlet = candidate => candidate && candidate.data &&
+    typeof candidate.data === 'object' && !Array.isArray(candidate.data) &&
+    candidate.sourceOutlet === selectedOutlet && candidate.period === expectedPeriod;
+  // Exact, verified CSV-derived targets override potentially corrupted old MIS
+  // entries. A subsequent explicit CSV import may replace the bundled defaults.
+  if (verified && !mis?.userApprovedReplacement) {
+    const data = {};
+    defaults.outlets[selectedOutlet].forEach((pair, index) => {
+      data[String(index + 1)] = {day:pair[0], mtd:pair[1],
+        dateDay:index+1, dateMonth:selected.month, dateYear:selected.year};
+    });
+    mis = {filename:selectedOutlet + ' November MIS (verified)', period:expectedPeriod,
+      sourceOutlet:selectedOutlet, verifiedOutlet:true, data};
+  } else if (!belongsToOutlet(mis)) {
+    return null;
+  }
   const records = Object.entries(mis.data)
     .map(([key, value]) => normaliseMISRecord(key, value))
     .filter(Boolean);
-  if (!records.length) return null;
-  let declaredPeriod = typeof mis.period === 'string' ? mis.period : null;
-  if (!declaredPeriod && Number.isInteger(Number(mis.reportYear)) &&
-      Number.isInteger(Number(mis.reportMonth)) && Number(mis.reportMonth) >= 1 &&
-      Number(mis.reportMonth) <= 12) {
-    declaredPeriod = Number(mis.reportYear) + '-' + String(mis.reportMonth).padStart(2, '0');
-  }
-  // Some older saved files have no metadata; accept them only if their
-  // explicitly dated rows identify one unambiguous dominant year/month.
-  if (!declaredPeriod) {
-    const counts = Object.create(null);
-    for (const record of records) {
-      if (!Number.isInteger(record.year)) continue;
-      const key = record.year + '-' + String(record.month).padStart(2, '0');
-      counts[key] = (counts[key] || 0) + 1;
-    }
-    const ranked = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    if (!ranked.length || (ranked[1] && ranked[0][1] === ranked[1][1])) return null;
-    declaredPeriod = ranked[0][0];
-  }
-  if (declaredPeriod !== expectedPeriod) return null;
   const monthRecords = records.filter(record =>
-    record.month === selected.month);
+    record.month === selected.month && (record.year === null || record.year === selected.year));
   if (!monthRecords.length) return null;
   return {mis, selected, monthRecords};
 }
-
 function getTomorrowTarget(dateVal) {
   try {
     const match = getMatchingMISForDate(dateVal);
@@ -1717,7 +1712,7 @@ function parseMISFile(text, file) {
 
   return {outlet, value: {
     filename:file.name, period, reportYear, reportMonth, data:parsedData,
-    sourceOutlet:outlet, verifiedOutlet:true
+    sourceOutlet:outlet, verifiedOutlet:true, userApprovedReplacement:true
   }};
 }
 async function handleMISUpload(event) {
