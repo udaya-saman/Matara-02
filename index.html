@@ -698,7 +698,7 @@ html, body { touch-action: pan-x pan-y; }
         placeholder="-" 
         style="font-size:15px; cursor:pointer;">
     </div>
-<div class="period-legend"><b style="color:#ffffff">● Today</b><b style="color:#83e5a8">● MTD</b><b style="color:#f3c454">● YTD</b></div>
+<div class="period-legend" style="font-size:70%"><b style="color:#ffffff">● Today</b><b style="color:#83e5a8">● MTD</b><b style="color:#f3c454">● YTD</b></div>
 <details class="report-group" open><summary>💰 Sales Performance</summary><div class="grid-2" id="cat-gamma"></div></details>
 <details class="report-group"><summary>🏆 GES & Win Score</summary><div class="grid-2" id="cat-ges"></div></details>
 <details class="report-group"><summary>🤖 HutBot Performance</summary><div class="grid-2" id="cat-hutbot"></div></details>
@@ -1225,18 +1225,18 @@ function focusNext(el) {
 }
 
 function extractMISOutlet(lines) {
+  const normalize = value => String(value || '').toLowerCase()
+    .replace(/[-_]/g, ' ').replace(/\b0?2\b/g, '02')
+    .replace(/\s+/g, ' ').trim();
   for (const line of lines.slice(0, 50)) {
     const cols = parseCSVLine(line);
     const first = String(cols[0] || '').trim();
     if (!/^LOCATION\s*:/i.test(first)) continue;
     const raw = String(cols[1] || first.replace(/^LOCATION\s*:/i, '')).trim();
-    const normalized = raw.toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ')
-      .replace(/\b0?2\b/g, '02').trim();
-    const outlet = ReportStore.OUTLETS.find(name =>
-      name.toLowerCase().replace(/\b0?2\b/g, '02') === normalized);
-    return {found: true, outlet: outlet || null};
+    const outlet = ReportStore.OUTLETS.find(name => normalize(name) === normalize(raw));
+    return {found:true, outlet:outlet || null};
   }
-  return {found: false, outlet: null};
+  return {found:false, outlet:null};
 }
 function getMatchingMISForDate(dateValue) {
   const selected = parseAppDate(dateValue);
@@ -1754,11 +1754,15 @@ async function handleMISUpload(event) {
       saveToStorage();
     }
     if (status) {
-      status.textContent = saved + ' MIS file(s) saved for ' + new Date().getFullYear() +
-        (errors.length ? '. Problems: ' + errors.join(' | ') : '.');
+      const month = updates[0]?.value.period || (new Date().getFullYear() + '-??');
+      const savedOutlets = ReportStore.OUTLETS.filter(outlet => ReportStore.getMIS(outlet, month));
+      const missing = ReportStore.OUTLETS.filter(outlet => !savedOutlets.includes(outlet));
+      status.textContent = 'Saved for ' + month + ': ' + (savedOutlets.join(', ') || 'none') +
+        (missing.length ? '. Missing: ' + missing.join(', ') + '. Select those CSV files to import.' : '. All six outlets ready.') +
+        (errors.length ? ' Problems: ' + errors.join(' | ') : '');
       status.style.color = errors.length ? '#f3c454' : '#83e5a8';
     }
-    toast(saved + ' MIS file(s) saved' + (errors.length ? '; review errors below' : ''), errors.length ? 'warning' : 'success');
+    toast(saved + ' MIS file(s) saved. Check the outlet list below.', errors.length ? 'warning' : 'success');
   } finally { event.target.value = ''; }
 }
 
