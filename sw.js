@@ -2,7 +2,7 @@
 const BASE = self.registration.scope;
 const CACHE_PREFIX = "ph-report:" + BASE + ":";
 const CACHE_NAME = CACHE_PREFIX + "v22";
-const APP_SHELL = ["", "index.html", "report-store.js", "manifest.json", "icons/icon-192.png", "icons/icon-512.png"]
+const APP_SHELL = ["", "index.html", "report-store.js", "mis-defaults.js", "manifest.json", "icons/icon-192.png", "icons/icon-512.png"]
   .map(path => new URL(path, BASE).href);
 
 self.addEventListener("install", event => {
